@@ -1,23 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Desktop.Models
 {
-    public class RestaurantDish
+    public class RestaurantDish : INotifyPropertyChanged
     {
-        public int RestaurantId { get; set; }
-        public int DishId { get; set; }
-        public string RestaurantName { get; set; }
-        public string DishName { get; set; }
-        public decimal Price { get; set; }
-        public bool IsAvailable { get; set; }
+        private int _restaurantId;
+        private int _dishId;
 
-        public RestaurantDish()
+        public int RestaurantId
         {
-            IsAvailable = true;
+            get => _restaurantId;
+            set { _restaurantId = value; OnPropertyChanged(nameof(RestaurantId)); }
+        }
+
+        public int DishId
+        {
+            get => _dishId;
+            set { _dishId = value; OnPropertyChanged(nameof(DishId)); }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

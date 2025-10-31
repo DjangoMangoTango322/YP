@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -22,46 +23,109 @@ namespace Desktop.Pages
     /// </summary>
     public partial class RegisterPage : Page
     {
+        private string connectionString = "Server=localhost;Database=RestaurantDB;Integrated Security=true;";
         public RegisterPage()
         {
             InitializeComponent();
             TxtFirstName.Focus();
 
-            // Устанавливаем максимальную длину для предотвращения переполнения
-            TxtFirstName.MaxLength = 50;
-            TxtLastName.MaxLength = 50;
-            TxtEmail.MaxLength = 100;
-            TxtPhone.MaxLength = 20;
+            // Подписываемся на события изменения текста
+            TxtFirstName.TextChanged += TextBox_TextChanged;
+            TxtLastName.TextChanged += TextBox_TextChanged;
+            TxtEmail.TextChanged += TextBox_TextChanged;
+            TxtPhone.TextChanged += TextBox_TextChanged;
+            TxtPassword.PasswordChanged += PasswordBox_PasswordChanged;
+            TxtConfirmPassword.PasswordChanged += PasswordBox_PasswordChanged;
         }
 
         private void BtnRegister_Click(object sender, RoutedEventArgs e)
         {
-            if (!ValidateForm())
-                return;
+            AttemptRegistration();
+        }
 
-            // Симуляция успешной регистрации
-            ShowMessage("Администратор успешно зарегистрирован!", "Успех");
-
-            // Возврат на страницу входа
-            if (Application.Current.MainWindow is MainWindow mainWindow)
+        private void TextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
             {
-                mainWindow.MainFrame.Navigate(new LoginPage());
+                MoveToNextField(sender);
             }
         }
 
-        private bool ValidateForm()
+        private void PasswordBox_KeyDown(object sender, KeyEventArgs e)
         {
-            ClearError();
-
-            // Проверка имени
-            if (string.IsNullOrWhiteSpace(TxtFirstName.Text))
+            if (e.Key == Key.Enter)
             {
-                ShowError("Пожалуйста, введите имя");
+                AttemptRegistration();
+            }
+        }
+
+        private void LinkLogin_Click(object sender, RoutedEventArgs e)
+        {
+            // Возврат на страницу входа
+            NavigationService.GoBack();
+        }
+
+        private void MoveToNextField(object currentField)
+        {
+            if (currentField == TxtFirstName)
+                TxtLastName.Focus();
+            else if (currentField == TxtLastName)
+                TxtEmail.Focus();
+            else if (currentField == TxtEmail)
+                TxtPhone.Focus();
+            else if (currentField == TxtPhone)
+                TxtPassword.Focus();
+            else if (currentField == TxtPassword)
+                TxtConfirmPassword.Focus();
+            else if (currentField == TxtConfirmPassword)
+                AttemptRegistration();
+        }
+
+        private void AttemptRegistration()
+        {
+            string firstName = TxtFirstName.Text.Trim();
+            string lastName = TxtLastName.Text.Trim();
+            string email = TxtEmail.Text.Trim();
+            string phone = TxtPhone.Text.Trim();
+            string password = TxtPassword.Password;
+            string confirmPassword = TxtConfirmPassword.Password;
+
+            // Валидация
+            if (!ValidateInput(firstName, lastName, email, phone, password, confirmPassword))
+                return;
+
+            // Показываем индикатор загрузки
+            SetLoadingState(true);
+
+            // Попытка регистрации
+            System.Threading.Tasks.Task.Run(() =>
+            {
+                bool isRegistered = RegisterUser(firstName, lastName, email, phone, password);
+
+                Dispatcher.Invoke(() =>
+                {
+                    SetLoadingState(false);
+
+                    if (isRegistered)
+                    {
+                        ShowSuccess("Пользователь успешно зарегистрирован!");
+                        ClearFields();
+                    }
+                });
+            });
+        }
+
+        private bool ValidateInput(string firstName, string lastName, string email, string phone, string password, string confirmPassword)
+        {
+            // Проверка имени
+            if (string.IsNullOrWhiteSpace(firstName))
+            {
+                ShowError("Введите имя");
                 TxtFirstName.Focus();
                 return false;
             }
 
-            if (TxtFirstName.Text.Length < 2)
+            if (firstName.Length < 2)
             {
                 ShowError("Имя должно содержать минимум 2 символа");
                 TxtFirstName.Focus();
@@ -69,14 +133,14 @@ namespace Desktop.Pages
             }
 
             // Проверка фамилии
-            if (string.IsNullOrWhiteSpace(TxtLastName.Text))
+            if (string.IsNullOrWhiteSpace(lastName))
             {
-                ShowError("Пожалуйста, введите фамилию");
+                ShowError("Введите фамилию");
                 TxtLastName.Focus();
                 return false;
             }
 
-            if (TxtLastName.Text.Length < 2)
+            if (lastName.Length < 2)
             {
                 ShowError("Фамилия должна содержать минимум 2 символа");
                 TxtLastName.Focus();
@@ -84,58 +148,59 @@ namespace Desktop.Pages
             }
 
             // Проверка email
-            if (string.IsNullOrWhiteSpace(TxtEmail.Text))
+            if (string.IsNullOrWhiteSpace(email))
             {
-                ShowError("Пожалуйста, введите email");
+                ShowError("Введите email");
                 TxtEmail.Focus();
                 return false;
             }
 
-            if (!IsValidEmail(TxtEmail.Text))
+            if (!IsValidEmail(email))
             {
-                ShowError("Пожалуйста, введите корректный email адрес");
+                ShowError("Введите корректный email");
                 TxtEmail.Focus();
                 return false;
             }
 
             // Проверка телефона
-            if (string.IsNullOrWhiteSpace(TxtPhone.Text))
+            if (string.IsNullOrWhiteSpace(phone))
             {
-                ShowError("Пожалуйста, введите телефон");
+                ShowError("Введите телефон");
                 TxtPhone.Focus();
                 return false;
             }
 
             // Проверка пароля
-            if (TxtPassword.Password.Length == 0)
+            if (string.IsNullOrWhiteSpace(password))
             {
-                ShowError("Пожалуйста, введите пароль");
+                ShowError("Введите пароль");
                 TxtPassword.Focus();
                 return false;
             }
 
-            if (TxtPassword.Password.Length < 6)
+            if (password.Length < 6)
             {
                 ShowError("Пароль должен содержать минимум 6 символов");
                 TxtPassword.Focus();
                 return false;
             }
 
-            if (TxtConfirmPassword.Password.Length == 0)
+            // Проверка подтверждения пароля
+            if (string.IsNullOrWhiteSpace(confirmPassword))
             {
-                ShowError("Пожалуйста, подтвердите пароль");
+                ShowError("Подтвердите пароль");
                 TxtConfirmPassword.Focus();
                 return false;
             }
 
-            if (TxtPassword.Password != TxtConfirmPassword.Password)
+            if (password != confirmPassword)
             {
                 ShowError("Пароли не совпадают");
                 TxtConfirmPassword.Focus();
-                TxtConfirmPassword.SelectAll();
                 return false;
             }
 
+            HideError();
             return true;
         }
 
@@ -152,74 +217,143 @@ namespace Desktop.Pages
             }
         }
 
-        private void LinkLogin_Click(object sender, RoutedEventArgs e)
+        private bool RegisterUser(string firstName, string lastName, string email, string phone, string password)
         {
-            if (Application.Current.MainWindow is MainWindow mainWindow)
+            try
             {
-                mainWindow.MainFrame.Navigate(new LoginPage());
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+
+                    // Проверяем, не существует ли уже пользователь с таким email
+                    var checkQuery = "SELECT COUNT(*) FROM users WHERE email = @email";
+                    using (var checkCommand = new SqlCommand(checkQuery, connection))
+                    {
+                        checkCommand.Parameters.AddWithValue("@email", email);
+                        int existingUsers = Convert.ToInt32(checkCommand.ExecuteScalar());
+
+                        if (existingUsers > 0)
+                        {
+                            Dispatcher.Invoke(() =>
+                            {
+                                ShowError("Пользователь с таким email уже существует");
+                            });
+                            return false;
+                        }
+                    }
+
+                    // Регистрируем нового пользователя с паролем
+                    var insertQuery = @"
+                        INSERT INTO users (first_name, last_name, email, phone, password, created_at)
+                        VALUES (@first_name, @last_name, @email, @phone, @password, @created_at);
+                        SELECT SCOPE_IDENTITY();";
+
+                    using (var command = new SqlCommand(insertQuery, connection))
+                    {
+                        command.Parameters.AddWithValue("@first_name", firstName);
+                        command.Parameters.AddWithValue("@last_name", lastName);
+                        command.Parameters.AddWithValue("@email", email);
+                        command.Parameters.AddWithValue("@phone", phone);
+                        command.Parameters.AddWithValue("@password", password); // В реальном приложении используйте хеширование!
+                        command.Parameters.AddWithValue("@created_at", DateTime.Now);
+
+                        var newId = Convert.ToInt32(command.ExecuteScalar());
+
+                        if (newId > 0)
+                        {
+                            Dispatcher.Invoke(() =>
+                            {
+                                ShowSuccess($"Пользователь успешно зарегистрирован!\nID: {newId}");
+                            });
+                            return true;
+                        }
+                    }
+                }
             }
+            catch (SqlException sqlEx)
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    ShowError($"Ошибка базы данных: {sqlEx.Message}");
+                });
+                return false;
+            }
+            catch (Exception ex)
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    ShowError($"Ошибка регистрации: {ex.Message}");
+                });
+                return false;
+            }
+
+            return false;
+        }
+
+        private void SetLoadingState(bool isLoading)
+        {
+            BtnRegister.Content = isLoading ? "⏳ Регистрация..." : "Зарегистрировать";
+            BtnRegister.IsEnabled = !isLoading;
+            TxtFirstName.IsEnabled = !isLoading;
+            TxtLastName.IsEnabled = !isLoading;
+            TxtEmail.IsEnabled = !isLoading;
+            TxtPhone.IsEnabled = !isLoading;
+            TxtPassword.IsEnabled = !isLoading;
+            TxtConfirmPassword.IsEnabled = !isLoading;
+            LinkLogin.IsEnabled = !isLoading;
         }
 
         private void ShowError(string message)
         {
             TxtError.Text = message;
+            TxtError.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 107, 107));
+            ErrorBorder.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(90, 0, 0));
             ErrorBorder.Visibility = Visibility.Visible;
-
-            var animation = new DoubleAnimation(0, 1, TimeSpan.FromSeconds(0.3));
-            ErrorBorder.BeginAnimation(UIElement.OpacityProperty, animation);
         }
 
-        private void ClearError()
+        private void ShowSuccess(string message)
         {
-            var animation = new DoubleAnimation(1, 0, TimeSpan.FromSeconds(0.3));
-            animation.Completed += (s, e) => ErrorBorder.Visibility = Visibility.Collapsed;
-            ErrorBorder.BeginAnimation(UIElement.OpacityProperty, animation);
+            TxtError.Text = message;
+            TxtError.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(107, 255, 107));
+            ErrorBorder.Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(0, 90, 0));
+            ErrorBorder.Visibility = Visibility.Visible;
         }
 
-        private void TextBox_KeyDown(object sender, KeyEventArgs e)
+        private void HideError()
         {
-            if (e.Key == Key.Enter)
-            {
-                MoveToNextField(sender as UIElement);
-            }
+            ErrorBorder.Visibility = Visibility.Collapsed;
         }
 
-        private void PasswordBox_KeyDown(object sender, KeyEventArgs e)
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (e.Key == Key.Enter)
-            {
-                if (sender == TxtConfirmPassword)
-                {
-                    BtnRegister_Click(sender, e);
-                }
-                else
-                {
-                    MoveToNextField(sender as UIElement);
-                }
-            }
+            HideError();
         }
 
-        private void MoveToNextField(UIElement currentElement)
+        private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
         {
-            var elements = new UIElement[]
-            {
-                TxtFirstName, TxtLastName, TxtEmail, TxtPhone,
-                TxtPassword, TxtConfirmPassword, BtnRegister
-            };
-
-            for (int i = 0; i < elements.Length - 1; i++)
-            {
-                if (elements[i] == currentElement)
-                {
-                    elements[i + 1].Focus();
-                    break;
-                }
-            }
+            HideError();
         }
 
-        private void ShowMessage(string message, string title)
+        private void ClearFields()
         {
-            MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Information);
+            TxtFirstName.Clear();
+            TxtLastName.Clear();
+            TxtEmail.Clear();
+            TxtPhone.Clear();
+            TxtPassword.Clear();
+            TxtConfirmPassword.Clear();
+            TxtFirstName.Focus();
+        }
+
+        // Метод для тестирования (можно удалить в продакшене)
+        public void FillTestData()
+        {
+            TxtFirstName.Text = "Тест";
+            TxtLastName.Text = "Пользователь";
+            TxtEmail.Text = "test@example.com";
+            TxtPhone.Text = "+7 (999) 123-45-67";
+            TxtPassword.Password = "password123";
+            TxtConfirmPassword.Password = "password123";
         }
     }
 }

@@ -1,36 +1,76 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows;
 
 namespace Desktop.Models
 {
-    public class Booking
+    public class Booking : INotifyPropertyChanged
     {
-        public int Id { get; set; }
-        public int UserId { get; set; }
-        public int RestaurantId { get; set; }
-        public DateTime BookingDate { get; set; }
-        public string BookingTime { get; set; }
-        public int NumberOfGuests { get; set; }
-        public string Status { get; set; } 
-        public string SpecialRequests { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
-        public string UserName { get; set; }
-        public string RestaurantName { get; set; }
-        public string UserPhone { get; set; }
-        public string UserEmail { get; set; }
+        private int _id;
+        private int _userId;
+        private int _restaurantId;
+        private DateTime _bookingDate;
+        private TimeSpan _bookingTime;
+        private int _numberOfGuests;
+        private string _status;
+        private DateTime _createdAt;
 
-        public Visibility ShowConfirmButton =>
-            Status == "pending" ? Visibility.Visible : Visibility.Collapsed;
-
-        public Booking()
+        public int Id
         {
-            CreatedAt = DateTime.Now;
-            Status = "pending";
+            get => _id;
+            set { _id = value; OnPropertyChanged(nameof(Id)); }
+        }
+
+        public int UserId
+        {
+            get => _userId;
+            set { _userId = value; OnPropertyChanged(nameof(UserId)); }
+        }
+
+        public int RestaurantId
+        {
+            get => _restaurantId;
+            set { _restaurantId = value; OnPropertyChanged(nameof(RestaurantId)); }
+        }
+
+        public DateTime BookingDate
+        {
+            get => _bookingDate;
+            set { _bookingDate = value; OnPropertyChanged(nameof(BookingDate)); }
+        }
+
+        public TimeSpan BookingTime
+        {
+            get => _bookingTime;
+            set { _bookingTime = value; OnPropertyChanged(nameof(BookingTime)); }
+        }
+
+        public int NumberOfGuests
+        {
+            get => _numberOfGuests;
+            set { _numberOfGuests = value; OnPropertyChanged(nameof(NumberOfGuests)); }
+        }
+
+        public string Status
+        {
+            get => _status;
+            set { _status = value; OnPropertyChanged(nameof(Status)); }
+        }
+
+        public DateTime CreatedAt
+        {
+            get => _createdAt;
+            set { _createdAt = value; OnPropertyChanged(nameof(CreatedAt)); }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected virtual void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
+

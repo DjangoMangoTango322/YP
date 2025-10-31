@@ -5,10 +5,10 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:Desktop.Pages"
       mc:Ignorable="d" 
-      Title="RegisterPage">
+      Title="RegisterPage" Height="621" >
 
     <Grid Background="{StaticResource BackgroundBrush}">
-        <Border Width="440" Height="580" 
+        <Border Width="440" Height="620"
                 HorizontalAlignment="Center" VerticalAlignment="Center"
                 Background="{StaticResource CardBrush}"
                 BorderBrush="#444444" BorderThickness="1" 
@@ -25,7 +25,7 @@
                                   Foreground="{StaticResource AccentBrush}" 
                                   FontSize="24" FontWeight="Bold"
                                   HorizontalAlignment="Center"/>
-                        <TextBlock Text="администратора" 
+                        <TextBlock Text="нового пользователя" 
                                   Foreground="{StaticResource TextSecondaryBrush}" 
                                   FontSize="16" FontWeight="Medium"
                                   HorizontalAlignment="Center" Margin="0,5,0,0"/>
@@ -34,71 +34,89 @@
                     </StackPanel>
 
                     <!-- Registration Form -->
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="10"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
+                    <TextBlock Text="Имя" Margin="0,0,0,8" 
+                              Foreground="{StaticResource TextSecondaryBrush}" 
+                              FontWeight="SemiBold" FontSize="13"/>
+                    <Border BorderBrush="#404040" BorderThickness="1" CornerRadius="4">
+                        <TextBox x:Name="TxtFirstName" Height="38" 
+                                FontSize="14" Padding="10"
+                                KeyDown="TextBox_KeyDown"
+                                Background="#2A2A2A"
+                                Foreground="{StaticResource TextBrush}"
+                                BorderThickness="0"/>
+                    </Border>
 
-                        <!-- Left Column -->
-                        <StackPanel Grid.Column="0">
-                            <TextBlock Text="Имя" Margin="0,0,0,8" 
-                                      Foreground="{StaticResource TextSecondaryBrush}" 
-                                      FontWeight="SemiBold" FontSize="13"/>
-                            <TextBox x:Name="TxtFirstName" Height="38" 
+                    <TextBlock Text="Фамилия" Margin="0,15,0,8" 
+                              Foreground="{StaticResource TextSecondaryBrush}" 
+                              FontWeight="SemiBold" FontSize="13"/>
+                    <Border BorderBrush="#404040" BorderThickness="1" CornerRadius="4">
+                        <TextBox x:Name="TxtLastName" Height="38" 
+                                FontSize="14" Padding="10"
+                                KeyDown="TextBox_KeyDown"
+                                Background="#2A2A2A"
+                                Foreground="{StaticResource TextBrush}"
+                                BorderThickness="0"/>
+                    </Border>
+
+                    <TextBlock Text="Email" Margin="0,15,0,8" 
+                              Foreground="{StaticResource TextSecondaryBrush}" 
+                              FontWeight="SemiBold" FontSize="13"/>
+                    <Border BorderBrush="#404040" BorderThickness="1" CornerRadius="4">
+                        <TextBox x:Name="TxtEmail" Height="38" 
+                                FontSize="14" Padding="10"
+                                KeyDown="TextBox_KeyDown"
+                                Background="#2A2A2A"
+                                Foreground="{StaticResource TextBrush}"
+                                BorderThickness="0"/>
+                    </Border>
+
+                    <TextBlock Text="Телефон" Margin="0,15,0,8" 
+                              Foreground="{StaticResource TextSecondaryBrush}" 
+                              FontWeight="SemiBold" FontSize="13"/>
+                    <Border BorderBrush="#404040" BorderThickness="1" CornerRadius="4">
+                        <TextBox x:Name="TxtPhone" Height="38" 
+                                FontSize="14" Padding="10"
+                                KeyDown="TextBox_KeyDown"
+                                Background="#2A2A2A"
+                                Foreground="{StaticResource TextBrush}"
+                                BorderThickness="0"/>
+                    </Border>
+
+                    <!-- Password Field -->
+                    <TextBlock Text="Пароль" Margin="0,15,0,8" 
+                              Foreground="{StaticResource TextSecondaryBrush}" 
+                              FontWeight="SemiBold" FontSize="13"/>
+                    <Border BorderBrush="#404040" BorderThickness="1">
+                        <PasswordBox x:Name="TxtPassword" Height="38" 
                                     FontSize="14" Padding="10"
-                                    KeyDown="TextBox_KeyDown"/>
+                                    KeyDown="PasswordBox_KeyDown"
+                                    Background="#2A2A2A"
+                                    Foreground="{StaticResource TextBrush}"
+                                    BorderThickness="0"/>
+                    </Border>
 
-                            <TextBlock Text="Email" Margin="0,15,0,8" 
-                                      Foreground="{StaticResource TextSecondaryBrush}" 
-                                      FontWeight="SemiBold" FontSize="13"/>
-                            <TextBox x:Name="TxtEmail" Height="38" 
+                    <!-- Confirm Password Field -->
+                    <TextBlock Text="Подтверждение пароля" Margin="0,15,0,8" 
+                              Foreground="{StaticResource TextSecondaryBrush}" 
+                              FontWeight="SemiBold" FontSize="13"/>
+                    <Border BorderBrush="#404040" BorderThickness="1">
+                        <PasswordBox x:Name="TxtConfirmPassword" Height="38" 
                                     FontSize="14" Padding="10"
-                                    KeyDown="TextBox_KeyDown"/>
-
-                            <TextBlock Text="Пароль" Margin="0,15,0,8" 
-                                      Foreground="{StaticResource TextSecondaryBrush}" 
-                                      FontWeight="SemiBold" FontSize="13"/>
-                            <PasswordBox x:Name="TxtPassword" Height="38" 
-                                        FontSize="14" Padding="10"
-                                        KeyDown="PasswordBox_KeyDown"/>
-                        </StackPanel>
-
-                        <!-- Right Column -->
-                        <StackPanel Grid.Column="2">
-                            <TextBlock Text="Фамилия" Margin="0,0,0,8" 
-                                      Foreground="{StaticResource TextSecondaryBrush}" 
-                                      FontWeight="SemiBold" FontSize="13"/>
-                            <TextBox x:Name="TxtLastName" Height="38" 
-                                    FontSize="14" Padding="10"
-                                    KeyDown="TextBox_KeyDown"/>
-
-                            <TextBlock Text="Телефон" Margin="0,15,0,8" 
-                                      Foreground="{StaticResource TextSecondaryBrush}" 
-                                      FontWeight="SemiBold" FontSize="13"/>
-                            <TextBox x:Name="TxtPhone" Height="38" 
-                                    FontSize="14" Padding="10"
-                                    KeyDown="TextBox_KeyDown"/>
-
-                            <TextBlock Text="Подтверждение" Margin="0,15,0,8" 
-                                      Foreground="{StaticResource TextSecondaryBrush}" 
-                                      FontWeight="SemiBold" FontSize="13"/>
-                            <PasswordBox x:Name="TxtConfirmPassword" Height="38" 
-                                        FontSize="14" Padding="10"
-                                        KeyDown="PasswordBox_KeyDown"/>
-                        </StackPanel>
-                    </Grid>
+                                    KeyDown="PasswordBox_KeyDown"
+                                    Background="#2A2A2A"
+                                    Foreground="{StaticResource TextBrush}"
+                                    BorderThickness="0"/>
+                    </Border>
 
                     <!-- Register Button -->
-                    <Button x:Name="BtnRegister" Content="Зарегистрироваться" 
+                    <Button x:Name="BtnRegister" Content="Зарегистрировать" 
                            Style="{StaticResource PrimaryButtonStyle}"
                            Height="44" FontSize="15" FontWeight="Bold"
-                           Margin="0,25,0,15"
+                           Margin="0,30,0,15"
                            Click="BtnRegister_Click"/>
 
                     <!-- Back to Login -->
-                    <TextBlock HorizontalAlignment="Center" Margin="0,5,0,0"
+                    <TextBlock HorizontalAlignment="Center" Margin="0,10,0,0"
                               Foreground="{StaticResource TextSecondaryBrush}" FontSize="13">
                         <Hyperlink x:Name="LinkLogin" Click="LinkLogin_Click">
                             Назад к входу

@@ -6,11 +6,11 @@
       xmlns:local="clr-namespace:Desktop.Pages"
       mc:Ignorable="d" 
       Title="RestaurantsPage">
-
     <Grid Background="{StaticResource BackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Header -->
@@ -38,7 +38,15 @@
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
                     <Button Content="➕ Добавить" 
                            Style="{StaticResource PrimaryButtonStyle}"
-                           Click="BtnAddRestaurant_Click"/>
+                           Click="BtnAddRestaurant_Click" Width="97"/>
+                    <Button Content="✏️ Изменить" 
+                           Style="{StaticResource PrimaryButtonStyle}"
+                           Margin="10,0,0,0"
+                           Click="BtnEditSelected_Click" Width="104"/>
+                    <Button Content="🗑️ Удалить" 
+                           Style="{StaticResource SecondaryButtonStyle}"
+                           Margin="10,0,0,0"
+                           Click="BtnDeleteSelected_Click"/>
                     <Button Content="🔄 Обновить" 
                            Style="{StaticResource SecondaryButtonStyle}"
                            Margin="10,0,0,0"
@@ -54,34 +62,34 @@
                 <StaticResource ResourceKey="ShadowEffect"/>
             </Border.Effect>
 
-            <DataGrid x:Name="RestaurantsGrid" AutoGenerateColumns="False"
-                     IsReadOnly="True" Background="Transparent">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="70"/>
-                    <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="180"/>
-                    <DataGridTextColumn Header="Адрес" Binding="{Binding Address}" Width="220"/>
-                    <DataGridTextColumn Header="Вместимость" Binding="{Binding Capacity}" Width="90"/>
-                    <DataGridTextColumn Header="Открытие" Binding="{Binding OpenTime}" Width="90"/>
-                    <DataGridTextColumn Header="Закрытие" Binding="{Binding CloseTime}" Width="90"/>
-                    <DataGridTextColumn Header="Тематика" Binding="{Binding Tematic}" Width="140"/>
-                    <DataGridTemplateColumn Header="Действия" Width="140">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <Button Content="✏️" ToolTip="Редактировать" 
-                                           Click="BtnEdit_Click" Margin="4,0"
-                                           Style="{StaticResource SecondaryButtonStyle}"
-                                           Padding="8" FontSize="12"/>
-                                    <Button Content="🗑️" ToolTip="Удалить" 
-                                           Click="BtnDelete_Click" Margin="4,0"
-                                           Style="{StaticResource SecondaryButtonStyle}"
-                                           Padding="8" FontSize="12"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                </DataGrid.Columns>
-            </DataGrid>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <DataGrid x:Name="RestaurantsGrid" AutoGenerateColumns="False"
+                         IsReadOnly="True" Background="Transparent"
+                         BorderThickness="0" SelectionChanged="RestaurantsGrid_SelectionChanged"
+                         HorizontalScrollBarVisibility="Disabled"
+                         CanUserResizeColumns="False"
+                         CanUserSortColumns="True"
+                         CanUserReorderColumns="False"
+                         Width="Auto">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60" CanUserResize="False"/>
+                        <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="180" CanUserResize="False"/>
+                        <DataGridTextColumn Header="Адрес" Binding="{Binding Address}" Width="220" CanUserResize="False"/>
+                        <DataGridTextColumn Header="Вместимость" Binding="{Binding Capacity}" Width="90" CanUserResize="False"/>
+                        <DataGridTextColumn Header="Открытие" Binding="{Binding OpenTime, StringFormat=hh\\:mm}" Width="80" CanUserResize="False"/>
+                        <DataGridTextColumn Header="Закрытие" Binding="{Binding CloseTime, StringFormat=hh\\:mm}" Width="80" CanUserResize="False"/>
+                        <DataGridTextColumn Header="Тематика" Binding="{Binding Tematic}" Width="140" CanUserResize="False"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Empty Grid for Item Output -->
+        <Border Grid.Row="2" Background="{StaticResource CardBrush}" 
+                CornerRadius="8" Margin="0,200,0,0" Padding="15">
+            <Grid x:Name="ItemOutputGrid">
+                <!-- Пустой Grid для вывода item из БД -->
+            </Grid>
         </Border>
     </Grid>
 </Page>

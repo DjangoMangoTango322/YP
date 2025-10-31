@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Desktop.Models;
 
 namespace Desktop.Pages
 {
@@ -20,223 +22,148 @@ namespace Desktop.Pages
     /// </summary>
     public partial class UsersPage : Page
     {
-        private List<User> _allUsers = new List<User>();
-        private bool _isSearchPlaceholder = true;
         public UsersPage()
         {
             InitializeComponent();
-            InitializeSearchBox();
-            LoadUsers();
-            UpdateStatistics();
+            LoadUsersFromApi();
         }
 
-        private void InitializeSearchBox()
+        private async void LoadUsersFromApi()
         {
-            TxtSearch.Text = "Поиск по имени или email...";
-            TxtSearch.Foreground = new SolidColorBrush(Colors.Gray);
-
-            TxtSearch.GotFocus += (s, e) =>
+            try
             {
-                if (_isSearchPlaceholder)
+                var users = await App.ApiClient.GetUsersAsync();
+                UsersGrid.ItemsSource = users;
+                UpdateOutput($"✅ Загружено {users.Count} пользователей из API");
+            }
+            catch (Exception ex)
+            {
+                UpdateOutput($"❌ Ошибка загрузки данных: {ex.Message}");
+                MessageBox.Show($"Ошибка подключения к API: {ex.Message}", "Ошибка",
+                              MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void UpdateOutput(string message)
+        {
+            // Метод для обновления вывода, если нужно
+        }
+
+        private User GetSelectedUser()
+        {
+            return UsersGrid.SelectedItem as User;
+        }
+
+        private async void BtnAddUser_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var newUser = new User
                 {
-                    TxtSearch.Text = "";
-                    TxtSearch.Foreground = new SolidColorBrush(Colors.White);
-                    _isSearchPlaceholder = false;
-                }
-            };
+                    FirstName = "Новый",
+                    LastName = "Пользователь",
+                    Email = "newuser@example.com",
+                    Phone = "+7 (000) 000-00-00",
+                    CreatedAt = DateTime.Now
+                };
 
-            TxtSearch.LostFocus += (s, e) =>
+                var createdUser = await App.ApiClient.CreateUserAsync(newUser);
+                UpdateOutput($"✅ Добавлен новый пользователь через API:\nID: #{createdUser.Id}\nИмя: {createdUser.FirstName} {createdUser.LastName}");
+                LoadUsersFromApi();
+            }
+            catch (Exception ex)
             {
-                if (string.IsNullOrWhiteSpace(TxtSearch.Text))
+                UpdateOutput($"❌ Ошибка добавления пользователя: {ex.Message}");
+                MessageBox.Show($"Ошибка при добавлении пользователя: {ex.Message}", "Ошибка",
+                              MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private async void BtnEditSelected_Click(object sender, RoutedEventArgs e)
+        {
+            var user = GetSelectedUser();
+            if (user != null)
+            {
+                try
                 {
-                    TxtSearch.Text = "Поиск по имени или email...";
-                    TxtSearch.Foreground = new SolidColorBrush(Colors.Gray);
-                    _isSearchPlaceholder = true;
+                    user.FirstName += " (изм.)";
+                    user.Email = "changed_" + user.Email;
+
+                    var updatedUser = await App.ApiClient.UpdateUserAsync(user.Id, user);
+                    UpdateOutput($"✏️ Пользователь обновлен через API:\nID: #{updatedUser.Id}\nНовое имя: {updatedUser.FirstName}");
+                    LoadUsersFromApi();
                 }
-            };
-        }
-
-        private void LoadUsers()
-        {
-            _allUsers = new List<User>
-            {
-                new User {
-                    Id = 1,
-                    FirstName = "Иван",
-                    LastName = "Петров",
-                    Email = "admin@restaurant.com",
-                    Phone = "+7 (495) 111-11-11",
-                    Role = "Администратор",
-                    IsActive = true,
-                    CreatedAt = System.DateTime.Now.AddDays(-30)
-                },
-                new User {
-                    Id = 2,
-                    FirstName = "Мария",
-                    LastName = "Сидорова",
-                    Email = "maria@example.com",
-                    Phone = "+7 (495) 222-22-22",
-                    Role = "Пользователь",
-                    IsActive = true,
-                    CreatedAt = System.DateTime.Now.AddDays(-15)
-                },
-                new User {
-                    Id = 3,
-                    FirstName = "Алексей",
-                    LastName = "Козлов",
-                    Email = "alex@example.com",
-                    Phone = "+7 (495) 333-33-33",
-                    Role = "Пользователь",
-                    IsActive = false,
-                    CreatedAt = System.DateTime.Now.AddDays(-7)
-                },
-                new User {
-                    Id = 4,
-                    FirstName = "Елена",
-                    LastName = "Иванова",
-                    Email = "elena@example.com",
-                    Phone = "+7 (495) 444-44-44",
-                    Role = "Пользователь",
-                    IsActive = true,
-                    CreatedAt = System.DateTime.Now.AddDays(-3)
-                },
-                new User {
-                    Id = 5,
-                    FirstName = "Дмитрий",
-                    LastName = "Смирнов",
-                    Email = "dmitry@example.com",
-                    Phone = "+7 (495) 555-55-55",
-                    Role = "Администратор",
-                    IsActive = true,
-                    CreatedAt = System.DateTime.Now.AddDays(-10)
+                catch (Exception ex)
+                {
+                    UpdateOutput($"❌ Ошибка обновления пользователя: {ex.Message}");
+                    MessageBox.Show($"Ошибка при обновлении пользователя: {ex.Message}", "Ошибка",
+                                  MessageBoxButton.OK, MessageBoxImage.Error);
                 }
-            };
-
-            ApplyFilters();
-        }
-
-        private void ApplyFilters()
-        {
-            var filteredUsers = _allUsers.AsEnumerable();
-
-            // Поиск (игнорируем placeholder текст)
-            if (!_isSearchPlaceholder && !string.IsNullOrWhiteSpace(TxtSearch.Text))
-            {
-                var searchText = TxtSearch.Text.ToLower();
-                filteredUsers = filteredUsers.Where(u =>
-                    u.FullName.ToLower().Contains(searchText) ||
-                    u.Email.ToLower().Contains(searchText));
             }
-
-            // Фильтр по роли
-            if (CmbRoleFilter.SelectedIndex > 0)
+            else
             {
-                var selectedRole = (CmbRoleFilter.SelectedItem as ComboBoxItem)?.Content.ToString();
-                filteredUsers = filteredUsers.Where(u => u.Role == selectedRole);
-            }
-
-            UsersGrid.ItemsSource = filteredUsers.ToList();
-            UpdateStatistics();
-        }
-
-        private void UpdateStatistics()
-        {
-            var filtered = UsersGrid.ItemsSource as IEnumerable<User> ?? _allUsers;
-            TxtTotalUsers.Text = filtered.Count().ToString();
-            TxtAdminCount.Text = filtered.Count(u => u.Role == "Администратор").ToString();
-            TxtActiveCount.Text = filtered.Count(u => u.IsActive).ToString();
-        }
-
-        private void TxtSearch_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            if (!_isSearchPlaceholder)
-            {
-                ApplyFilters();
+                MessageBox.Show("Пожалуйста, выберите пользователя для изменения", "Внимание",
+                              MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
-        private void CmbRoleFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void BtnDeleteSelected_Click(object sender, RoutedEventArgs e)
         {
-            ApplyFilters();
-        }
-
-        private void BtnResetFilters_Click(object sender, RoutedEventArgs e)
-        {
-            TxtSearch.Text = "Поиск по имени или email...";
-            TxtSearch.Foreground = new SolidColorBrush(Colors.Gray);
-            _isSearchPlaceholder = true;
-            CmbRoleFilter.SelectedIndex = 0;
-        }
-
-        private void BtnAddUser_Click(object sender, RoutedEventArgs e)
-        {
-            var newUser = new User
-            {
-                Id = _allUsers.Count + 1,
-                FirstName = "Новый",
-                LastName = "Пользователь",
-                Email = "new@example.com",
-                Phone = "+7 (495) 000-00-00",
-                Role = "Пользователь",
-                IsActive = true,
-                CreatedAt = System.DateTime.Now
-            };
-            _allUsers.Add(newUser);
-            ApplyFilters();
-
-            ShowMessage("Пользователь добавлен", "Успех");
-        }
-
-        private void BtnExport_Click(object sender, RoutedEventArgs e)
-        {
-            ShowMessage("Экспорт данных в CSV выполнен", "Экспорт");
-        }
-
-        private void BtnView_Click(object sender, RoutedEventArgs e)
-        {
-            var user = (sender as Button)?.DataContext as User;
+            var user = GetSelectedUser();
             if (user != null)
             {
-                ShowMessage($"Детальная информация о пользователе:\n\n" +
-                          $"ФИО: {user.FullName}\n" +
-                          $"Email: {user.Email}\n" +
-                          $"Телефон: {user.Phone}\n" +
-                          $"Роль: {user.Role}\n" +
-                          $"Статус: {(user.IsActive ? "Активен" : "Заблокирован")}\n" +
-                          $"Дата регистрации: {user.CreatedAt:dd.MM.yyyy}",
-                          "Информация о пользователе");
+                var result = MessageBox.Show($"Вы уверены, что хотите удалить пользователя \"{user.FirstName} {user.LastName}\"?",
+                                           "Подтверждение удаления",
+                                           MessageBoxButton.YesNo,
+                                           MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    try
+                    {
+                        var success = await App.ApiClient.DeleteUserAsync(user.Id);
+                        if (success)
+                        {
+                            UpdateOutput($"🗑️ Пользователь удален через API:\nID: #{user.Id}\nИмя: {user.FirstName} {user.LastName}");
+                            LoadUsersFromApi();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        UpdateOutput($"❌ Ошибка удаления пользователя: {ex.Message}");
+                        MessageBox.Show($"Ошибка при удалении пользователя: {ex.Message}", "Ошибка",
+                                      MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show("Пожалуйста, выберите пользователя для удаления", "Внимание",
+                              MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 
-        private void BtnEdit_Click(object sender, RoutedEventArgs e)
+        private void BtnRefresh_Click(object sender, RoutedEventArgs e)
         {
-            var user = (sender as Button)?.DataContext as User;
+            LoadUsersFromApi();
+        }
+
+        private void UsersGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var user = GetSelectedUser();
             if (user != null)
             {
-                user.FirstName = "Измененное";
-                user.LastName = "Имя";
-                ApplyFilters();
-
-                ShowMessage($"Пользователь {user.FullName} изменен", "Успех");
+                // Можно добавить вывод деталей в ItemOutputGrid
             }
         }
 
-        private void BtnToggleActive_Click(object sender, RoutedEventArgs e)
-        {
-            var user = (sender as Button)?.DataContext as User;
-            if (user != null)
-            {
-                user.IsActive = !user.IsActive;
-                ApplyFilters();
-
-                ShowMessage($"Пользователь {user.FullName} {(user.IsActive ? "активирован" : "заблокирован")}",
-                          "Статус изменен");
-            }
-        }
-
-        private void ShowMessage(string message, string title)
-        {
-            MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Information);
-        }
+        // Убраны неиспользуемые методы
+        private void TxtSearch_TextChanged(object sender, TextChangedEventArgs e) { }
+        private void CmbRoleFilter_SelectionChanged(object sender, SelectionChangedEventArgs e) { }
+        private void BtnResetFilters_Click(object sender, RoutedEventArgs e) { }
+        private void BtnExport_Click(object sender, RoutedEventArgs e) { }
+        private void BtnView_Click(object sender, RoutedEventArgs e) { }
+        private void BtnEdit_Click(object sender, RoutedEventArgs e) { }
+        private void BtnToggleActive_Click(object sender, RoutedEventArgs e) { }
     }
 }

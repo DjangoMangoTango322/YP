@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Desktop.Models;
 
 namespace Desktop.Pages
 {
@@ -20,93 +22,140 @@ namespace Desktop.Pages
     /// </summary>
     public partial class RestaurantsPage : Page
     {
-        private List<Restaurant> _restaurants = new List<Restaurant>();
         public RestaurantsPage()
         {
             InitializeComponent();
-            LoadRestaurants();
+            LoadRestaurantsFromApi();
         }
 
-        private void LoadRestaurants()
+        private async void LoadRestaurantsFromApi()
         {
-            _restaurants = new List<Restaurant>
+            try
             {
-                new Restaurant {
-                    Id = 1,
-                    Name = "Итальянский дворик",
-                    Address = "ул. Пушкина, 1",
-                    Capacity = 50,
-                    OpenTime = "10:00",
-                    CloseTime = "23:00",
-                    Tematic = "Итальянская кухня"
-                },
-                new Restaurant {
-                    Id = 2,
-                    Name = "Суши-бар Токио",
-                    Address = "ул. Лермонтова, 15",
-                    Capacity = 30,
-                    OpenTime = "11:00",
-                    CloseTime = "22:00",
-                    Tematic = "Японская кухня"
-                },
-                new Restaurant {
-                    Id = 3,
-                    Name = "Гриль-хаус",
-                    Address = "пр. Мира, 25",
-                    Capacity = 80,
-                    OpenTime = "12:00",
-                    CloseTime = "24:00",
-                    Tematic = "Американская кухня"
-                }
-            };
-
-            RestaurantsGrid.ItemsSource = _restaurants;
+                var restaurants = await App.ApiClient.GetRestaurantsAsync();
+                RestaurantsGrid.ItemsSource = restaurants;
+                UpdateOutput($"✅ Загружено {restaurants.Count} ресторанов из API");
+            }
+            catch (Exception ex)
+            {
+                UpdateOutput($"❌ Ошибка загрузки данных: {ex.Message}");
+                MessageBox.Show($"Ошибка подключения к API: {ex.Message}", "Ошибка",
+                              MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
-        private void BtnAddRestaurant_Click(object sender, RoutedEventArgs e)
+        private void UpdateOutput(string message)
         {
-            ShowMessage("Функция добавления ресторана", "Информация");
+            // Метод для обновления вывода
+        }
+
+        private Restaurant GetSelectedRestaurant()
+        {
+            return RestaurantsGrid.SelectedItem as Restaurant;
+        }
+
+        private async void BtnAddRestaurant_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var newRestaurant = new Restaurant
+                {
+                    Name = "Новый ресторан",
+                    Address = "Новый адрес",
+                    Capacity = 50,
+                    OpenTime = new TimeSpan(10, 0, 0),
+                    CloseTime = new TimeSpan(22, 0, 0),
+                    Tematic = "Общая"
+                };
+
+                var createdRestaurant = await App.ApiClient.CreateRestaurantAsync(newRestaurant);
+                UpdateOutput($"✅ Добавлен новый ресторан через API:\nID: #{createdRestaurant.Id}\nНазвание: {createdRestaurant.Name}");
+                LoadRestaurantsFromApi();
+            }
+            catch (Exception ex)
+            {
+                UpdateOutput($"❌ Ошибка добавления ресторана: {ex.Message}");
+                MessageBox.Show($"Ошибка при добавлении ресторана: {ex.Message}", "Ошибка",
+                              MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private async void BtnEditSelected_Click(object sender, RoutedEventArgs e)
+        {
+            var restaurant = GetSelectedRestaurant();
+            if (restaurant != null)
+            {
+                try
+                {
+                    restaurant.Name += " (изм.)";
+                    restaurant.Capacity += 10;
+
+                    var updatedRestaurant = await App.ApiClient.UpdateRestaurantAsync(restaurant.Id, restaurant);
+                    UpdateOutput($"✏️ Ресторан обновлен через API:\nID: #{updatedRestaurant.Id}\nНовое название: {updatedRestaurant.Name}");
+                    LoadRestaurantsFromApi();
+                }
+                catch (Exception ex)
+                {
+                    UpdateOutput($"❌ Ошибка обновления ресторана: {ex.Message}");
+                    MessageBox.Show($"Ошибка при обновлении ресторана: {ex.Message}", "Ошибка",
+                                  MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Пожалуйста, выберите ресторан для изменения", "Внимание",
+                              MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private async void BtnDeleteSelected_Click(object sender, RoutedEventArgs e)
+        {
+            var restaurant = GetSelectedRestaurant();
+            if (restaurant != null)
+            {
+                var result = MessageBox.Show($"Вы уверены, что хотите удалить ресторан \"{restaurant.Name}\"?",
+                                           "Подтверждение удаления",
+                                           MessageBoxButton.YesNo,
+                                           MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    try
+                    {
+                        var success = await App.ApiClient.DeleteRestaurantAsync(restaurant.Id);
+                        if (success)
+                        {
+                            UpdateOutput($"🗑️ Ресторан удален через API:\nID: #{restaurant.Id}\nНазвание: {restaurant.Name}");
+                            LoadRestaurantsFromApi();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        UpdateOutput($"❌ Ошибка удаления ресторана: {ex.Message}");
+                        MessageBox.Show($"Ошибка при удалении ресторана: {ex.Message}", "Ошибка",
+                                      MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show("Пожалуйста, выберите ресторан для удаления", "Внимание",
+                              MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
         }
 
         private void BtnRefresh_Click(object sender, RoutedEventArgs e)
         {
-            LoadRestaurants();
-            ShowMessage("Список ресторанов обновлен", "Успех");
+            LoadRestaurantsFromApi();
         }
 
-        private void BtnEdit_Click(object sender, RoutedEventArgs e)
+        private void RestaurantsGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var restaurant = (sender as Button)?.DataContext as Restaurant;
+            var restaurant = GetSelectedRestaurant();
             if (restaurant != null)
             {
-                ShowMessage($"Редактирование: {restaurant.Name}", "Информация");
+                // Можно добавить вывод деталей в ItemOutputGrid
             }
-        }
-
-        private void BtnDelete_Click(object sender, RoutedEventArgs e)
-        {
-            var restaurant = (sender as Button)?.DataContext as Restaurant;
-            if (restaurant != null)
-            {
-                var result = ShowConfirmation($"Удалить ресторан '{restaurant.Name}'?");
-                if (result == MessageBoxResult.Yes)
-                {
-                    _restaurants.RemoveAll(r => r.Id == restaurant.Id);
-                    RestaurantsGrid.ItemsSource = null;
-                    RestaurantsGrid.ItemsSource = _restaurants;
-                    ShowMessage("Ресторан удален", "Успех");
-                }
-            }
-        }
-
-        private void ShowMessage(string message, string title)
-        {
-            MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Information);
-        }
-
-        private MessageBoxResult ShowConfirmation(string message)
-        {
-            return MessageBox.Show(message, "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
         }
     }
 }

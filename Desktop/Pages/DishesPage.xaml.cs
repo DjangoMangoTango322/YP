@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Desktop.Models;
 
 namespace Desktop.Pages
 {
@@ -20,146 +22,258 @@ namespace Desktop.Pages
     /// </summary>
     public partial class DishesPage : Page
     {
-        private List<Dish> _allDishes = new List<Dish>();
-
+        private string connectionString = "Server=localhost;Database=RestaurantDB;Integrated Security=true;";
         public DishesPage()
         {
             InitializeComponent();
-            LoadRestaurants();
-            LoadDishes();
+            LoadDishesFromDatabase();
         }
 
-        private void LoadRestaurants()
+        private void LoadDishesFromDatabase()
         {
-            var restaurants = new List<Restaurant>
+            try
             {
-                new Restaurant { Id = 1, Name = "Итальянский дворик" },
-                new Restaurant { Id = 2, Name = "Суши-бар Токио" },
-                new Restaurant { Id = 3, Name = "Гриль-хаус" },
-                new Restaurant { Id = 4, Name = "Все рестораны" }
-            };
-
-            CmbRestaurants.ItemsSource = restaurants;
-            CmbRestaurants.SelectedIndex = 3; // Select "Все рестораны"
-        }
-
-        private void LoadDishes()
-        {
-            _allDishes = new List<Dish>
-            {
-                new Dish {
-                    Id = 1,
-                    Name = "Паста Карбонара",
-                    Description = "Спагетти с беконом, яйцом и пармезаном",
-                    Price = 450,
-                    Category = "Основные блюда",
-                    RestaurantId = 1,
-                    RestaurantName = "Итальянский дворик"
-                },
-                new Dish {
-                    Id = 2,
-                    Name = "Пицца Маргарита",
-                    Description = "Классическая итальянская пицца",
-                    Price = 380,
-                    Category = "Пицца",
-                    RestaurantId = 1,
-                    RestaurantName = "Итальянский дворик"
-                },
-                new Dish {
-                    Id = 3,
-                    Name = "Ролл Филадельфия",
-                    Description = "Лосось, сливочный сыр, огурец",
-                    Price = 520,
-                    Category = "Суши",
-                    RestaurantId = 2,
-                    RestaurantName = "Суши-бар Токио"
-                },
-                new Dish {
-                    Id = 4,
-                    Name = "Стейк Рибай",
-                    Description = "Мраморная говядина прожарки medium",
-                    Price = 1200,
-                    Category = "Гриль",
-                    RestaurantId = 3,
-                    RestaurantName = "Гриль-хаус"
-                },
-                new Dish {
-                    Id = 5,
-                    Name = "Цезарь с креветками",
-                    Description = "Салат с листьями айсберг, креветками и соусом цезарь",
-                    Price = 320,
-                    Category = "Салаты",
-                    RestaurantId = 1,
-                    RestaurantName = "Итальянский дворик"
-                }
-            };
-
-            FilterDishes();
-        }
-
-        private void FilterDishes()
-        {
-            if (CmbRestaurants.SelectedItem is Restaurant selectedRestaurant)
-            {
-                if (selectedRestaurant.Name == "Все рестораны")
+                using (var connection = new SqlConnection(connectionString))
                 {
-                    DishesGrid.ItemsSource = _allDishes;
+                    connection.Open();
+                    var query = @"
+                        SELECT 
+                            d.id,
+                            d.name,
+                            d.description,
+                            d.price,
+                            d.category,
+                            r.name as restaurant_name
+                        FROM dishes d
+                        LEFT JOIN restaurant_dishes rd ON d.id = rd.dish_id
+                        LEFT JOIN restaurants r ON rd.restaurant_id = r.id
+                        ORDER BY d.name";
+
+                    using (var command = new SqlCommand(query, connection))
+                    using (var reader = command.ExecuteReader())
+                    {
+                        var dishes = new List<Dish>();
+                        while (reader.Read())
+                        {
+                            var dish = new Dish
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("id")),
+                                Name = reader.GetString(reader.GetOrdinal("name")),
+                                Description = reader.GetString(reader.GetOrdinal("description")),
+                                Price = reader.GetDecimal(reader.GetOrdinal("price")),
+                                Category = reader.GetString(reader.GetOrdinal("category"))
+                            };
+
+                            if (!reader.IsDBNull(reader.GetOrdinal("restaurant_name")))
+                            {
+                                SetRestaurantName(dish, reader.GetString(reader.GetOrdinal("restaurant_name")));
+                            }
+
+                            dishes.Add(dish);
+                        }
+
+                        DishesGrid.ItemsSource = dishes;
+                        UpdateOutput($"Загружено {dishes.Count} блюд из базы данных");
+                    }
                 }
-                else
-                {
-                    DishesGrid.ItemsSource = _allDishes.Where(d => d.RestaurantId == selectedRestaurant.Id).ToList();
-                }
+            }
+            catch (Exception ex)
+            {
+                UpdateOutput($"Ошибка загрузки данных: {ex.Message}");
+                MessageBox.Show($"Ошибка подключения к базе данных: {ex.Message}", "Ошибка",
+                              MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private void CmbRestaurants_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void SetRestaurantName(Dish dish, string restaurantName)
         {
-            FilterDishes();
+            var restaurantNameField = typeof(Dish).GetField("_restaurantName",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (restaurantNameField != null)
+            {
+                restaurantNameField.SetValue(dish, restaurantName);
+            }
+        }
+
+        private string GetRestaurantName(Dish dish)
+        {
+            var restaurantNameField = typeof(Dish).GetField("_restaurantName",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (restaurantNameField != null)
+            {
+                return restaurantNameField.GetValue(dish) as string ?? "Неизвестный ресторан";
+            }
+            return "Неизвестный ресторан";
+        }
+
+        private void UpdateOutput(string message)
+        {
+            TxtOutput.Text = message;
+        }
+
+        private Dish GetSelectedDish()
+        {
+            return DishesGrid.SelectedItem as Dish;
         }
 
         private void BtnAddDish_Click(object sender, RoutedEventArgs e)
         {
-            ShowMessage("Функция добавления блюда", "Информация");
+            try
+            {
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    var query = @"
+                        INSERT INTO dishes (name, description, price, category)
+                        VALUES (@name, @description, @price, @category);
+                        SELECT SCOPE_IDENTITY();";
+
+                    using (var command = new SqlCommand(query, connection))
+                    {
+                        command.Parameters.AddWithValue("@name", "Новое блюдо");
+                        command.Parameters.AddWithValue("@description", "Описание нового блюда");
+                        command.Parameters.AddWithValue("@price", 500.00m);
+                        command.Parameters.AddWithValue("@category", "Основное");
+
+                        var newId = Convert.ToInt32(command.ExecuteScalar());
+                        var linkQuery = "INSERT INTO restaurant_dishes (restaurant_id, dish_id) VALUES (1, @dish_id)";
+                        using (var linkCommand = new SqlCommand(linkQuery, connection))
+                        {
+                            linkCommand.Parameters.AddWithValue("@dish_id", newId);
+                            linkCommand.ExecuteNonQuery();
+                        }
+
+                        UpdateOutput($"Добавлено новое блюдо в базу данных:\nID: #{newId}\nНазвание: Новое блюдо\nЦена: 500₽");
+                        LoadDishesFromDatabase();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                UpdateOutput($"Ошибка добавления блюда: {ex.Message}");
+                MessageBox.Show($"Ошибка при добавлении блюда: {ex.Message}", "Ошибка",
+                              MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void BtnEditSelected_Click(object sender, RoutedEventArgs e)
+        {
+            var dish = GetSelectedDish();
+            if (dish != null)
+            {
+                try
+                {
+                    using (var connection = new SqlConnection(connectionString))
+                    {
+                        connection.Open();
+                        var query = @"
+                            UPDATE dishes 
+                            SET name = @name, 
+                                price = @price,
+                                category = @category
+                            WHERE id = @id";
+
+                        using (var command = new SqlCommand(query, connection))
+                        {
+                            command.Parameters.AddWithValue("@id", dish.Id);
+                            command.Parameters.AddWithValue("@name", dish.Name + " (изм.)");
+                            command.Parameters.AddWithValue("@price", dish.Price + 100);
+                            command.Parameters.AddWithValue("@category", dish.Category);
+
+                            int rowsAffected = command.ExecuteNonQuery();
+
+                            if (rowsAffected > 0)
+                            {
+                                UpdateOutput($"Блюдо обновлено в базе данных:\nID: #{dish.Id}\nНовое название: {dish.Name} (изм.)\nНовая цена: {dish.Price + 100}₽");
+                                LoadDishesFromDatabase();
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    UpdateOutput($"Ошибка обновления блюда: {ex.Message}");
+                    MessageBox.Show($"Ошибка при обновлении блюда: {ex.Message}", "Ошибка",
+                                  MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            else
+            {
+                MessageBox.Show("Пожалуйста, выберите блюдо для изменения", "Внимание",
+                              MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private void BtnDeleteSelected_Click(object sender, RoutedEventArgs e)
+        {
+            var dish = GetSelectedDish();
+            if (dish != null)
+            {
+                var result = MessageBox.Show($"Вы уверены, что хотите удалить блюдо \"{dish.Name}\"?",
+                                           "Подтверждение удаления",
+                                           MessageBoxButton.YesNo,
+                                           MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    try
+                    {
+                        using (var connection = new SqlConnection(connectionString))
+                        {
+                            connection.Open();
+                            var deleteLinksQuery = "DELETE FROM restaurant_dishes WHERE dish_id = @id";
+                            using (var linkCommand = new SqlCommand(deleteLinksQuery, connection))
+                            {
+                                linkCommand.Parameters.AddWithValue("@id", dish.Id);
+                                linkCommand.ExecuteNonQuery();
+                            }
+                            var deleteDishQuery = "DELETE FROM dishes WHERE id = @id";
+                            using (var dishCommand = new SqlCommand(deleteDishQuery, connection))
+                            {
+                                dishCommand.Parameters.AddWithValue("@id", dish.Id);
+                                int rowsAffected = dishCommand.ExecuteNonQuery();
+
+                                if (rowsAffected > 0)
+                                {
+                                    UpdateOutput($"Блюдо удалено из базы данных:\nID: #{dish.Id}\nНазвание: {dish.Name}");
+                                    LoadDishesFromDatabase();
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        UpdateOutput($"Ошибка удаления блюда: {ex.Message}");
+                        MessageBox.Show($"Ошибка при удалении блюда: {ex.Message}", "Ошибка",
+                                      MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show("Пожалуйста, выберите блюдо для удаления", "Внимание",
+                              MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
         }
 
         private void BtnRefresh_Click(object sender, RoutedEventArgs e)
         {
-            LoadDishes();
-            ShowMessage("Список блюд обновлен", "Успех");
+            LoadDishesFromDatabase();
         }
 
-        private void BtnEdit_Click(object sender, RoutedEventArgs e)
+        private void DishesGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var dish = (sender as Button)?.DataContext as Dish;
+            var dish = GetSelectedDish();
             if (dish != null)
             {
-                ShowMessage($"Редактирование: {dish.Name}", "Информация");
+                UpdateOutput($"Информация о блюде (из БД):\n" +
+                           $"ID: {dish.Id}\n" +
+                           $"Название: {dish.Name}\n" +
+                           $"Описание: {dish.Description}\n" +
+                           $"Цена: {dish.Price}₽\n" +
+                           $"Категория: {dish.Category}\n" +
+                           $"Ресторан: {GetRestaurantName(dish)}");
             }
-        }
-
-        private void BtnDelete_Click(object sender, RoutedEventArgs e)
-        {
-            var dish = (sender as Button)?.DataContext as Dish;
-            if (dish != null)
-            {
-                var result = ShowConfirmation($"Удалить блюдо '{dish.Name}'?");
-                if (result == MessageBoxResult.Yes)
-                {
-                    _allDishes.RemoveAll(d => d.Id == dish.Id);
-                    FilterDishes();
-                    ShowMessage("Блюдо удалено", "Успех");
-                }
-            }
-        }
-
-        private void ShowMessage(string message, string title)
-        {
-            MessageBox.Show(message, title, MessageBoxButton.OK, MessageBoxImage.Information);
-        }
-
-        private MessageBoxResult ShowConfirmation(string message)
-        {
-            return MessageBox.Show(message, "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
         }
     }
 }
