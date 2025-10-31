@@ -4,9 +4,85 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Desktop"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Restaurant Booking System" Height="700" Width="1200"
+        WindowStartupLocation="CenterScreen">
     <Grid>
-         
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="260"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Sidebar Menu -->
+        <Border Grid.Column="0" Background="{StaticResource PrimaryDarkBrush}">
+            <Border.Effect>
+                <DropShadowEffect ShadowDepth="8" Opacity="0.4" BlurRadius="20"/>
+            </Border.Effect>
+
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header -->
+                <Border Grid.Row="0" Background="{StaticResource PrimaryBrush}" 
+                        Height="100">
+                    <StackPanel VerticalAlignment="Center" Margin="20,0">
+                        <TextBlock Text="Gourmet" 
+                                 Foreground="{StaticResource AccentBrush}" 
+                                 FontSize="18" FontWeight="Bold"/>
+                        <TextBlock Text="Booking System" 
+                                 Foreground="White" 
+                                 FontSize="14" FontWeight="Medium"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Menu Items -->
+                <StackPanel Grid.Row="1" Margin="10,20">
+                    <Button x:Name="BtnRestaurants" Content="🍽️ Рестораны" 
+                            Style="{StaticResource MenuButtonStyle}"
+                            Click="BtnRestaurants_Click"/>
+                    <Button x:Name="BtnDishes" Content="🍕 Блюда" 
+                            Style="{StaticResource MenuButtonStyle}"
+                            Click="BtnDishes_Click"/>
+                    <Button x:Name="BtnUsers" Content="👥 Пользователи" 
+                            Style="{StaticResource MenuButtonStyle}"
+                            Click="BtnUsers_Click"/>
+                    <Button x:Name="BtnBookings" Content="📅 Бронирования" 
+                            Style="{StaticResource MenuButtonStyle}"
+                            Click="BtnBookings_Click"/>
+                </StackPanel>
+
+                <!-- Logout Button -->
+                <Border Grid.Row="2" Margin="15" Background="Transparent">
+                    <Button x:Name="BtnLogout" Content="🚪 Выход" 
+                            Background="{StaticResource PrimaryBrush}"
+                            Foreground="White"
+                            BorderThickness="0" Height="40" FontSize="14"
+                            Click="BtnLogout_Click">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource MenuButtonStyle}">
+                                <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+                                <Setter Property="Foreground" Value="White"/>
+                                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="#A52A2A"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- Main Content Area -->
+        <Border Grid.Column="1" Background="{StaticResource BackgroundBrush}" 
+                Padding="20">
+            <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden"
+                   Background="Transparent"/>
+        </Border>
     </Grid>
 </Window>
