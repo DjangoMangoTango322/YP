@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Desktop.Models;
+using Desktop.Pages.Items;
 
 namespace Desktop.Pages
 {
@@ -22,178 +23,84 @@ namespace Desktop.Pages
     /// </summary>
     public partial class DishesPage : Page
     {
-        private string connectionString = "Server=localhost;Database=RestaurantDB;Integrated Security=true;";
+        private Dish _selectedDish;
         public DishesPage()
         {
             InitializeComponent();
-            LoadDishesFromDatabase();
+            LoadDishesFromApi();
         }
 
-        private void LoadDishesFromDatabase()
+        private async void LoadDishesFromApi()
         {
             try
             {
-                using (var connection = new SqlConnection(connectionString))
-                {
-                    connection.Open();
-                    var query = @"
-                        SELECT 
-                            d.id,
-                            d.name,
-                            d.description,
-                            d.price,
-                            d.category,
-                            r.name as restaurant_name
-                        FROM dishes d
-                        LEFT JOIN restaurant_dishes rd ON d.id = rd.dish_id
-                        LEFT JOIN restaurants r ON rd.restaurant_id = r.id
-                        ORDER BY d.name";
-
-                    using (var command = new SqlCommand(query, connection))
-                    using (var reader = command.ExecuteReader())
-                    {
-                        var dishes = new List<Dish>();
-                        while (reader.Read())
-                        {
-                            var dish = new Dish
-                            {
-                                Id = reader.GetInt32(reader.GetOrdinal("id")),
-                                Name = reader.GetString(reader.GetOrdinal("name")),
-                                Description = reader.GetString(reader.GetOrdinal("description")),
-                                Price = reader.GetDecimal(reader.GetOrdinal("price")),
-                                Category = reader.GetString(reader.GetOrdinal("category"))
-                            };
-
-                            if (!reader.IsDBNull(reader.GetOrdinal("restaurant_name")))
-                            {
-                                SetRestaurantName(dish, reader.GetString(reader.GetOrdinal("restaurant_name")));
-                            }
-
-                            dishes.Add(dish);
-                        }
-
-                        DishesGrid.ItemsSource = dishes;
-                        UpdateOutput($"Загружено {dishes.Count} блюд из базы данных");
-                    }
-                }
+                var dishes = await App.ApiClient.GetDishesAsync();
+                DishesGrid.ItemsSource = dishes;
+                DishesItemsControl.ItemsSource = dishes;
             }
             catch (Exception ex)
             {
-                UpdateOutput($"Ошибка загрузки данных: {ex.Message}");
-                MessageBox.Show($"Ошибка подключения к базе данных: {ex.Message}", "Ошибка",
+                MessageBox.Show($"❌ Ошибка загрузки данных: {ex.Message}", "Ошибка",
                               MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private void SetRestaurantName(Dish dish, string restaurantName)
+        private void DishCard_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var restaurantNameField = typeof(Dish).GetField("_restaurantName",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            if (restaurantNameField != null)
+            if (sender is DishCard card)
             {
-                restaurantNameField.SetValue(dish, restaurantName);
+                _selectedDish = card.Dish;
+                DishesGrid.SelectedItem = _selectedDish;
             }
-        }
-
-        private string GetRestaurantName(Dish dish)
-        {
-            var restaurantNameField = typeof(Dish).GetField("_restaurantName",
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            if (restaurantNameField != null)
-            {
-                return restaurantNameField.GetValue(dish) as string ?? "Неизвестный ресторан";
-            }
-            return "Неизвестный ресторан";
-        }
-
-        private void UpdateOutput(string message)
-        {
-            TxtOutput.Text = message;
         }
 
         private Dish GetSelectedDish()
         {
-            return DishesGrid.SelectedItem as Dish;
+            return _selectedDish ?? DishesGrid.SelectedItem as Dish;
         }
 
-        private void BtnAddDish_Click(object sender, RoutedEventArgs e)
+        private async void BtnAddDish_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                using (var connection = new SqlConnection(connectionString))
+                var newDish = new Dish
                 {
-                    connection.Open();
-                    var query = @"
-                        INSERT INTO dishes (name, description, price, category)
-                        VALUES (@name, @description, @price, @category);
-                        SELECT SCOPE_IDENTITY();";
+                    Name = "Новое блюдо",
+                    Description = "Описание нового блюда",
+                    Price = 500.00m,
+                    Category = "Основное"
+                };
 
-                    using (var command = new SqlCommand(query, connection))
-                    {
-                        command.Parameters.AddWithValue("@name", "Новое блюдо");
-                        command.Parameters.AddWithValue("@description", "Описание нового блюда");
-                        command.Parameters.AddWithValue("@price", 500.00m);
-                        command.Parameters.AddWithValue("@category", "Основное");
-
-                        var newId = Convert.ToInt32(command.ExecuteScalar());
-                        var linkQuery = "INSERT INTO restaurant_dishes (restaurant_id, dish_id) VALUES (1, @dish_id)";
-                        using (var linkCommand = new SqlCommand(linkQuery, connection))
-                        {
-                            linkCommand.Parameters.AddWithValue("@dish_id", newId);
-                            linkCommand.ExecuteNonQuery();
-                        }
-
-                        UpdateOutput($"Добавлено новое блюдо в базу данных:\nID: #{newId}\nНазвание: Новое блюдо\nЦена: 500₽");
-                        LoadDishesFromDatabase();
-                    }
-                }
+                var createdDish = await App.ApiClient.CreateDishAsync(newDish);
+                MessageBox.Show($"✅ Добавлено новое блюдо через API!\nID: #{createdDish.Id}\nНазвание: {createdDish.Name}\nЦена: {createdDish.Price}₽",
+                              "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                LoadDishesFromApi();
             }
             catch (Exception ex)
             {
-                UpdateOutput($"Ошибка добавления блюда: {ex.Message}");
-                MessageBox.Show($"Ошибка при добавлении блюда: {ex.Message}", "Ошибка",
+                MessageBox.Show($"❌ Ошибка добавления блюда: {ex.Message}", "Ошибка",
                               MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private void BtnEditSelected_Click(object sender, RoutedEventArgs e)
+        private async void BtnEditSelected_Click(object sender, RoutedEventArgs e)
         {
             var dish = GetSelectedDish();
             if (dish != null)
             {
                 try
                 {
-                    using (var connection = new SqlConnection(connectionString))
-                    {
-                        connection.Open();
-                        var query = @"
-                            UPDATE dishes 
-                            SET name = @name, 
-                                price = @price,
-                                category = @category
-                            WHERE id = @id";
+                    dish.Name += " (изм.)";
+                    dish.Price += 100;
 
-                        using (var command = new SqlCommand(query, connection))
-                        {
-                            command.Parameters.AddWithValue("@id", dish.Id);
-                            command.Parameters.AddWithValue("@name", dish.Name + " (изм.)");
-                            command.Parameters.AddWithValue("@price", dish.Price + 100);
-                            command.Parameters.AddWithValue("@category", dish.Category);
-
-                            int rowsAffected = command.ExecuteNonQuery();
-
-                            if (rowsAffected > 0)
-                            {
-                                UpdateOutput($"Блюдо обновлено в базе данных:\nID: #{dish.Id}\nНовое название: {dish.Name} (изм.)\nНовая цена: {dish.Price + 100}₽");
-                                LoadDishesFromDatabase();
-                            }
-                        }
-                    }
+                    var updatedDish = await App.ApiClient.UpdateDishAsync(dish.Id, dish);
+                    MessageBox.Show($"✏️ Блюдо обновлено через API!\nID: #{updatedDish.Id}\nНовое название: {updatedDish.Name}\nНовая цена: {updatedDish.Price}₽",
+                                  "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                    LoadDishesFromApi();
                 }
                 catch (Exception ex)
                 {
-                    UpdateOutput($"Ошибка обновления блюда: {ex.Message}");
-                    MessageBox.Show($"Ошибка при обновлении блюда: {ex.Message}", "Ошибка",
+                    MessageBox.Show($"❌ Ошибка обновления блюда: {ex.Message}", "Ошибка",
                                   MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
@@ -204,7 +111,7 @@ namespace Desktop.Pages
             }
         }
 
-        private void BtnDeleteSelected_Click(object sender, RoutedEventArgs e)
+        private async void BtnDeleteSelected_Click(object sender, RoutedEventArgs e)
         {
             var dish = GetSelectedDish();
             if (dish != null)
@@ -218,33 +125,17 @@ namespace Desktop.Pages
                 {
                     try
                     {
-                        using (var connection = new SqlConnection(connectionString))
+                        var success = await App.ApiClient.DeleteDishAsync(dish.Id);
+                        if (success)
                         {
-                            connection.Open();
-                            var deleteLinksQuery = "DELETE FROM restaurant_dishes WHERE dish_id = @id";
-                            using (var linkCommand = new SqlCommand(deleteLinksQuery, connection))
-                            {
-                                linkCommand.Parameters.AddWithValue("@id", dish.Id);
-                                linkCommand.ExecuteNonQuery();
-                            }
-                            var deleteDishQuery = "DELETE FROM dishes WHERE id = @id";
-                            using (var dishCommand = new SqlCommand(deleteDishQuery, connection))
-                            {
-                                dishCommand.Parameters.AddWithValue("@id", dish.Id);
-                                int rowsAffected = dishCommand.ExecuteNonQuery();
-
-                                if (rowsAffected > 0)
-                                {
-                                    UpdateOutput($"Блюдо удалено из базы данных:\nID: #{dish.Id}\nНазвание: {dish.Name}");
-                                    LoadDishesFromDatabase();
-                                }
-                            }
+                            MessageBox.Show($"🗑️ Блюдо удалено через API!\nID: #{dish.Id}\nНазвание: {dish.Name}",
+                                          "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                            LoadDishesFromApi();
                         }
                     }
                     catch (Exception ex)
                     {
-                        UpdateOutput($"Ошибка удаления блюда: {ex.Message}");
-                        MessageBox.Show($"Ошибка при удалении блюда: {ex.Message}", "Ошибка",
+                        MessageBox.Show($"❌ Ошибка удаления блюда: {ex.Message}", "Ошибка",
                                       MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
@@ -258,22 +149,12 @@ namespace Desktop.Pages
 
         private void BtnRefresh_Click(object sender, RoutedEventArgs e)
         {
-            LoadDishesFromDatabase();
+            LoadDishesFromApi();
         }
 
         private void DishesGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var dish = GetSelectedDish();
-            if (dish != null)
-            {
-                UpdateOutput($"Информация о блюде (из БД):\n" +
-                           $"ID: {dish.Id}\n" +
-                           $"Название: {dish.Name}\n" +
-                           $"Описание: {dish.Description}\n" +
-                           $"Цена: {dish.Price}₽\n" +
-                           $"Категория: {dish.Category}\n" +
-                           $"Ресторан: {GetRestaurantName(dish)}");
-            }
+            _selectedDish = DishesGrid.SelectedItem as Dish;
         }
     }
 }

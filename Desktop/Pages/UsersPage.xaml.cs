@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Desktop.Models;
+using Desktop.Pages.Items;
 
 namespace Desktop.Pages
 {
@@ -22,6 +23,7 @@ namespace Desktop.Pages
     /// </summary>
     public partial class UsersPage : Page
     {
+        private User _selectedUser;
         public UsersPage()
         {
             InitializeComponent();
@@ -34,24 +36,27 @@ namespace Desktop.Pages
             {
                 var users = await App.ApiClient.GetUsersAsync();
                 UsersGrid.ItemsSource = users;
-                UpdateOutput($"✅ Загружено {users.Count} пользователей из API");
+                UsersItemsControl.ItemsSource = users;
             }
             catch (Exception ex)
             {
-                UpdateOutput($"❌ Ошибка загрузки данных: {ex.Message}");
-                MessageBox.Show($"Ошибка подключения к API: {ex.Message}", "Ошибка",
+                MessageBox.Show($"❌ Ошибка загрузки данных: {ex.Message}", "Ошибка",
                               MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private void UpdateOutput(string message)
+        private void UserCard_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            // Метод для обновления вывода, если нужно
+            if (sender is UserCard card)
+            {
+                _selectedUser = card.User;
+                UsersGrid.SelectedItem = _selectedUser;
+            }
         }
 
         private User GetSelectedUser()
         {
-            return UsersGrid.SelectedItem as User;
+            return _selectedUser ?? UsersGrid.SelectedItem as User;
         }
 
         private async void BtnAddUser_Click(object sender, RoutedEventArgs e)
@@ -63,18 +68,17 @@ namespace Desktop.Pages
                     FirstName = "Новый",
                     LastName = "Пользователь",
                     Email = "newuser@example.com",
-                    Phone = "+7 (000) 000-00-00",
-                    CreatedAt = DateTime.Now
+                    Phone = "+7 (999) 999-99-99"
                 };
 
                 var createdUser = await App.ApiClient.CreateUserAsync(newUser);
-                UpdateOutput($"✅ Добавлен новый пользователь через API:\nID: #{createdUser.Id}\nИмя: {createdUser.FirstName} {createdUser.LastName}");
+                MessageBox.Show($"✅ Добавлен новый пользователь через API!\nID: #{createdUser.Id}\nИмя: {createdUser.FirstName} {createdUser.LastName}",
+                              "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                 LoadUsersFromApi();
             }
             catch (Exception ex)
             {
-                UpdateOutput($"❌ Ошибка добавления пользователя: {ex.Message}");
-                MessageBox.Show($"Ошибка при добавлении пользователя: {ex.Message}", "Ошибка",
+                MessageBox.Show($"❌ Ошибка добавления пользователя: {ex.Message}", "Ошибка",
                               MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -87,16 +91,16 @@ namespace Desktop.Pages
                 try
                 {
                     user.FirstName += " (изм.)";
-                    user.Email = "changed_" + user.Email;
+                    user.LastName += " (изм.)";
 
                     var updatedUser = await App.ApiClient.UpdateUserAsync(user.Id, user);
-                    UpdateOutput($"✏️ Пользователь обновлен через API:\nID: #{updatedUser.Id}\nНовое имя: {updatedUser.FirstName}");
+                    MessageBox.Show($"✏️ Пользователь обновлен через API!\nID: #{updatedUser.Id}\nНовое имя: {updatedUser.FirstName} {updatedUser.LastName}",
+                                  "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                     LoadUsersFromApi();
                 }
                 catch (Exception ex)
                 {
-                    UpdateOutput($"❌ Ошибка обновления пользователя: {ex.Message}");
-                    MessageBox.Show($"Ошибка при обновлении пользователя: {ex.Message}", "Ошибка",
+                    MessageBox.Show($"❌ Ошибка обновления пользователя: {ex.Message}", "Ошибка",
                                   MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
@@ -124,14 +128,14 @@ namespace Desktop.Pages
                         var success = await App.ApiClient.DeleteUserAsync(user.Id);
                         if (success)
                         {
-                            UpdateOutput($"🗑️ Пользователь удален через API:\nID: #{user.Id}\nИмя: {user.FirstName} {user.LastName}");
+                            MessageBox.Show($"🗑️ Пользователь удален через API!\nID: #{user.Id}\nИмя: {user.FirstName} {user.LastName}",
+                                          "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                             LoadUsersFromApi();
                         }
                     }
                     catch (Exception ex)
                     {
-                        UpdateOutput($"❌ Ошибка удаления пользователя: {ex.Message}");
-                        MessageBox.Show($"Ошибка при удалении пользователя: {ex.Message}", "Ошибка",
+                        MessageBox.Show($"❌ Ошибка удаления пользователя: {ex.Message}", "Ошибка",
                                       MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
@@ -150,20 +154,7 @@ namespace Desktop.Pages
 
         private void UsersGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var user = GetSelectedUser();
-            if (user != null)
-            {
-                // Можно добавить вывод деталей в ItemOutputGrid
-            }
+            _selectedUser = UsersGrid.SelectedItem as User;
         }
-
-        // Убраны неиспользуемые методы
-        private void TxtSearch_TextChanged(object sender, TextChangedEventArgs e) { }
-        private void CmbRoleFilter_SelectionChanged(object sender, SelectionChangedEventArgs e) { }
-        private void BtnResetFilters_Click(object sender, RoutedEventArgs e) { }
-        private void BtnExport_Click(object sender, RoutedEventArgs e) { }
-        private void BtnView_Click(object sender, RoutedEventArgs e) { }
-        private void BtnEdit_Click(object sender, RoutedEventArgs e) { }
-        private void BtnToggleActive_Click(object sender, RoutedEventArgs e) { }
     }
 }

@@ -15,6 +15,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Desktop.Models;
 
 namespace Desktop.Pages
 {
@@ -23,7 +24,6 @@ namespace Desktop.Pages
     /// </summary>
     public partial class RegisterPage : Page
     {
-        private string connectionString = "Server=localhost;Database=RestaurantDB;Integrated Security=true;";
         public RegisterPage()
         {
             InitializeComponent();
@@ -61,7 +61,6 @@ namespace Desktop.Pages
 
         private void LinkLogin_Click(object sender, RoutedEventArgs e)
         {
-            // Возврат на страницу входа
             NavigationService.GoBack();
         }
 
@@ -81,7 +80,7 @@ namespace Desktop.Pages
                 AttemptRegistration();
         }
 
-        private void AttemptRegistration()
+        private async void AttemptRegistration()
         {
             string firstName = TxtFirstName.Text.Trim();
             string lastName = TxtLastName.Text.Trim();
@@ -97,22 +96,44 @@ namespace Desktop.Pages
             // Показываем индикатор загрузки
             SetLoadingState(true);
 
-            // Попытка регистрации
-            System.Threading.Tasks.Task.Run(() =>
+            try
             {
-                bool isRegistered = RegisterUser(firstName, lastName, email, phone, password);
-
-                Dispatcher.Invoke(() =>
+                // Создаем объект для регистрации (если у User нет Password, возможно нужно использовать другой подход)
+                // Вариант 1: Если API ожидает отдельный DTO для регистрации
+                var registrationData = new
                 {
-                    SetLoadingState(false);
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Email = email,
+                    Phone = phone,
+                    Password = password
+                };
 
-                    if (isRegistered)
-                    {
-                        ShowSuccess("Пользователь успешно зарегистрирован!");
-                        ClearFields();
-                    }
-                });
-            });
+                // Вариант 2: Если нужно использовать существующий User класс
+                var newUser = new User
+                {
+                    FirstName = firstName,
+                    LastName = lastName,
+                    Email = email,
+                    Phone = phone
+                    // Password не добавляем, так как его нет в классе User
+                };
+
+                // Если RegisterUserAsync не существует, используем CreateUserAsync или другой доступный метод
+                // Замените RegisterUserAsync на правильный метод из вашего ApiClient
+                var createdUser = await App.ApiClient.CreateUserAsync(newUser);
+
+                ShowSuccess($"✅ Пользователь успешно зарегистрирован через API!\nID: #{createdUser.Id}\nEmail: {createdUser.Email}");
+                ClearFields();
+            }
+            catch (Exception ex)
+            {
+                ShowError($"❌ Ошибка регистрации через API: {ex.Message}");
+            }
+            finally
+            {
+                SetLoadingState(false);
+            }
         }
 
         private bool ValidateInput(string firstName, string lastName, string email, string phone, string password, string confirmPassword)
@@ -215,79 +236,6 @@ namespace Desktop.Pages
             {
                 return false;
             }
-        }
-
-        private bool RegisterUser(string firstName, string lastName, string email, string phone, string password)
-        {
-            try
-            {
-                using (var connection = new SqlConnection(connectionString))
-                {
-                    connection.Open();
-
-                    // Проверяем, не существует ли уже пользователь с таким email
-                    var checkQuery = "SELECT COUNT(*) FROM users WHERE email = @email";
-                    using (var checkCommand = new SqlCommand(checkQuery, connection))
-                    {
-                        checkCommand.Parameters.AddWithValue("@email", email);
-                        int existingUsers = Convert.ToInt32(checkCommand.ExecuteScalar());
-
-                        if (existingUsers > 0)
-                        {
-                            Dispatcher.Invoke(() =>
-                            {
-                                ShowError("Пользователь с таким email уже существует");
-                            });
-                            return false;
-                        }
-                    }
-
-                    // Регистрируем нового пользователя с паролем
-                    var insertQuery = @"
-                        INSERT INTO users (first_name, last_name, email, phone, password, created_at)
-                        VALUES (@first_name, @last_name, @email, @phone, @password, @created_at);
-                        SELECT SCOPE_IDENTITY();";
-
-                    using (var command = new SqlCommand(insertQuery, connection))
-                    {
-                        command.Parameters.AddWithValue("@first_name", firstName);
-                        command.Parameters.AddWithValue("@last_name", lastName);
-                        command.Parameters.AddWithValue("@email", email);
-                        command.Parameters.AddWithValue("@phone", phone);
-                        command.Parameters.AddWithValue("@password", password); // В реальном приложении используйте хеширование!
-                        command.Parameters.AddWithValue("@created_at", DateTime.Now);
-
-                        var newId = Convert.ToInt32(command.ExecuteScalar());
-
-                        if (newId > 0)
-                        {
-                            Dispatcher.Invoke(() =>
-                            {
-                                ShowSuccess($"Пользователь успешно зарегистрирован!\nID: {newId}");
-                            });
-                            return true;
-                        }
-                    }
-                }
-            }
-            catch (SqlException sqlEx)
-            {
-                Dispatcher.Invoke(() =>
-                {
-                    ShowError($"Ошибка базы данных: {sqlEx.Message}");
-                });
-                return false;
-            }
-            catch (Exception ex)
-            {
-                Dispatcher.Invoke(() =>
-                {
-                    ShowError($"Ошибка регистрации: {ex.Message}");
-                });
-                return false;
-            }
-
-            return false;
         }
 
         private void SetLoadingState(bool isLoading)

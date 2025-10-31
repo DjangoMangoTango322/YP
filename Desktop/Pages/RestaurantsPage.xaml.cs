@@ -14,6 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Desktop.Models;
+using Desktop.Pages.Items;
 
 namespace Desktop.Pages
 {
@@ -22,6 +23,7 @@ namespace Desktop.Pages
     /// </summary>
     public partial class RestaurantsPage : Page
     {
+        private Restaurant _selectedRestaurant;
         public RestaurantsPage()
         {
             InitializeComponent();
@@ -34,24 +36,38 @@ namespace Desktop.Pages
             {
                 var restaurants = await App.ApiClient.GetRestaurantsAsync();
                 RestaurantsGrid.ItemsSource = restaurants;
-                UpdateOutput($"✅ Загружено {restaurants.Count} ресторанов из API");
+                RestaurantsItemsControl.ItemsSource = restaurants;
             }
             catch (Exception ex)
             {
-                UpdateOutput($"❌ Ошибка загрузки данных: {ex.Message}");
-                MessageBox.Show($"Ошибка подключения к API: {ex.Message}", "Ошибка",
+                MessageBox.Show($"❌ Ошибка загрузки данных: {ex.Message}", "Ошибка",
                               MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private void UpdateOutput(string message)
+        private void RestaurantCard_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            // Метод для обновления вывода
+            if (sender is RestaurantCard card)
+            {
+                // Снимаем выделение со всех карточек
+                foreach (var item in RestaurantsItemsControl.Items)
+                {
+                    if (item is Restaurant restaurant)
+                    {
+                        // Можно добавить логику снятия выделения если нужно
+                    }
+                }
+
+                _selectedRestaurant = card.Restaurant;
+
+                // Выделяем выбранный элемент в DataGrid
+                RestaurantsGrid.SelectedItem = _selectedRestaurant;
+            }
         }
 
         private Restaurant GetSelectedRestaurant()
         {
-            return RestaurantsGrid.SelectedItem as Restaurant;
+            return _selectedRestaurant ?? RestaurantsGrid.SelectedItem as Restaurant;
         }
 
         private async void BtnAddRestaurant_Click(object sender, RoutedEventArgs e)
@@ -69,13 +85,13 @@ namespace Desktop.Pages
                 };
 
                 var createdRestaurant = await App.ApiClient.CreateRestaurantAsync(newRestaurant);
-                UpdateOutput($"✅ Добавлен новый ресторан через API:\nID: #{createdRestaurant.Id}\nНазвание: {createdRestaurant.Name}");
+                MessageBox.Show($"✅ Добавлен новый ресторан через API!\nID: #{createdRestaurant.Id}\nНазвание: {createdRestaurant.Name}",
+                              "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                 LoadRestaurantsFromApi();
             }
             catch (Exception ex)
             {
-                UpdateOutput($"❌ Ошибка добавления ресторана: {ex.Message}");
-                MessageBox.Show($"Ошибка при добавлении ресторана: {ex.Message}", "Ошибка",
+                MessageBox.Show($"❌ Ошибка добавления ресторана: {ex.Message}", "Ошибка",
                               MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
@@ -91,13 +107,13 @@ namespace Desktop.Pages
                     restaurant.Capacity += 10;
 
                     var updatedRestaurant = await App.ApiClient.UpdateRestaurantAsync(restaurant.Id, restaurant);
-                    UpdateOutput($"✏️ Ресторан обновлен через API:\nID: #{updatedRestaurant.Id}\nНовое название: {updatedRestaurant.Name}");
+                    MessageBox.Show($"✏️ Ресторан обновлен через API!\nID: #{updatedRestaurant.Id}\nНовое название: {updatedRestaurant.Name}",
+                                  "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                     LoadRestaurantsFromApi();
                 }
                 catch (Exception ex)
                 {
-                    UpdateOutput($"❌ Ошибка обновления ресторана: {ex.Message}");
-                    MessageBox.Show($"Ошибка при обновлении ресторана: {ex.Message}", "Ошибка",
+                    MessageBox.Show($"❌ Ошибка обновления ресторана: {ex.Message}", "Ошибка",
                                   MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
@@ -125,14 +141,14 @@ namespace Desktop.Pages
                         var success = await App.ApiClient.DeleteRestaurantAsync(restaurant.Id);
                         if (success)
                         {
-                            UpdateOutput($"🗑️ Ресторан удален через API:\nID: #{restaurant.Id}\nНазвание: {restaurant.Name}");
+                            MessageBox.Show($"🗑️ Ресторан удален через API!\nID: #{restaurant.Id}\nНазвание: {restaurant.Name}",
+                                          "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                             LoadRestaurantsFromApi();
                         }
                     }
                     catch (Exception ex)
                     {
-                        UpdateOutput($"❌ Ошибка удаления ресторана: {ex.Message}");
-                        MessageBox.Show($"Ошибка при удалении ресторана: {ex.Message}", "Ошибка",
+                        MessageBox.Show($"❌ Ошибка удаления ресторана: {ex.Message}", "Ошибка",
                                       MessageBoxButton.OK, MessageBoxImage.Error);
                     }
                 }
@@ -151,11 +167,7 @@ namespace Desktop.Pages
 
         private void RestaurantsGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            var restaurant = GetSelectedRestaurant();
-            if (restaurant != null)
-            {
-                // Можно добавить вывод деталей в ItemOutputGrid
-            }
+            _selectedRestaurant = RestaurantsGrid.SelectedItem as Restaurant;
         }
     }
 }

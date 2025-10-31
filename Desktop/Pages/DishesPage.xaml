@@ -78,18 +78,28 @@
                         <DataGridTextColumn Header="Описание" Binding="{Binding Description}" Width="250" CanUserResize="False"/>
                         <DataGridTextColumn Header="Цена" Binding="{Binding Price, StringFormat='{}{0}₽'}" Width="100" CanUserResize="False"/>
                         <DataGridTextColumn Header="Категория" Binding="{Binding Category}" Width="140" CanUserResize="False"/>
-                        <DataGridTextColumn Header="Ресторан" Binding="{Binding RestaurantName}" Width="160" CanUserResize="False"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </ScrollViewer>
         </Border>
 
-        <!-- Empty Grid for Item Output -->
+        <!-- User Controls Container -->
         <Border Grid.Row="2" Background="{StaticResource CardBrush}" 
-                CornerRadius="8" Margin="0,200,0,0" Padding="15">
-            <Grid x:Name="ItemOutputGrid">
-                <!-- Пустой Grid для вывода item из БД -->
-            </Grid>
+                CornerRadius="12" Margin="0,20,0,0" Padding="20">
+            <Border.Effect>
+                <StaticResource ResourceKey="ShadowEffect"/>
+            </Border.Effect>
+
+            <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="300">
+                <ItemsControl x:Name="DishesItemsControl">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <items:DishCard 
+                                MouseLeftButtonDown="DishCard_MouseLeftButtonDown"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
         </Border>
     </Grid>
 </Page>
