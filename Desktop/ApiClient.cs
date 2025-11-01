@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using Newtonsoft.Json;
 using System.Threading.Tasks;
 using Desktop.Models;
 
@@ -215,4 +217,4 @@ namespace Desktop
         public T Data { get; set; }
     }
 }
-}
+

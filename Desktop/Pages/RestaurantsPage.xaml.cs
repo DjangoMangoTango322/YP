@@ -45,24 +45,75 @@ namespace Desktop.Pages
             }
         }
 
+        private void RestaurantCard_MouseEnter(object sender, MouseEventArgs e)
+        {
+            if (sender is Border border)
+            {
+                border.Background = new SolidColorBrush(Color.FromRgb(45, 45, 45));
+            }
+        }
+
+        private void RestaurantCard_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (sender is Border border)
+            {
+                border.Background = new SolidColorBrush(Color.FromRgb(30, 30, 30));
+            }
+        }
+
         private void RestaurantCard_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (sender is RestaurantCard card)
+            if (sender is Border border)
             {
-                // Снимаем выделение со всех карточек
+                // Сбрасываем выделение у всех карточек
                 foreach (var item in RestaurantsItemsControl.Items)
                 {
-                    if (item is Restaurant restaurant)
+                    var container = RestaurantsItemsControl.ItemContainerGenerator.ContainerFromItem(item);
+                    if (container != null)
                     {
-                        // Можно добавить логику снятия выделения если нужно
+                        var contentPresenter = FindVisualChild<ContentPresenter>(container);
+                        if (contentPresenter != null)
+                        {
+                            var templateBorder = FindVisualChild<Border>(contentPresenter);
+                            if (templateBorder != null)
+                            {
+                                templateBorder.BorderBrush = Brushes.Transparent;
+                                templateBorder.BorderThickness = new Thickness(0);
+                            }
+                        }
                     }
                 }
 
-                _selectedRestaurant = card.Restaurant;
+                // Выделяем текущую карточку
+                border.BorderBrush = new SolidColorBrush(Color.FromRgb(0, 120, 215));
+                border.BorderThickness = new Thickness(2);
 
-                // Выделяем выбранный элемент в DataGrid
-                RestaurantsGrid.SelectedItem = _selectedRestaurant;
+                // Получаем данные ресторана
+                var restaurant = border.DataContext as Restaurant;
+                if (restaurant != null)
+                {
+                    _selectedRestaurant = restaurant;
+                    RestaurantsGrid.SelectedItem = _selectedRestaurant;
+                }
             }
+        }
+
+        // Вспомогательные методы для поиска дочерних элементов
+        private T FindVisualChild<T>(DependencyObject parent) where T : DependencyObject
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                if (child is T result)
+                    return result;
+                else
+                {
+                    var descendant = FindVisualChild<T>(child);
+                    if (descendant != null)
+                        return descendant;
+                }
+            }
+            return null;
         }
 
         private Restaurant GetSelectedRestaurant()
@@ -79,13 +130,13 @@ namespace Desktop.Pages
                     Name = "Новый ресторан",
                     Address = "Новый адрес",
                     Capacity = 50,
-                    OpenTime = new TimeSpan(10, 0, 0),
-                    CloseTime = new TimeSpan(22, 0, 0),
-                    Tematic = "Общая"
+                    OpenTime = new TimeSpan(9, 0, 0),
+                    CloseTime = new TimeSpan(23, 0, 0),
+                    Tematic = "Итальянская"
                 };
 
                 var createdRestaurant = await App.ApiClient.CreateRestaurantAsync(newRestaurant);
-                MessageBox.Show($"✅ Добавлен новый ресторан через API!\nID: #{createdRestaurant.Id}\nНазвание: {createdRestaurant.Name}",
+                MessageBox.Show($"✅ Добавлен новый ресторан через API!\nID: #{createdRestaurant.Id}\nНазвание: {createdRestaurant.Name}\nВместимость: {createdRestaurant.Capacity} мест",
                               "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                 LoadRestaurantsFromApi();
             }
@@ -107,7 +158,7 @@ namespace Desktop.Pages
                     restaurant.Capacity += 10;
 
                     var updatedRestaurant = await App.ApiClient.UpdateRestaurantAsync(restaurant.Id, restaurant);
-                    MessageBox.Show($"✏️ Ресторан обновлен через API!\nID: #{updatedRestaurant.Id}\nНовое название: {updatedRestaurant.Name}",
+                    MessageBox.Show($"✏️ Ресторан обновлен через API!\nID: #{updatedRestaurant.Id}\nНазвание: {updatedRestaurant.Name}\nВместимость: {updatedRestaurant.Capacity} мест",
                                   "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                     LoadRestaurantsFromApi();
                 }
@@ -168,6 +219,57 @@ namespace Desktop.Pages
         private void RestaurantsGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             _selectedRestaurant = RestaurantsGrid.SelectedItem as Restaurant;
+
+            // Обновляем выделение в карточках при выборе в DataGrid
+            if (_selectedRestaurant != null)
+            {
+                foreach (var item in RestaurantsItemsControl.Items)
+                {
+                    if (item is Restaurant restaurant && restaurant.Id == _selectedRestaurant.Id)
+                    {
+                        var container = RestaurantsItemsControl.ItemContainerGenerator.ContainerFromItem(item);
+                        if (container != null)
+                        {
+                            var contentPresenter = FindVisualChild<ContentPresenter>(container);
+                            if (contentPresenter != null)
+                            {
+                                var templateBorder = FindVisualChild<Border>(contentPresenter);
+                                if (templateBorder != null)
+                                {
+                                    // Сначала сбрасываем все выделения
+                                    foreach (var otherItem in RestaurantsItemsControl.Items)
+                                    {
+                                        var otherContainer = RestaurantsItemsControl.ItemContainerGenerator.ContainerFromItem(otherItem);
+                                        if (otherContainer != null)
+                                        {
+                                            var otherContentPresenter = FindVisualChild<ContentPresenter>(otherContainer);
+                                            if (otherContentPresenter != null)
+                                            {
+                                                var otherBorder = FindVisualChild<Border>(otherContentPresenter);
+                                                if (otherBorder != null)
+                                                {
+                                                    otherBorder.BorderBrush = Brushes.Transparent;
+                                                    otherBorder.BorderThickness = new Thickness(0);
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    // Выделяем выбранную карточку
+                                    templateBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(0, 120, 215));
+                                    templateBorder.BorderThickness = new Thickness(2);
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        private void RestaurantsItemsControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            // Дополнительная логика при загрузке, если нужна
         }
     }
 }

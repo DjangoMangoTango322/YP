@@ -21,10 +21,25 @@ namespace Desktop.Pages.Items
     /// </summary>
     public partial class UserCard : UserControl
     {
+        public static readonly DependencyProperty UserProperty =
+            DependencyProperty.Register("User", typeof(User), typeof(UserCard),
+                new PropertyMetadata(null, OnUserChanged));
+
+        public User User
+        {
+            get { return (User)GetValue(UserProperty); }
+            set { SetValue(UserProperty, value); }
+        }
         public UserCard()
         {
             InitializeComponent();
-            this.DataContext = this;
+           
+        }
+
+        private static void OnUserChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var control = d as UserCard;
+            control.DataContext = control.User;
         }
 
         private void UserControl_MouseEnter(object sender, MouseEventArgs e)
@@ -44,3 +59,5 @@ namespace Desktop.Pages.Items
         }
     }
 }
+
+

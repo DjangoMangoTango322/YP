@@ -4,8 +4,11 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Desktop.Pages.Items"
-             mc:Ignorable="d" 
-             d:DesignHeight="80" d:DesignWidth="400">
+            mc:Ignorable="d" 
+             d:DesignHeight="80" d:DesignWidth="400"
+             MouseEnter="UserControl_MouseEnter"
+             MouseLeave="UserControl_MouseLeave"
+             MouseLeftButtonDown="UserControl_MouseLeftButtonDown">
 
     <Border x:Name="MainBorder" Background="{StaticResource CardBrush}" 
             CornerRadius="12" Padding="20" Margin="0,0,0,10"
@@ -45,7 +48,7 @@
                           Foreground="{StaticResource TextSecondaryBrush}" 
                           FontSize="10"/>
 
-                <TextBlock Text="{Binding Id, StringFormat=#{0}}" 
+                <TextBlock Text="{Binding Id, StringFormat=ID: #{0}}" 
                           Foreground="{StaticResource TextSecondaryBrush}" 
                           FontSize="10" Margin="0,5,0,0"/>
             </StackPanel>

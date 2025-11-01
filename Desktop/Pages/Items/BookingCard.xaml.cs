@@ -22,46 +22,53 @@ namespace Desktop.Pages.Items
     public partial class BookingCard : UserControl
     {
         public static readonly DependencyProperty BookingProperty =
-           DependencyProperty.Register("Booking", typeof(Booking), typeof(BookingCard));
-
-        public static readonly DependencyProperty IsSelectedProperty =
-            DependencyProperty.Register("IsSelected", typeof(bool), typeof(BookingCard));
+             DependencyProperty.Register("Booking", typeof(Booking), typeof(BookingCard),
+                 new PropertyMetadata(null, OnBookingChanged));
 
         public Booking Booking
         {
-            get => (Booking)GetValue(BookingProperty);
-            set => SetValue(BookingProperty, value);
-        }
-
-        public bool IsSelected
-        {
-            get => (bool)GetValue(IsSelectedProperty);
-            set => SetValue(IsSelectedProperty, value);
-        }
-
-        public Brush StatusColor
-        {
-            get
-            {
-                return Booking?.Status switch
-                {
-                    "Подтверждено" => new SolidColorBrush(Color.FromRgb(46, 125, 50)),
-                    "Ожидание" => new SolidColorBrush(Color.FromRgb(251, 140, 0)),
-                    "Отменено" => new SolidColorBrush(Color.FromRgb(198, 40, 40)),
-                    _ => new SolidColorBrush(Color.FromRgb(100, 100, 100))
-                };
-            }
+            get { return (Booking)GetValue(BookingProperty); }
+            set { SetValue(BookingProperty, value); }
         }
 
         public BookingCard()
         {
             InitializeComponent();
-            this.DataContext = this;
+           
+        }
+
+        private static void OnBookingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var control = d as BookingCard;
+            control.DataContext = control.Booking;
+            control.UpdateStatusColor();
+        }
+
+        private void UpdateStatusColor()
+        {
+            if (Booking == null || StatusBorder == null) return;
+
+            switch (Booking.Status)
+            {
+                case "Подтверждено":
+                    StatusBorder.Background = new SolidColorBrush(Color.FromRgb(46, 125, 50));
+                    break;
+                case "Ожидание":
+                    StatusBorder.Background = new SolidColorBrush(Color.FromRgb(251, 140, 0));
+                    break;
+                case "Отменено":
+                    StatusBorder.Background = new SolidColorBrush(Color.FromRgb(198, 40, 40));
+                    break;
+                default:
+                    StatusBorder.Background = new SolidColorBrush(Color.FromRgb(100, 100, 100));
+                    break;
+            }
         }
 
         private void UserControl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            IsSelected = true;
+            MainBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(0, 120, 215));
+            MainBorder.BorderThickness = new Thickness(2);
         }
     }
 }

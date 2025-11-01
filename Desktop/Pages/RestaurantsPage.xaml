@@ -92,11 +92,59 @@
             </Border.Effect>
 
             <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="300">
-                <ItemsControl x:Name="RestaurantsItemsControl">
+                <ItemsControl x:Name="RestaurantsItemsControl" Loaded="RestaurantsItemsControl_Loaded">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <items:RestaurantCard 
-                                MouseLeftButtonDown="RestaurantCard_MouseLeftButtonDown"/>
+                            <Border Background="{StaticResource CardBrush}" CornerRadius="12" 
+                                   Padding="20" Margin="0,0,0,10" Cursor="Hand"
+                                   MouseEnter="RestaurantCard_MouseEnter"
+                                   MouseLeave="RestaurantCard_MouseLeave"
+                                   MouseLeftButtonDown="RestaurantCard_MouseLeftButtonDown">
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.1"/>
+                                </Border.Effect>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="{Binding Name}" 
+                                                  Foreground="{StaticResource TextBrush}" 
+                                                  FontSize="16" FontWeight="Bold"/>
+                                        <TextBlock Text="{Binding Address}" 
+                                                  Foreground="{StaticResource TextSecondaryBrush}" 
+                                                  FontSize="12" Margin="0,2,0,0"
+                                                  TextTrimming="CharacterEllipsis"
+                                                  MaxWidth="300"/>
+                                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                            <TextBlock Text="👥 " FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                            <TextBlock Text="{Binding Capacity, StringFormat={}{0} мест}" 
+                                                      FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                            <TextBlock Text="   🕒 " FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" Margin="10,0,0,0"/>
+                                            <TextBlock Text="{Binding OpenTime, StringFormat=hh\\:mm}" 
+                                                      FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                            <TextBlock Text=" - " FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                            <TextBlock Text="{Binding CloseTime, StringFormat=hh\\:mm}" 
+                                                      FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                            <TextBlock Text="   🏷️ " FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" Margin="10,0,0,0"/>
+                                            <TextBlock Text="{Binding Tematic}" 
+                                                      FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                                        <Border Background="{StaticResource PrimaryBrush}" CornerRadius="8" Padding="8,4">
+                                            <TextBlock Text="{Binding Capacity, StringFormat={}{0} мест}" 
+                                                      Foreground="White" FontSize="10" FontWeight="Bold"/>
+                                        </Border>
+                                        <TextBlock Text="{Binding Id, StringFormat=#{0}}" 
+                                                  Foreground="{StaticResource TextSecondaryBrush}" 
+                                                  FontSize="10" Margin="0,5,0,0"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>

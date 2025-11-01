@@ -45,13 +45,75 @@ namespace Desktop.Pages
             }
         }
 
+        private void BookingCard_MouseEnter(object sender, MouseEventArgs e)
+        {
+            if (sender is Border border)
+            {
+                border.Background = new SolidColorBrush(Color.FromRgb(45, 45, 45));
+            }
+        }
+
+        private void BookingCard_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (sender is Border border)
+            {
+                border.Background = new SolidColorBrush(Color.FromRgb(30, 30, 30));
+            }
+        }
+
         private void BookingCard_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (sender is BookingCard card)
+            if (sender is Border border)
             {
-                _selectedBooking = card.Booking;
-                BookingsGrid.SelectedItem = _selectedBooking;
+                // Сбрасываем выделение у всех карточек
+                foreach (var item in BookingsItemsControl.Items)
+                {
+                    var container = BookingsItemsControl.ItemContainerGenerator.ContainerFromItem(item);
+                    if (container != null)
+                    {
+                        var contentPresenter = FindVisualChild<ContentPresenter>(container);
+                        if (contentPresenter != null)
+                        {
+                            var templateBorder = FindVisualChild<Border>(contentPresenter);
+                            if (templateBorder != null)
+                            {
+                                templateBorder.BorderBrush = Brushes.Transparent;
+                                templateBorder.BorderThickness = new Thickness(0);
+                            }
+                        }
+                    }
+                }
+
+                // Выделяем текущую карточку
+                border.BorderBrush = new SolidColorBrush(Color.FromRgb(0, 120, 215));
+                border.BorderThickness = new Thickness(2);
+
+                // Получаем данные бронирования
+                var booking = border.DataContext as Booking;
+                if (booking != null)
+                {
+                    _selectedBooking = booking;
+                    BookingsGrid.SelectedItem = _selectedBooking;
+                }
             }
+        }
+
+        // Вспомогательные методы для поиска дочерних элементов
+        private T FindVisualChild<T>(DependencyObject parent) where T : DependencyObject
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                if (child is T result)
+                    return result;
+                else
+                {
+                    var descendant = FindVisualChild<T>(child);
+                    if (descendant != null)
+                        return descendant;
+                }
+            }
+            return null;
         }
 
         private Booking GetSelectedBooking()
@@ -93,7 +155,7 @@ namespace Desktop.Pages
                 try
                 {
                     booking.NumberOfGuests += 1;
-                    booking.Status = "Изменено";
+                    booking.Status = "Подтверждено";
                     booking.BookingDate = booking.BookingDate.AddDays(1);
 
                     var updatedBooking = await App.ApiClient.UpdateBookingAsync(booking.Id, booking);
@@ -158,6 +220,112 @@ namespace Desktop.Pages
         private void BookingsGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             _selectedBooking = BookingsGrid.SelectedItem as Booking;
+
+            // Обновляем выделение в карточках при выборе в DataGrid
+            if (_selectedBooking != null)
+            {
+                foreach (var item in BookingsItemsControl.Items)
+                {
+                    if (item is Booking booking && booking.Id == _selectedBooking.Id)
+                    {
+                        var container = BookingsItemsControl.ItemContainerGenerator.ContainerFromItem(item);
+                        if (container != null)
+                        {
+                            var contentPresenter = FindVisualChild<ContentPresenter>(container);
+                            if (contentPresenter != null)
+                            {
+                                var templateBorder = FindVisualChild<Border>(contentPresenter);
+                                if (templateBorder != null)
+                                {
+                                    // Сначала сбрасываем все выделения
+                                    foreach (var otherItem in BookingsItemsControl.Items)
+                                    {
+                                        var otherContainer = BookingsItemsControl.ItemContainerGenerator.ContainerFromItem(otherItem);
+                                        if (otherContainer != null)
+                                        {
+                                            var otherContentPresenter = FindVisualChild<ContentPresenter>(otherContainer);
+                                            if (otherContentPresenter != null)
+                                            {
+                                                var otherBorder = FindVisualChild<Border>(otherContentPresenter);
+                                                if (otherBorder != null)
+                                                {
+                                                    otherBorder.BorderBrush = Brushes.Transparent;
+                                                    otherBorder.BorderThickness = new Thickness(0);
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    // Выделяем выбранную карточку
+                                    templateBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(0, 120, 215));
+                                    templateBorder.BorderThickness = new Thickness(2);
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Метод для обновления цвета статуса в реальном времени
+        private void UpdateStatusColor(Border statusBorder, string status)
+        {
+            switch (status)
+            {
+                case "Подтверждено":
+                    statusBorder.Background = new SolidColorBrush(Color.FromRgb(46, 125, 50));
+                    break;
+                case "Ожидание":
+                    statusBorder.Background = new SolidColorBrush(Color.FromRgb(251, 140, 0));
+                    break;
+                case "Отменено":
+                    statusBorder.Background = new SolidColorBrush(Color.FromRgb(198, 40, 40));
+                    break;
+                default:
+                    statusBorder.Background = new SolidColorBrush(Color.FromRgb(100, 100, 100));
+                    break;
+            }
+        }
+
+        // Метод вызывается когда загружается элемент ItemsControl
+        private void BookingsItemsControl_Loaded(object sender, RoutedEventArgs e)
+        {
+            // Обновляем цвета статусов после загрузки данных
+            foreach (var item in BookingsItemsControl.Items)
+            {
+                var container = BookingsItemsControl.ItemContainerGenerator.ContainerFromItem(item);
+                if (container != null)
+                {
+                    var contentPresenter = FindVisualChild<ContentPresenter>(container);
+                    if (contentPresenter != null)
+                    {
+                        var statusBorder = FindVisualChild<Border>(contentPresenter, "StatusBorder");
+                        if (statusBorder != null && item is Booking booking)
+                        {
+                            UpdateStatusColor(statusBorder, booking.Status);
+                        }
+                    }
+                }
+            }
+        }
+
+        // Перегруженный метод для поиска по имени
+        private T FindVisualChild<T>(DependencyObject parent, string childName) where T : DependencyObject
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                if (child is T result && (child as FrameworkElement)?.Name == childName)
+                    return result;
+                else
+                {
+                    var descendant = FindVisualChild<T>(child, childName);
+                    if (descendant != null)
+                        return descendant;
+                }
+            }
+            return null;
         }
     }
 }

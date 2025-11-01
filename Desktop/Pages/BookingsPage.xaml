@@ -97,8 +97,51 @@
                 <ItemsControl x:Name="BookingsItemsControl">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Items:BookingCard 
-                                MouseLeftButtonDown="BookingCard_MouseLeftButtonDown"/>
+                            <Border Background="{StaticResource CardBrush}" CornerRadius="12" 
+                                   Padding="20" Margin="0,0,0,10" Cursor="Hand"
+                                   MouseEnter="BookingCard_MouseEnter"
+                                   MouseLeave="BookingCard_MouseLeave"
+                                   MouseLeftButtonDown="BookingCard_MouseLeftButtonDown">
+                                <Border.Effect>
+                                    <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.1"/>
+                                </Border.Effect>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="{Binding UserId, StringFormat=Клиент ID: {0}}" 
+                                                  Foreground="{StaticResource TextBrush}" 
+                                                  FontSize="16" FontWeight="Bold"/>
+                                        <TextBlock Text="{Binding RestaurantId, StringFormat=Ресторан ID: {0}}" 
+                                                  Foreground="{StaticResource TextSecondaryBrush}" 
+                                                  FontSize="12" Margin="0,2,0,0"/>
+                                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                            <TextBlock Text="📅 " FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                            <TextBlock Text="{Binding BookingDate, StringFormat=dd.MM.yyyy}" 
+                                                      FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                            <TextBlock Text="   🕒 " FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" Margin="10,0,0,0"/>
+                                            <TextBlock Text="{Binding BookingTime, StringFormat=hh\\:mm}" 
+                                                      FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                            <TextBlock Text="   👥 " FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" Margin="10,0,0,0"/>
+                                            <TextBlock Text="{Binding NumberOfGuests}" 
+                                                      FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                                        <Border x:Name="StatusBorder" CornerRadius="8" Padding="8,4">
+                                            <TextBlock Text="{Binding Status}" 
+                                                      Foreground="White" FontSize="10" FontWeight="Bold"/>
+                                        </Border>
+                                        <TextBlock Text="{Binding Id, StringFormat=#{0}}" 
+                                                  Foreground="{StaticResource TextSecondaryBrush}" 
+                                                  FontSize="10" Margin="0,5,0,0"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
