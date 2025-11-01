@@ -5,7 +5,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="24dp">
+    android:padding="24dp"
+    android:background="#1a1a1a">
+
 
     <TextView
         android:id="@+id/TvAuth"
@@ -16,7 +18,8 @@
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:textColor="#d4af37"/>
 
     <TextView
         android:id="@+id/TvLogin"
@@ -28,7 +31,8 @@
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/TvAuth"
-        android:layout_marginStart="60dp" />
+        android:layout_marginStart="60dp"
+        android:textColor="#b0b0b0"/>
 
 
     <EditText
@@ -39,11 +43,13 @@
         android:layout_marginEnd="60dp"
         android:layout_marginTop="10dp"
         android:hint="Логин"
+        android:textColorHint="@color/TextHintColor"
         android:inputType="text"
         android:padding="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/TvLogin" />
+        app:layout_constraintTop_toBottomOf="@+id/TvLogin"
+        android:background="@drawable/textbox"/>
 
     <TextView
         android:id="@+id/TvPassword"
@@ -51,9 +57,11 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="60dp"
         android:layout_marginTop="20dp"
-        android:text="Password:"
+        android:textSize="16sp"
+        android:text="Введите пароль:"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/EtLogin" />
+        app:layout_constraintTop_toBottomOf="@id/EtLogin"
+        android:textColor="#b0b0b0"/>
 
 
     <EditText
@@ -65,10 +73,12 @@
         android:layout_marginTop="10dp"
         android:padding="10dp"
         android:hint="Пароль"
+        android:textColorHint="@color/TextHintColor"
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/TvPassword" />
+        app:layout_constraintTop_toBottomOf="@id/TvPassword"
+        android:background="@drawable/textbox"/>
     <TextView
         android:id="@+id/ForgotPass"
         android:layout_width="wrap_content"
@@ -89,11 +99,13 @@
         android:layout_marginEnd="80dp"
         android:layout_marginTop="50dp"
         android:text="Вход"
-        android:textColor="@color/black"
-        android:textAllCaps="false"
+        android:textColor="@color/TextColor"
+        android:textAllCaps="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/ForgotPass" />
+        app:layout_constraintTop_toBottomOf="@id/ForgotPass"
+        android:background="@drawable/button"
+        android:onClick="LogIn_Click"/>
 
     <TextView
         android:id="@+id/RegIn"
@@ -101,8 +113,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
         android:text="Регистрация"
+        android:onClick="Reg_Text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/bthSingIn" />
+        app:layout_constraintTop_toBottomOf="@id/bthSingIn"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

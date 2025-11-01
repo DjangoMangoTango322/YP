@@ -1,6 +1,7 @@
 package com.example.a123;
 
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,7 +14,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-            return insets;
+        setContentView(R.layout.login);
+
         };
+    public void Reg_Text(View view)
+    {
+        setContentView(R.layout.regin);
     }
+}
+

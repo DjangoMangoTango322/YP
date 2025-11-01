@@ -1,20 +1,295 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:background="#000000"
+    android:padding="16dp"
+    android:fitsSystemWindows="true">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvRestaurants"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:padding="8dp" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- Секция ресторана -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="25dp"
+            app:cardElevation="12dp"
+            app:cardBackgroundColor="#1A1A1A"
+            android:layout_marginBottom="30dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Картинка ресторана -->
+                <ImageView
+                    android:id="@+id/restaurantImage"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/restaurant_interior"
+                    android:contentDescription="Интерьер ресторана" />
+
+                <!-- Название ресторана -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="LA BELLA VITA"
+                    android:textColor="#FFD700"
+                    android:textSize="32sp"
+                    android:textStyle="bold"
+                    android:gravity="center"
+                    android:padding="20dp"
+                    android:letterSpacing="0.2"
+                    android:background="#2A2A2A"
+                    android:textAllCaps="true" />
+
+                <!-- Рейтинг и кухня -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:padding="16dp"
+                    android:background="#1A1A1A">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:layout_weight="1">
+
+                        <RatingBar
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:numStars="5"
+                            android:rating="4.7"
+                            android:stepSize="0.1"
+                            android:isIndicator="true"
+                            android:progressTint="#FFD700"
+                            android:progressBackgroundTint="#444444" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="4.7/5 (284 отзыва)"
+                            android:textColor="#FFFFFF"
+                            android:textSize="12sp"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="40dp"
+                        android:background="#FFD700"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:layout_weight="1">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🍝 Итальянская кухня"
+                            android:textColor="#FFFFFF"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🥂 Премиум-вина"
+                            android:textColor="#FFFFFF"
+                            android:textSize="12sp"
+                            android:layout_marginTop="2dp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- Описание ресторана -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Элегантный ресторан итальянской кухни с атмосферой старой Италии. Шеф-повар с мишленовским опытом, живая музыка по вечерам и лучшая винная карта в городе. Идеальное место для романтических ужинов и деловых встреч."
+                    android:textColor="#CCCCCC"
+                    android:textSize="16sp"
+                    android:lineSpacingExtra="4dp"
+                    android:padding="20dp"
+                    android:background="#1A1A1A" />
+
+                <!-- Особенности -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"
+                    android:padding="16dp"
+                    android:background="#2A2A2A">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:layout_weight="1">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🎻"
+                            android:textSize="24sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Живая музыка"
+                            android:textColor="#FFFFFF"
+                            android:textSize="12sp"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:layout_weight="1">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🍷"
+                            android:textSize="24sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Винная карта"
+                            android:textColor="#FFFFFF"
+                            android:textSize="12sp"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:layout_weight="1">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🌿"
+                            android:textSize="24sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Терраса"
+                            android:textColor="#FFFFFF"
+                            android:textSize="12sp"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:layout_weight="1">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🚗"
+                            android:textSize="24sp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Парковка"
+                            android:textColor="#FFFFFF"
+                            android:textSize="12sp"
+                            android:layout_marginTop="4dp" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- Заголовок бронирования -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="БРОНИРОВАНИЕ СТОЛИКА"
+            android:textColor="#FFD700"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="30dp"
+            android:letterSpacing="0.1"
+            android:textAllCaps="true" />
+
+        <!-- Остальная часть формы бронирования (как в предыдущем коде) -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="8dp"
+            app:cardBackgroundColor="#1A1A1A"
+            android:layout_marginBottom="30dp">
+
+            <!-- ... форма бронирования ... -->
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- Кнопка бронирования -->
+        <Button
+            android:id="@+id/btnBook"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:text="ЗАБРОНИРОВАТЬ СТОЛ"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:letterSpacing="0.05"
+            android:background="@drawable/button_red_rounded_large"
+            android:layout_marginTop="20dp" />
+
+        <!-- Контактная информация -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📞 Для срочных бронирований: +7 (999) 123-45-67\n📍 ул. Престижная, 15, центр города"
+            android:textColor="#FFD700"
+            android:textSize="14sp"
+            android:gravity="center"
+            android:layout_marginTop="30dp"
+            android:padding="16dp"
+            android:background="#1A1A1A"
+            android:backgroundTint="#1A1A1A"
+            android:lineSpacingExtra="4dp" />
+
+    </LinearLayout>
+
+</ScrollView>
