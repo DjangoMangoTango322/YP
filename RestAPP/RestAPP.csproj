@@ -9,6 +9,9 @@
   <ItemGroup>
     <Folder Include="Pages\" />
     <Folder Include="wwwroot\" />
+    <Folder Include="Context\" />
+    <Folder Include="Controllers\" />
+    <Folder Include="Model\" />
   </ItemGroup>
 
   <ItemGroup>
