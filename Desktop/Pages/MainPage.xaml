@@ -33,9 +33,7 @@
                         <TextBlock Text="Gourmet" 
                                  Foreground="{StaticResource AccentBrush}" 
                                  FontSize="18" FontWeight="Bold"/>
-                        <TextBlock Text="Booking System" 
-                                 Foreground="White" 
-                                 FontSize="14" FontWeight="Medium"/>
+                        
                     </StackPanel>
                 </Border>
 

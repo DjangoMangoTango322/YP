@@ -175,7 +175,7 @@ namespace Desktop.Pages
             BtnLogin.IsEnabled = !isLoading;
             TxtLogin.IsEnabled = !isLoading;
             TxtPassword.IsEnabled = !isLoading;
-            LinkRegister.IsEnabled = !isLoading;
+          
         }
 
         private void ShowError(string message)

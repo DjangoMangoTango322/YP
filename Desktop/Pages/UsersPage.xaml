@@ -98,7 +98,10 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Border Background="{StaticResource CardBrush}" CornerRadius="12" 
-                           Padding="20" Margin="0,0,0,10" Cursor="Hand">
+                           Padding="20" Margin="0,0,0,10" Cursor="Hand"
+                           MouseEnter="UserCard_MouseEnter"
+                           MouseLeave="UserCard_MouseLeave"
+                           MouseLeftButtonDown="UserCard_MouseLeftButtonDown">
                                 <Border.Effect>
                                     <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.1"/>
                                 </Border.Effect>

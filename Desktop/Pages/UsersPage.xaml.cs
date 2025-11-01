@@ -45,13 +45,87 @@ namespace Desktop.Pages
             }
         }
 
+        private void UserCard_MouseEnter(object sender, MouseEventArgs e)
+        {
+            if (sender is Border border && border.DataContext is User user && user != _selectedUser)
+            {
+                border.Background = new SolidColorBrush(Color.FromRgb(45, 45, 45));
+            }
+        }
+
+        private void UserCard_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (sender is Border border && border.DataContext is User user && user != _selectedUser)
+            {
+                border.Background = new SolidColorBrush(Color.FromRgb(30, 30, 30));
+            }
+        }
+
         private void UserCard_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (sender is UserCard card)
+            if (sender is Border border)
             {
-                _selectedUser = card.User;
-                UsersGrid.SelectedItem = _selectedUser;
+                var user = border.DataContext as User;
+                if (user != null)
+                {
+                    // Сбрасываем предыдущее выделение
+                    if (_selectedUser != null)
+                    {
+                        ResetUserCardSelection(_selectedUser);
+                    }
+
+                    // Устанавливаем новое выделение
+                    _selectedUser = user;
+                    border.BorderBrush = new SolidColorBrush(Color.FromRgb(0, 120, 215));
+                    border.BorderThickness = new Thickness(2);
+
+                    UsersGrid.SelectedItem = _selectedUser;
+                }
             }
+        }
+
+        private void ResetUserCardSelection(User userToReset)
+        {
+            foreach (var item in UsersItemsControl.Items)
+            {
+                if (item is User user && user.Id == userToReset.Id)
+                {
+                    var container = UsersItemsControl.ItemContainerGenerator.ContainerFromItem(item);
+                    if (container != null)
+                    {
+                        var contentPresenter = FindVisualChild<ContentPresenter>(container);
+                        if (contentPresenter != null)
+                        {
+                            var templateBorder = FindVisualChild<Border>(contentPresenter);
+                            if (templateBorder != null)
+                            {
+                                templateBorder.BorderBrush = Brushes.Transparent;
+                                templateBorder.BorderThickness = new Thickness(0);
+                                templateBorder.Background = new SolidColorBrush(Color.FromRgb(30, 30, 30));
+                            }
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
+        // Вспомогательные методы для поиска дочерних элементов
+        private T FindVisualChild<T>(DependencyObject parent) where T : DependencyObject
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = VisualTreeHelper.GetChild(parent, i);
+                if (child is T result)
+                    return result;
+                else
+                {
+                    var descendant = FindVisualChild<T>(child);
+                    if (descendant != null)
+                        return descendant;
+                }
+            }
+            return null;
         }
 
         private User GetSelectedUser()
@@ -155,6 +229,53 @@ namespace Desktop.Pages
         private void UsersGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             _selectedUser = UsersGrid.SelectedItem as User;
+
+            // Обновляем выделение в карточках при выборе в DataGrid
+            if (_selectedUser != null)
+            {
+                // Сбрасываем все выделения
+                foreach (var item in UsersItemsControl.Items)
+                {
+                    var container = UsersItemsControl.ItemContainerGenerator.ContainerFromItem(item);
+                    if (container != null)
+                    {
+                        var contentPresenter = FindVisualChild<ContentPresenter>(container);
+                        if (contentPresenter != null)
+                        {
+                            var templateBorder = FindVisualChild<Border>(contentPresenter);
+                            if (templateBorder != null)
+                            {
+                                templateBorder.BorderBrush = Brushes.Transparent;
+                                templateBorder.BorderThickness = new Thickness(0);
+                                templateBorder.Background = new SolidColorBrush(Color.FromRgb(30, 30, 30));
+                            }
+                        }
+                    }
+                }
+
+                // Выделяем выбранную карточку
+                foreach (var item in UsersItemsControl.Items)
+                {
+                    if (item is User user && user.Id == _selectedUser.Id)
+                    {
+                        var container = UsersItemsControl.ItemContainerGenerator.ContainerFromItem(item);
+                        if (container != null)
+                        {
+                            var contentPresenter = FindVisualChild<ContentPresenter>(container);
+                            if (contentPresenter != null)
+                            {
+                                var templateBorder = FindVisualChild<Border>(contentPresenter);
+                                if (templateBorder != null)
+                                {
+                                    templateBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(0, 120, 215));
+                                    templateBorder.BorderThickness = new Thickness(2);
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
         }
     }
 }

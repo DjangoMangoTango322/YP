@@ -25,12 +25,21 @@ namespace Desktop.Pages.Items
              DependencyProperty.Register("Booking", typeof(Booking), typeof(BookingCard),
                  new PropertyMetadata(null, OnBookingChanged));
 
+        public static readonly DependencyProperty IsSelectedProperty =
+            DependencyProperty.Register("IsSelected", typeof(bool), typeof(BookingCard),
+                new PropertyMetadata(false, OnIsSelectedChanged));
+
         public Booking Booking
         {
             get { return (Booking)GetValue(BookingProperty); }
             set { SetValue(BookingProperty, value); }
         }
 
+        public bool IsSelected
+        {
+            get { return (bool)GetValue(IsSelectedProperty); }
+            set { SetValue(IsSelectedProperty, value); }
+        }
         public BookingCard()
         {
             InitializeComponent();
@@ -42,6 +51,12 @@ namespace Desktop.Pages.Items
             var control = d as BookingCard;
             control.DataContext = control.Booking;
             control.UpdateStatusColor();
+        }
+
+        private static void OnIsSelectedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var control = d as BookingCard;
+            control.UpdateSelectionAppearance();
         }
 
         private void UpdateStatusColor()
@@ -65,10 +80,23 @@ namespace Desktop.Pages.Items
             }
         }
 
+        private void UpdateSelectionAppearance()
+        {
+            if (IsSelected)
+            {
+                MainBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(0, 120, 215));
+                MainBorder.BorderThickness = new Thickness(2);
+            }
+            else
+            {
+                MainBorder.BorderBrush = Brushes.Transparent;
+                MainBorder.BorderThickness = new Thickness(0);
+            }
+        }
+
         private void UserControl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            MainBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(0, 120, 215));
-            MainBorder.BorderThickness = new Thickness(2);
+            IsSelected = !IsSelected; // Переключаем выделение
         }
     }
 }

@@ -34,7 +34,20 @@ namespace Desktop
                 var response = await _httpClient.GetAsync(_baseUrl + endpoint);
                 response.EnsureSuccessStatusCode();
                 var content = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<ApiResponse<T>>(content).Data;
+
+                // Попробуем десериализовать как ApiResponse, если не получится - как прямой объект
+                try
+                {
+                    var apiResponse = JsonConvert.DeserializeObject<ApiResponse<T>>(content);
+                    if (apiResponse != null && apiResponse.Success)
+                        return apiResponse.Data;
+                }
+                catch
+                {
+                    // Если не ApiResponse, пробуем как прямой объект
+                }
+
+                return JsonConvert.DeserializeObject<T>(content);
             }
             catch (HttpRequestException ex)
             {
@@ -55,7 +68,20 @@ namespace Desktop
                 var response = await _httpClient.PostAsync(_baseUrl + endpoint, content);
                 response.EnsureSuccessStatusCode();
                 var responseContent = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<ApiResponse<T>>(responseContent).Data;
+
+                // Попробуем десериализовать как ApiResponse, если не получится - как прямой объект
+                try
+                {
+                    var apiResponse = JsonConvert.DeserializeObject<ApiResponse<T>>(responseContent);
+                    if (apiResponse != null && apiResponse.Success)
+                        return apiResponse.Data;
+                }
+                catch
+                {
+                    // Если не ApiResponse, пробуем как прямой объект
+                }
+
+                return JsonConvert.DeserializeObject<T>(responseContent);
             }
             catch (Exception ex)
             {
@@ -72,7 +98,20 @@ namespace Desktop
                 var response = await _httpClient.PutAsync(_baseUrl + endpoint, content);
                 response.EnsureSuccessStatusCode();
                 var responseContent = await response.Content.ReadAsStringAsync();
-                return JsonConvert.DeserializeObject<ApiResponse<T>>(responseContent).Data;
+
+                // Попробуем десериализовать как ApiResponse, если не получится - как прямой объект
+                try
+                {
+                    var apiResponse = JsonConvert.DeserializeObject<ApiResponse<T>>(responseContent);
+                    if (apiResponse != null && apiResponse.Success)
+                        return apiResponse.Data;
+                }
+                catch
+                {
+                    // Если не ApiResponse, пробуем как прямой объект
+                }
+
+                return JsonConvert.DeserializeObject<T>(responseContent);
             }
             catch (Exception ex)
             {
@@ -85,7 +124,22 @@ namespace Desktop
             try
             {
                 var response = await _httpClient.DeleteAsync(_baseUrl + endpoint);
-                return response.IsSuccessStatusCode;
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+
+                    // Проверяем, если ответ в формате ApiResponse
+                    try
+                    {
+                        var apiResponse = JsonConvert.DeserializeObject<ApiResponse<object>>(responseContent);
+                        return apiResponse?.Success ?? response.IsSuccessStatusCode;
+                    }
+                    catch
+                    {
+                        return response.IsSuccessStatusCode;
+                    }
+                }
+                return false;
             }
             catch (Exception ex)
             {
@@ -93,6 +147,7 @@ namespace Desktop
             }
         }
 
+        // Остальные методы остаются без изменений
         public async Task<List<User>> GetUsersAsync()
         {
             return await GetAsync<List<User>>("users");
@@ -217,4 +272,3 @@ namespace Desktop
         public T Data { get; set; }
     }
 }
-
