@@ -175,6 +175,9 @@ namespace Desktop.Pages
             var user = GetSelectedUser();
             if (user != null)
             {
+
+
+
                 var result = MessageBox.Show($"Вы уверены, что хотите удалить пользователя \"{user.FirstName} {user.LastName}\"?",
                                            "Подтверждение удаления",
                                            MessageBoxButton.YesNo,
