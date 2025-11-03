@@ -21,11 +21,13 @@ namespace Desktop.Pages.Items
     /// </summary>
     public partial class DishCard : UserControl
     {
-        public static readonly DependencyProperty DishProperty =
-           DependencyProperty.Register("Dish", typeof(Dish), typeof(DishCard));
+       public static readonly DependencyProperty DishProperty =
+           DependencyProperty.Register("Dish", typeof(Dish), typeof(DishCard),
+               new PropertyMetadata(null, OnDishChanged));
 
         public static readonly DependencyProperty IsSelectedProperty =
-            DependencyProperty.Register("IsSelected", typeof(bool), typeof(DishCard));
+            DependencyProperty.Register("IsSelected", typeof(bool), typeof(DishCard),
+                new PropertyMetadata(false, OnIsSelectedChanged));
 
         public Dish Dish
         {
@@ -38,15 +40,44 @@ namespace Desktop.Pages.Items
             get => (bool)GetValue(IsSelectedProperty);
             set => SetValue(IsSelectedProperty, value);
         }
+
         public DishCard()
         {
             InitializeComponent();
-            this.DataContext = this;
+        }
+
+        private static void OnDishChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var control = d as DishCard;
+            if (control != null && e.NewValue is Dish dish)
+            {
+                control.DataContext = dish; // Устанавливаем DataContext на блюдо
+            }
+        }
+
+        private static void OnIsSelectedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var control = d as DishCard;
+            control?.UpdateSelectionAppearance();
+        }
+
+        private void UpdateSelectionAppearance()
+        {
+            // Обновление внешнего вида при выделении
+            if (IsSelected)
+            {
+                VisualStateManager.GoToElementState(this, "SelectedState", true);
+            }
+            else
+            {
+                VisualStateManager.GoToElementState(this, "NormalState", true);
+            }
         }
 
         private void UserControl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            IsSelected = true;
+            IsSelected = !IsSelected;
+            e.Handled = true;
         }
     }
 }

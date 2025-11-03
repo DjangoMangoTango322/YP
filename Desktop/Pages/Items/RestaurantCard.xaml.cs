@@ -22,10 +22,12 @@ namespace Desktop.Pages.Items
     public partial class RestaurantCard : UserControl
     {
         public static readonly DependencyProperty RestaurantProperty =
-            DependencyProperty.Register("Restaurant", typeof(Restaurant), typeof(RestaurantCard));
+            DependencyProperty.Register("Restaurant", typeof(Restaurant), typeof(RestaurantCard),
+                new PropertyMetadata(null, OnRestaurantChanged));
 
         public static readonly DependencyProperty IsSelectedProperty =
-            DependencyProperty.Register("IsSelected", typeof(bool), typeof(RestaurantCard));
+            DependencyProperty.Register("IsSelected", typeof(bool), typeof(RestaurantCard),
+                new PropertyMetadata(false, OnIsSelectedChanged));
 
         public Restaurant Restaurant
         {
@@ -39,15 +41,44 @@ namespace Desktop.Pages.Items
             set => SetValue(IsSelectedProperty, value);
         }
 
+
         public RestaurantCard()
         {
             InitializeComponent();
-            this.DataContext = this;
+           
+        }
+
+        private static void OnRestaurantChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var control = d as RestaurantCard;
+            if (control != null && e.NewValue is Restaurant restaurant)
+            {
+                control.DataContext = restaurant;
+            }
+        }
+
+        private static void OnIsSelectedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var control = d as RestaurantCard;
+            control?.UpdateSelectionAppearance();
+        }
+
+        private void UpdateSelectionAppearance()
+        {
+            if (IsSelected)
+            {
+                VisualStateManager.GoToElementState(this, "SelectedState", true);
+            }
+            else
+            {
+                VisualStateManager.GoToElementState(this, "NormalState", true);
+            }
         }
 
         private void UserControl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            IsSelected = true;
+            IsSelected = !IsSelected;
+            e.Handled = true;
         }
     }
 }

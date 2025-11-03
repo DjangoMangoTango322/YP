@@ -71,6 +71,18 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Pages\AddEditDishPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\AddEditRestaurantPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\AddEditUserPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\BookingsPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -122,6 +134,15 @@
     <Compile Include="Models\Restaurant.cs" />
     <Compile Include="Models\RestaurantDish.cs" />
     <Compile Include="Models\User.cs" />
+    <Compile Include="Pages\AddEditDishPage.xaml.cs">
+      <DependentUpon>AddEditDishPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\AddEditRestaurantPage.xaml.cs">
+      <DependentUpon>AddEditRestaurantPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\AddEditUserPage.xaml.cs">
+      <DependentUpon>AddEditUserPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\BookingsPage.xaml.cs">
       <DependentUpon>BookingsPage.xaml</DependentUpon>
     </Compile>

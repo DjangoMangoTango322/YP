@@ -121,52 +121,17 @@ namespace Desktop.Pages
             return _selectedRestaurant ?? RestaurantsGrid.SelectedItem as Restaurant;
         }
 
-        private async void BtnAddRestaurant_Click(object sender, RoutedEventArgs e)
+        private void BtnAddRestaurant_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                var newRestaurant = new Restaurant
-                {
-                    Name = "Новый ресторан",
-                    Address = "Новый адрес",
-                    Capacity = 50,
-                    OpenTime = new TimeSpan(9, 0, 0),
-                    CloseTime = new TimeSpan(23, 0, 0),
-                    Tematic = "Итальянская"
-                };
-
-                var createdRestaurant = await App.ApiClient.CreateRestaurantAsync(newRestaurant);
-                MessageBox.Show($"✅ Добавлен новый ресторан через API!\nID: #{createdRestaurant.Id}\nНазвание: {createdRestaurant.Name}\nВместимость: {createdRestaurant.Capacity} мест",
-                              "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                LoadRestaurantsFromApi();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"❌ Ошибка добавления ресторана: {ex.Message}", "Ошибка",
-                              MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            NavigationService.Navigate(new AddEditRestaurantPage());
         }
 
-        private async void BtnEditSelected_Click(object sender, RoutedEventArgs e)
+        private void BtnEditSelected_Click(object sender, RoutedEventArgs e)
         {
             var restaurant = GetSelectedRestaurant();
             if (restaurant != null)
             {
-                try
-                {
-                    restaurant.Name += " (изм.)";
-                    restaurant.Capacity += 10;
-
-                    var updatedRestaurant = await App.ApiClient.UpdateRestaurantAsync(restaurant.Id, restaurant);
-                    MessageBox.Show($"✏️ Ресторан обновлен через API!\nID: #{updatedRestaurant.Id}\nНазвание: {updatedRestaurant.Name}\nВместимость: {updatedRestaurant.Capacity} мест",
-                                  "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                    LoadRestaurantsFromApi();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"❌ Ошибка обновления ресторана: {ex.Message}", "Ошибка",
-                                  MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+                NavigationService.Navigate(new AddEditRestaurantPage(restaurant));
             }
             else
             {
@@ -271,5 +236,6 @@ namespace Desktop.Pages
         {
             // Дополнительная логика при загрузке, если нужна
         }
+
     }
 }

@@ -121,50 +121,17 @@ namespace Desktop.Pages
             return _selectedDish ?? DishesGrid.SelectedItem as Dish;
         }
 
-        private async void BtnAddDish_Click(object sender, RoutedEventArgs e)
+        private void BtnAddDish_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                var newDish = new Dish
-                {
-                    Name = "Новое блюдо",
-                    Description = "Описание нового блюда",
-                    Price = 1000,
-                    Category = "Основное"
-                };
-
-                var createdDish = await App.ApiClient.CreateDishAsync(newDish);
-                MessageBox.Show($"✅ Добавлено новое блюдо через API!\nID: #{createdDish.Id}\nНазвание: {createdDish.Name}\nЦена: {createdDish.Price}₽",
-                              "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                LoadDishesFromApi();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"❌ Ошибка добавления блюда: {ex.Message}", "Ошибка",
-                              MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            NavigationService.Navigate(new AddEditDishPage());
         }
 
-        private async void BtnEditSelected_Click(object sender, RoutedEventArgs e)
+        private void BtnEditSelected_Click(object sender, RoutedEventArgs e)
         {
             var dish = GetSelectedDish();
             if (dish != null)
             {
-                try
-                {
-                    dish.Name += " (изм.)";
-                    dish.Price += 100;
-
-                    var updatedDish = await App.ApiClient.UpdateDishAsync(dish.Id, dish);
-                    MessageBox.Show($"✏️ Блюдо обновлено через API!\nID: #{updatedDish.Id}\nНазвание: {updatedDish.Name}\nЦена: {updatedDish.Price}₽",
-                                  "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                    LoadDishesFromApi();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"❌ Ошибка обновления блюда: {ex.Message}", "Ошибка",
-                                  MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+                NavigationService.Navigate(new AddEditDishPage(dish));
             }
             else
             {

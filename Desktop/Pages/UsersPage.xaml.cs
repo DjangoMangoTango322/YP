@@ -34,6 +34,7 @@ namespace Desktop.Pages
         {
             try
             {
+                SetLoadingState(true);
                 var users = await App.ApiClient.GetUsersAsync();
                 UsersGrid.ItemsSource = users;
                 UsersItemsControl.ItemsSource = users;
@@ -43,6 +44,16 @@ namespace Desktop.Pages
                 MessageBox.Show($"❌ Ошибка загрузки данных: {ex.Message}", "Ошибка",
                               MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            finally
+            {
+                SetLoadingState(false);
+            }
+        }
+
+        private void SetLoadingState(bool isLoading)
+        {
+            UsersGrid.IsEnabled = !isLoading;
+            UsersItemsControl.IsEnabled = !isLoading;
         }
 
         private void UserCard_MouseEnter(object sender, MouseEventArgs e)
@@ -68,13 +79,11 @@ namespace Desktop.Pages
                 var user = border.DataContext as User;
                 if (user != null)
                 {
-                    // Сбрасываем предыдущее выделение
                     if (_selectedUser != null)
                     {
                         ResetUserCardSelection(_selectedUser);
                     }
 
-                    // Устанавливаем новое выделение
                     _selectedUser = user;
                     border.BorderBrush = new SolidColorBrush(Color.FromRgb(0, 120, 215));
                     border.BorderThickness = new Thickness(2);
@@ -86,33 +95,43 @@ namespace Desktop.Pages
 
         private void ResetUserCardSelection(User userToReset)
         {
-            foreach (var item in UsersItemsControl.Items)
+            if (UsersItemsControl.ItemsSource == null) return;
+
+            try
             {
-                if (item is User user && user.Id == userToReset.Id)
+                foreach (var item in UsersItemsControl.Items)
                 {
-                    var container = UsersItemsControl.ItemContainerGenerator.ContainerFromItem(item);
-                    if (container != null)
+                    if (item is User user && user.Id == userToReset.Id)
                     {
-                        var contentPresenter = FindVisualChild<ContentPresenter>(container);
-                        if (contentPresenter != null)
+                        var container = UsersItemsControl.ItemContainerGenerator.ContainerFromItem(item);
+                        if (container != null)
                         {
-                            var templateBorder = FindVisualChild<Border>(contentPresenter);
-                            if (templateBorder != null)
+                            var contentPresenter = FindVisualChild<ContentPresenter>(container);
+                            if (contentPresenter != null)
                             {
-                                templateBorder.BorderBrush = Brushes.Transparent;
-                                templateBorder.BorderThickness = new Thickness(0);
-                                templateBorder.Background = new SolidColorBrush(Color.FromRgb(30, 30, 30));
+                                var templateBorder = FindVisualChild<Border>(contentPresenter);
+                                if (templateBorder != null)
+                                {
+                                    templateBorder.BorderBrush = Brushes.Transparent;
+                                    templateBorder.BorderThickness = new Thickness(0);
+                                    templateBorder.Background = new SolidColorBrush(Color.FromRgb(30, 30, 30));
+                                }
                             }
                         }
+                        break;
                     }
-                    break;
                 }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error resetting selection: {ex.Message}");
             }
         }
 
-        // Вспомогательные методы для поиска дочерних элементов
         private T FindVisualChild<T>(DependencyObject parent) where T : DependencyObject
         {
+            if (parent == null) return null;
+
             for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
             {
                 var child = VisualTreeHelper.GetChild(parent, i);
@@ -133,50 +152,17 @@ namespace Desktop.Pages
             return _selectedUser ?? UsersGrid.SelectedItem as User;
         }
 
-        private async void BtnAddUser_Click(object sender, RoutedEventArgs e)
+        private void BtnAddUser_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                var newUser = new User
-                {
-                    FirstName = "Новый",
-                    LastName = "Пользователь",
-                    Email = "newuser@example.com",
-                    Phone = "+7 (999) 999-99-99"
-                };
-
-                var createdUser = await App.ApiClient.CreateUserAsync(newUser);
-                MessageBox.Show($"✅ Добавлен новый пользователь через API!\nID: #{createdUser.Id}\nИмя: {createdUser.FirstName} {createdUser.LastName}",
-                              "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                LoadUsersFromApi();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"❌ Ошибка добавления пользователя: {ex.Message}", "Ошибка",
-                              MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            NavigationService.Navigate(new AddEditUserPage());
         }
 
-        private async void BtnEditSelected_Click(object sender, RoutedEventArgs e)
+        private void BtnEditSelected_Click(object sender, RoutedEventArgs e)
         {
             var user = GetSelectedUser();
             if (user != null)
             {
-                try
-                {
-                    user.FirstName += " (изм.)";
-                    user.LastName += " (изм.)";
-
-                    var updatedUser = await App.ApiClient.UpdateUserAsync(user.Id, user);
-                    MessageBox.Show($"✏️ Пользователь обновлен через API!\nID: #{updatedUser.Id}\nНовое имя: {updatedUser.FirstName} {updatedUser.LastName}",
-                                  "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
-                    LoadUsersFromApi();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"❌ Ошибка обновления пользователя: {ex.Message}", "Ошибка",
-                                  MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+                NavigationService.Navigate(new AddEditUserPage(user));
             }
             else
             {
@@ -184,7 +170,6 @@ namespace Desktop.Pages
                               MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
-
         private async void BtnDeleteSelected_Click(object sender, RoutedEventArgs e)
         {
             var user = GetSelectedUser();
@@ -230,30 +215,8 @@ namespace Desktop.Pages
         {
             _selectedUser = UsersGrid.SelectedItem as User;
 
-            // Обновляем выделение в карточках при выборе в DataGrid
             if (_selectedUser != null)
             {
-                // Сбрасываем все выделения
-                foreach (var item in UsersItemsControl.Items)
-                {
-                    var container = UsersItemsControl.ItemContainerGenerator.ContainerFromItem(item);
-                    if (container != null)
-                    {
-                        var contentPresenter = FindVisualChild<ContentPresenter>(container);
-                        if (contentPresenter != null)
-                        {
-                            var templateBorder = FindVisualChild<Border>(contentPresenter);
-                            if (templateBorder != null)
-                            {
-                                templateBorder.BorderBrush = Brushes.Transparent;
-                                templateBorder.BorderThickness = new Thickness(0);
-                                templateBorder.Background = new SolidColorBrush(Color.FromRgb(30, 30, 30));
-                            }
-                        }
-                    }
-                }
-
-                // Выделяем выбранную карточку
                 foreach (var item in UsersItemsControl.Items)
                 {
                     if (item is User user && user.Id == _selectedUser.Id)

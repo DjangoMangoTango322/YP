@@ -66,6 +66,10 @@ namespace Desktop.Models
             set { _createdAt = value; OnPropertyChanged(nameof(CreatedAt)); }
         }
 
+        // Вычисляемые свойства для отображения
+        public string ClientName => $"Клиент #{UserId}";
+        public string RestaurantName => $"Ресторан #{RestaurantId}";
+
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged(string propertyName)
         {

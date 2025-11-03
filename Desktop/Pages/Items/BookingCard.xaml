@@ -7,7 +7,6 @@
             mc:Ignorable="d" 
            
              MouseLeftButtonDown="UserControl_MouseLeftButtonDown">
-
     <Border x:Name="MainBorder" Background="{StaticResource CardBrush}" 
             CornerRadius="12" Padding="20" Margin="0,0,0,10"
             Cursor="Hand">
@@ -22,11 +21,12 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Column="0">
-                <TextBlock Text="{Binding ClientName}" 
+                <!-- Исправленные Binding -->
+                <TextBlock Text="{Binding UserId, StringFormat='Клиент #{0}'}" 
                           Foreground="{StaticResource TextBrush}" 
                           FontSize="16" FontWeight="Bold"/>
 
-                <TextBlock Text="{Binding RestaurantName}" 
+                <TextBlock Text="{Binding RestaurantId, StringFormat='Ресторан #{0}'}" 
                           Foreground="{StaticResource TextSecondaryBrush}" 
                           FontSize="12" Margin="0,2,0,0"/>
 
