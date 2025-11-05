@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/BackgroundColor"
+    android:fillViewport="true">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="32dp">
+
+        <ImageButton
+            android:id="@+id/backButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/q3"
+            android:layout_marginBottom="40dp"
+            android:tint="@color/TextColor" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Регистрация"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="@color/TextColor"
+            android:layout_marginBottom="40dp" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            app:cardBackgroundColor="@color/CardColor"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Имя"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/TextColor"
+                    android:layout_marginBottom="8dp" />
+
+                <EditText
+                    android:id="@+id/nameEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:hint="Ваше имя"
+                    android:textColorHint="@color/TextHintColor"
+                    android:inputType="textPersonName"
+                    android:background="@drawable/edit_text_bg"
+                    android:textColor="@color/TextColor"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:layout_marginBottom="20dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Email"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/TextColor"
+                    android:layout_marginBottom="8dp" />
+
+                <EditText
+                    android:id="@+id/emailEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:hint="your@email.com"
+                    android:textColorHint="@color/TextHintColor"
+                    android:inputType="textEmailAddress"
+                    android:background="@drawable/edit_text_bg"
+                    android:textColor="@color/TextColor"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:layout_marginBottom="20dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Пароль"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/TextColor"
+                    android:layout_marginBottom="8dp" />
+
+                <EditText
+                    android:id="@+id/passwordEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:hint="Введите пароль"
+                    android:textColorHint="@color/TextHintColor"
+                    android:inputType="textPassword"
+                    android:background="@drawable/edit_text_bg"
+                    android:textColor="@color/TextColor"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:layout_marginBottom="20dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Подтвердите пароль"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/TextColor"
+                    android:layout_marginBottom="8dp" />
+
+                <EditText
+                    android:id="@+id/confirmPasswordEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:hint="Повторите пароль"
+                    android:textColorHint="@color/TextHintColor"
+                    android:inputType="textPassword"
+                    android:background="@drawable/edit_text_bg"
+                    android:textColor="@color/TextColor"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:layout_marginBottom="24dp" />
+
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="16dp"
+                    android:visibility="gone" />
+
+                <Button
+                    android:id="@+id/registerButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:text="Зарегистрироваться"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/btn_primary"
+                    android:textColor="@color/white" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:id="@+id/loginLink"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Уже есть аккаунт? Войти"
+            android:textColor="@color/AccentColor"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal" />
+
+    </LinearLayout>
+</ScrollView>
