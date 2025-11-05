@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -13,19 +16,21 @@
         android:theme="@style/Theme._123"
         tools:targetApi="31">
         <activity
-            android:name=".MainActivity"
+            android:name=".Activities$MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".LoginActivity" />
-        <activity android:name=".RegisterActivity" />
-        <activity android:name=".RestaurantListActivity" />
-        <activity android:name=".RestaurantDetailActivity" />
-        <activity android:name=".BookingActivity" />
+        <activity android:name=".Activities$LoginActivity" />
+        <activity android:name=".Activities$RegisterActivity" />
+        <activity android:name=".Activities$RestaurantListActivity" />
+        <activity android:name=".Activities$RestaurantDetailActivity" />
+        <activity android:name=".Activities$BookingActivity" />
+        <activity android:name=".Activities$BookingConfirmationActivity" />
+        <activity android:name=".Activities$ProfileActivity" />
+
     </application>
 
 </manifest>

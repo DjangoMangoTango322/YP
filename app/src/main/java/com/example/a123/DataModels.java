@@ -1,17 +1,19 @@
 package com.example.a123;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Date;
 
-public class DataModels {   public static class User {
-    public String id, name, email, phone, role, createdAt;
-    public User(String id, String name, String email, String phone, String role) {
-        this.id = id; this.name = name; this.email = email; this.phone = phone; this.role = role;
+public class DataModels {   // User Model
+    public static class User implements Serializable {
+        public String id, name, email, phone, role, createdAt;
+        public User(String id, String name, String email, String phone, String role) {
+            this.id = id; this.name = name; this.email = email; this.phone = phone; this.role = role;
+        }
     }
-}
 
     // Restaurant Model
-    public static class Restaurant {
+    public static class Restaurant implements Serializable {
         public String id, name, address, cuisineType, phone, email, openingHours, imageUrl;
         public double rating;
         public List<Dish> menu;
@@ -24,7 +26,7 @@ public class DataModels {   public static class User {
     }
 
     // Dish Model
-    public static class Dish {
+    public static class Dish implements Serializable {
         public String id, name, description, category, imageUrl, restaurantId;
         public double price;
         public boolean isVegetarian, isSpicy;
@@ -38,7 +40,7 @@ public class DataModels {   public static class User {
     }
 
     // Booking Model
-    public static class Booking {
+    public static class Booking implements Serializable {
         public String id, userId, restaurantId, restaurantName, status, specialRequests;
         public Date bookingDate, createdAt;
         public int numberOfPeople;

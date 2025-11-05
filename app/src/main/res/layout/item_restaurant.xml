@@ -2,11 +2,12 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
+    android:id="@+id/cardView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:cardBackgroundColor="@color/CardColor"
-    app:cardCornerRadius="8dp"
-    app:cardElevation="2dp">
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp">
 
 
     <LinearLayout
@@ -15,39 +16,29 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <LinearLayout
+        <ImageView
+            android:id="@+id/restaurantImage"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:layout_marginBottom="8dp">
-
-            <TextView
-                android:id="@+id/dishNameTextView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Название блюда"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@color/TextColor" />
-
-            <TextView
-                android:id="@+id/dishPriceTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="$12.99"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                android:textColor="@color/AccentColor" />
-
-        </LinearLayout>
+            android:layout_height="120dp"
+            android:scaleType="centerCrop"
+            android:background="@color/PrimaryLightColor"
+            android:layout_marginBottom="12dp" />
 
         <TextView
-            android:id="@+id/dishDescriptionTextView"
+            android:id="@+id/nameTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Описание блюда"
+            android:text="Название ресторана"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/TextColor"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/addressTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Адрес ресторана"
             android:textSize="14sp"
             android:textColor="@color/TextSecondaryColor"
             android:layout_marginBottom="8dp" />
@@ -59,33 +50,33 @@
             android:gravity="center_vertical">
 
             <TextView
-                android:id="@+id/dishCategoryTextView"
+                android:id="@+id/ratingTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Основное блюдо"
-                android:textSize="12sp"
-                android:textColor="@color/TextHintColor"
-                android:background="@drawable/category_bg"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"
-                android:paddingTop="4dp"
-                android:paddingBottom="4dp"
+                android:text="★ 4.5"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/AccentColor"
                 android:layout_marginEnd="8dp" />
 
             <TextView
-                android:id="@+id/vegetarianBadge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="VEG"
-                android:textSize="10sp"
-                android:textStyle="bold"
-                android:textColor="@color/PrimaryDarkColor"
-                android:background="@drawable/vegetarian_bg"
-                android:paddingStart="6dp"
-                android:paddingEnd="6dp"
-                android:paddingTop="2dp"
-                android:paddingBottom="2dp"
-                android:visibility="gone" />
+                android:text="•"
+                android:textSize="14sp"
+                android:textColor="@color/TextSecondaryColor"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/cuisineTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Итальянская кухня"
+                android:textSize="14sp"
+                android:textColor="@color/TextSecondaryColor"
+                android:ellipsize="end"
+                android:maxLines="1" />
 
         </LinearLayout>
 

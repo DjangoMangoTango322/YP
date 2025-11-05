@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/restaurant_header"
+            android:src="@drawable/rest"
             android:background="@color/PrimaryColor" />
 
         <!-- Header with Back Button -->
@@ -36,7 +36,7 @@
                 android:layout_height="48dp"
                 android:background="@drawable/q3"
                 android:layout_marginEnd="16dp"
-                android:tint="@color/white" />
+                app:tint="@color/white" />
 
             <TextView
                 android:id="@+id/restaurantNameTextView"
@@ -118,7 +118,7 @@
                     android:textColor="@color/TextSecondaryColor"
                     android:layout_marginBottom="24dp" />
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/bookTableButton"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"

@@ -14,7 +14,7 @@
         android:background="@drawable/q3"
         android:layout_gravity="center_horizontal"
         android:layout_marginBottom="32dp"
-        android:tint="@color/AccentColor" />
+        app:tint="@color/AccentColor" />
 
     <TextView
         android:id="@+id/confirmationText"
@@ -55,7 +55,7 @@
 
     </com.google.android.material.card.MaterialCardView>
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/homeButton"
         android:layout_width="match_parent"
         android:layout_height="56dp"
@@ -66,7 +66,7 @@
         android:textColor="@color/white"
         android:layout_marginBottom="16dp" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/myBookingsButton"
         android:layout_width="match_parent"
         android:layout_height="56dp"

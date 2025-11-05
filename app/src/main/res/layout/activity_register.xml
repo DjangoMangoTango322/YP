@@ -18,7 +18,7 @@
             android:layout_height="48dp"
             android:background="@drawable/q3"
             android:layout_marginBottom="40dp"
-            android:tint="@color/TextColor" />
+            app:tint="@color/TextColor" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -139,7 +139,7 @@
                     android:layout_marginBottom="16dp"
                     android:visibility="gone" />
 
-                <Button
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/registerButton"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
