@@ -20,7 +20,7 @@ namespace RestAPI.Context
         {
             // Configure many-to-many relationship for Restaurant-Dish
             modelBuilder.Entity<RestaurantDish>()
-                .HasKey(rd => new { rd.RestaurantId, rd.DishId }); 
+                .HasKey(rd => new { rd.RestaurantId, rd.DishId });  
 
             modelBuilder.Entity<RestaurantDish>()
                 .HasOne(rd => rd.Restaurant)
