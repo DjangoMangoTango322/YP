@@ -2,10 +2,8 @@
 
 namespace RestAPI.Model
 {
-    public class User
+    public class RegisterRequest
     {
-        public int Id { get; set; }
-
         [Required]
         public string FirstName { get; set; }
 
@@ -21,7 +19,5 @@ namespace RestAPI.Model
 
         [Required]
         public string Password { get; set; }
-
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

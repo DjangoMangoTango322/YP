@@ -4,10 +4,12 @@ namespace RestAPI.Model
 {
     public class Booking
     {
-        public int BookingId { get; set; }
+        public int Id { get; set; }
 
+        [Required]
         public int UserId { get; set; }
 
+        [Required]
         public int RestaurantId { get; set; }
 
         [Required]
@@ -17,11 +19,14 @@ namespace RestAPI.Model
         public TimeSpan BookingTime { get; set; }
 
         [Required]
-        [Range(1, int.MaxValue)]
         public int NumberOfGuests { get; set; }
 
-        public string Status { get; set; } = "pending";
+        public string Status { get; set; } = "Ожидание";
 
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        // Navigation properties
+        public User User { get; set; }
+        public Restaurant Restaurant { get; set; }
     }
 }
