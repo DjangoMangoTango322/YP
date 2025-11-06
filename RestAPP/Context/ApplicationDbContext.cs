@@ -20,16 +20,16 @@ namespace RestAPI.Context
         {
             base.OnModelCreating(modelBuilder);
 
-
+            // Configure composite primary key for RestaurantDish
             modelBuilder.Entity<RestaurantDish>()
                 .HasKey(rd => new { rd.RestaurantId, rd.DishId });
 
-
+            // Configure User entity
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Email)
                 .IsUnique();
 
-
+            // Configure Booking entity
             modelBuilder.Entity<Booking>()
                 .Property(b => b.Status)
                 .HasDefaultValue("pending");

@@ -7,9 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\**" />
+    <Content Remove="Controllers\**" />
+    <EmbeddedResource Remove="Controllers\**" />
+    <None Remove="Controllers\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Pages\" />
     <Folder Include="wwwroot\" />
-    <Folder Include="Controllers\" />
   </ItemGroup>
 
   <ItemGroup>
