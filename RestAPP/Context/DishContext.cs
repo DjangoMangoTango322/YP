@@ -1,17 +1,17 @@
-﻿using RestAPI.Context;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using RestAPI.Context;
 using RestAPI.Model;
 
 namespace RestAPP.Context
 {
-    public class AdminContext : DbContext
+    public class DishContext : DbContext
     {
-        public DbSet<Administrator> Admin { get; set; }
+        public DbSet<Dish> Dishes { get; set; }
 
-        public AdminContext()
+        public DishContext(DbContextOptions<DishContext> options) : base(options)
         {
             Database.EnsureCreated();
-            Admin.Load();
+            Dishes.Load();
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

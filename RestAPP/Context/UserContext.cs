@@ -1,21 +1,21 @@
-﻿using RestAPI.Context;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using RestAPI.Model;
 
-namespace RestAPP.Context
+namespace RestAPI.Context
 {
-    public class AdminContext : DbContext
+    public class UserContext : DbContext
     {
-        public DbSet<Administrator> Admin { get; set; }
+        public DbSet<User> Users { get; set; }
 
-        public AdminContext()
+        public UserContext(DbContextOptions<UserContext> options) : base(options)
         {
             Database.EnsureCreated();
-            Admin.Load();
+            Users.Load();
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer(DbConnection.config);
         }
+
     }
 }

@@ -1,17 +1,17 @@
-﻿using RestAPI.Context;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+using RestAPI.Context;
 using RestAPI.Model;
 
 namespace RestAPP.Context
 {
-    public class AdminContext : DbContext
+    public class RestaurantContext : DbContext
     {
-        public DbSet<Administrator> Admin { get; set; }
+        public DbSet<Restaurant> Restaurants { get; set; }
 
-        public AdminContext()
+        public RestaurantContext()
         {
             Database.EnsureCreated();
-            Admin.Load();
+            Restaurants.Load();
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
