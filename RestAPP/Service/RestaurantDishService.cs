@@ -1,9 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using RestAPI.Interfaces;
 using RestAPI.Model;
 using RestAPP.Context;
-using RestAPP.Interfaces;
 
-namespace RestAPP.Service
+namespace RestAPI.Service
 {
     public class RestaurantDishService : IRestaurantDish
     {

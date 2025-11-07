@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using RestAPI.Context;
+using RestAPI.Interfaces;
 using RestAPI.Model;
-using RestAPP.Interfaces;
 
 namespace RestAPI.Controllers
 {

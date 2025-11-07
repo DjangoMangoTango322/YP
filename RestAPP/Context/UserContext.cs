@@ -10,11 +10,6 @@ namespace RestAPI.Context
         public UserContext(DbContextOptions<UserContext> options) : base(options)
         {
             Database.EnsureCreated();
-            Users.Load();
-        }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer(DbConnection.config);
         }
 
     }

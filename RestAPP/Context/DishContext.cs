@@ -11,11 +11,6 @@ namespace RestAPP.Context
         public DishContext(DbContextOptions<DishContext> options) : base(options)
         {
             Database.EnsureCreated();
-            Dishes.Load();
-        }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer(DbConnection.config);
         }
     }
 }

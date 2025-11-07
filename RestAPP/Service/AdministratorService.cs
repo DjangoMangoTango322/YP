@@ -16,38 +16,38 @@ namespace RestAPI.Service
         }
         public async Task ReginA(Administrator admin)
         {
-            _Admincontext.Admin.Add(admin);
+            _Admincontext.Administrators.Add(admin);
             await _Admincontext.SaveChangesAsync();
         }
 
         public async Task<int> LoginAdmin(string login, string password)
         {
-            Administrator admin = _Admincontext.Admin.Where(x => x.Login == login && x.Password == password).First();
+            Administrator admin = _Admincontext.Administrators.Where(x => x.Login == login && x.Password == password).First();
             return admin.Id;
         }
         
         public async Task<Administrator> GetAdminById(int id)
         {
-            return await _Admincontext.Admin.FindAsync(id);
+            return await _Admincontext.Administrators.FindAsync(id);
         }
 
         public async Task<List<Administrator>> GetAllAdmins()
         {
-            return await _Admincontext.Admin.ToListAsync();
+            return await _Admincontext.Administrators.ToListAsync();
         }
 
         public async Task UpdateAdmin(Administrator admin)
         {
-            _Admincontext.Admin.Update(admin);
+            _Admincontext.Administrators.Update(admin);
             await _Admincontext.SaveChangesAsync();
         }
 
         public async Task DeleteAdmin(int id)
         {
-            var admin = await _Admincontext.Admin.FindAsync(id);
+            var admin = await _Admincontext.Administrators.FindAsync(id);
             if (admin != null)
             {
-                _Admincontext.Admin.Remove(admin);
+                _Admincontext.Administrators.Remove(admin);
                 await _Admincontext.SaveChangesAsync();
             }
         }

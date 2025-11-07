@@ -6,16 +6,11 @@ namespace RestAPP.Context
 {
     public class AdminContext : DbContext
     {
-        public DbSet<Administrator> Admin { get; set; }
+        public DbSet<Administrator> Administrators { get; set; }
 
-        public AdminContext()
+        public AdminContext(DbContextOptions<AdminContext> options) : base(options)
         {
             Database.EnsureCreated();
-            Admin.Load();
-        }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer(DbConnection.config);
         }
     }
 }

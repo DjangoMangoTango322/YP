@@ -1,6 +1,6 @@
 ﻿using RestAPI.Model;
 
-namespace RestAPP.Interfaces
+namespace RestAPI.Interfaces
 {
     public interface IRestaurantDish
     {

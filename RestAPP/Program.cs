@@ -1,62 +1,47 @@
-using System.Reflection;
-using Microsoft.OpenApi.Models;
+using Microsoft.EntityFrameworkCore;
 using RestAPI.Context;
-using RestAPI.Interfaces;
-using RestAPI.Service;
 using RestAPP.Context;
-using RestAPP.Interfaces;
-using RestAPP.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddDbContext<AdminContext>(options =>
+    options.UseSqlServer(DbConnection.config));
+
+builder.Services.AddDbContext<BookingContext>(options =>
+    options.UseSqlServer(DbConnection.config));
+
+builder.Services.AddDbContext<DishContext>(options =>
+    options.UseSqlServer(DbConnection.config));
+
+builder.Services.AddDbContext<RestaurantContext>(options =>
+    options.UseSqlServer(DbConnection.config));
+
+builder.Services.AddDbContext<RestaurantDishContext>(options =>
+    options.UseSqlServer(DbConnection.config));
+
+builder.Services.AddDbContext<UserContext>(options =>
+    options.UseSqlServer(DbConnection.config));
+
+builder.Services.AddScoped<RestAPI.Interfaces.IAdministrator, RestAPI.Service.AdministratorService>();
+builder.Services.AddScoped<RestAPI.Interfaces.IBooking, RestAPI.Service.BookingService>();
+builder.Services.AddScoped<RestAPI.Interfaces.IDish, RestAPI.Service.DishService>();
+builder.Services.AddScoped<RestAPI.Interfaces.IRestaurant, RestAPI.Service.RestaurantService>();
+builder.Services.AddScoped<RestAPI.Interfaces.IRestaurantDish, RestAPI.Service.RestaurantDishService>();
+builder.Services.AddScoped<RestAPI.Interfaces.IUser, RestAPI.Service.UserService>();
+
 builder.Services.AddControllers();
-
-// Регистрация сервисов
-builder.Services.AddScoped<IAdministrator, AdministratorService>();
-builder.Services.AddScoped<IBooking, BookingService>();
-builder.Services.AddScoped<IDish, DishService>();
-builder.Services.AddScoped<IRestaurant, RestaurantService>();
-builder.Services.AddScoped<IRestaurantDish, RestaurantDishService>();
-builder.Services.AddScoped<IUser, UserService>();
-
-// Регистрация контекстов
-builder.Services.AddScoped<AdminContext>();
-builder.Services.AddScoped<BookingContext>();
-builder.Services.AddScoped<DishContext>();
-builder.Services.AddScoped<RestaurantContext>();
-builder.Services.AddScoped<RestaurantDishContext>();
-builder.Services.AddScoped<UserContext>();
-
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "RestAPI",
-        Version = "v1",
-        Description = "Методы в контроллере"
-    });
-
-    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    c.IncludeXmlComments(xmlPath);
-
-});
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "RestAPI v1");
-    });
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
-
 app.Run();

@@ -8,14 +8,9 @@ namespace RestAPP.Context
     {
         public DbSet<Restaurant> Restaurants { get; set; }
 
-        public RestaurantContext()
+        public RestaurantContext(DbContextOptions<RestaurantContext> options) : base(options)
         {
             Database.EnsureCreated();
-            Restaurants.Load();
-        }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer(DbConnection.config);
         }
     }
 }
