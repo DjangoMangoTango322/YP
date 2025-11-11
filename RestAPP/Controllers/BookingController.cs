@@ -41,9 +41,9 @@ namespace RestAPI.Controllers
         /// Получение бронирования по ID
         /// </summary>
         [HttpGet("GetBookingById/{id}")]
-        public async Task<IActionResult> GetBookingById(int id)
+        public async Task<IActionResult> GetBookingById(int id, int restaurantId)
         {
-            var booking = await _booking.GetBookingById(id);
+            var booking = await _booking.GetBookingById(id, restaurantId);
             if (booking == null)
                 return NotFound();
             return Ok(booking);
@@ -63,9 +63,9 @@ namespace RestAPI.Controllers
         /// Удаление бронирования
         /// </summary>
         [HttpDelete("DeleteBooking/{id}")]
-        public async Task<IActionResult> DeleteBooking(int id)
+        public async Task<IActionResult> DeleteBooking(int id, int restaurantId)
         {
-            await _booking.DeleteBooking(id);
+            await _booking.DeleteBooking(id, restaurantId);
             return Ok();
         }
 

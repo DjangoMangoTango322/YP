@@ -9,10 +9,12 @@ namespace RestAPI.Service
     public class BookingService : IBooking
     {
         private readonly BookingContext _Bookingcontext;
+        private readonly UserContext _Usercontext;
 
-        public BookingService(BookingContext Bookingcontext)
+        public BookingService(BookingContext Bookingcontext, UserContext Usercontext)
         {
             _Bookingcontext = Bookingcontext;
+            _Usercontext = Usercontext;
         }
 
         public async Task CreateBooking(Booking booking)
@@ -21,31 +23,26 @@ namespace RestAPI.Service
             await _Bookingcontext.SaveChangesAsync();
         }
 
-        public async Task<Booking> GetBookingById(int id)
+        public async Task<Booking> GetBookingById(int userId, int restaurantId)
         {
-            return await _Bookingcontext.Bookings
-                .Include(b => b.User_Id)
-                .Include(b => b.Restaurant_Id)
-                .FirstOrDefaultAsync(b => b.Id == id);
+            return await _Bookingcontext.Bookings.FindAsync(userId, restaurantId);
         }
 
         public async Task<List<Booking>> GetAllBookings()
         {
-            return await _Bookingcontext.Bookings
-                .Include(b => b.User_Id)
-                .Include(b => b.Restaurant_Id)
-                .ToListAsync();
+            return await _Bookingcontext.Bookings.ToListAsync();
         }
-
         public async Task UpdateBooking(Booking booking)
         {
             _Bookingcontext.Bookings.Update(booking);
             await _Bookingcontext.SaveChangesAsync();
         }
 
-        public async Task DeleteBooking(int id)
+        public async Task DeleteBooking(int userId, int restaurantId)
         {
-            var booking = await _Bookingcontext.Bookings.FindAsync(id);
+            var booking = await _Bookingcontext.Bookings
+                .FirstOrDefaultAsync(b => b.User_Id == userId && b.Restaurant_Id == restaurantId);
+
             if (booking != null)
             {
                 _Bookingcontext.Bookings.Remove(booking);
@@ -57,7 +54,6 @@ namespace RestAPI.Service
         {
             return await _Bookingcontext.Bookings
                 .Where(b => b.User_Id == userId)
-                .Include(b => b.Restaurant_Id)
                 .ToListAsync();
         }
     }
