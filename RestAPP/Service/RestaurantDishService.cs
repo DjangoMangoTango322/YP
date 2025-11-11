@@ -27,7 +27,7 @@ namespace RestAPI.Service
         public async Task RemoveDishFromRestaurant(int restaurantId, int dishId)
         {
             var restaurantDish = await _RestaurantDishcontext.RestaurantDishes
-                .FirstOrDefaultAsync(rd => rd.RestaurantId == restaurantId && rd.DishId == dishId);
+                .FirstOrDefaultAsync(rd => rd.Restaurant_Id == restaurantId && rd.Dish_Id == dishId);
 
             if (restaurantDish != null)
             {
@@ -39,8 +39,8 @@ namespace RestAPI.Service
         public async Task<List<Dish>> GetDishesByRestaurantId(int restaurantId)
         {
             var dishIds = await _RestaurantDishcontext.RestaurantDishes
-                .Where(rd => rd.RestaurantId == restaurantId)
-                .Select(rd => rd.DishId)
+                .Where(rd => rd.Restaurant_Id == restaurantId)
+                .Select(rd => rd.Dish_Id)
                 .ToListAsync();
 
             return await _Dishcontext.Dishes
@@ -51,8 +51,8 @@ namespace RestAPI.Service
         public async Task<List<Restaurant>> GetRestaurantsByDishId(int dishId)
         {
             var restaurantIds = await _RestaurantDishcontext.RestaurantDishes
-                .Where(rd => rd.DishId == dishId)
-                .Select(rd => rd.RestaurantId)
+                .Where(rd => rd.Dish_Id == dishId)
+                .Select(rd => rd.Restaurant_Id)
                 .ToListAsync();
 
             return await _Restaurantcontext.Restaurants

@@ -24,16 +24,16 @@ namespace RestAPI.Service
         public async Task<Booking> GetBookingById(int id)
         {
             return await _Bookingcontext.Bookings
-                .Include(b => b.User)
-                .Include(b => b.Restaurant)
+                .Include(b => b.User_Id)
+                .Include(b => b.Restaurant_Id)
                 .FirstOrDefaultAsync(b => b.Id == id);
         }
 
         public async Task<List<Booking>> GetAllBookings()
         {
             return await _Bookingcontext.Bookings
-                .Include(b => b.User)
-                .Include(b => b.Restaurant)
+                .Include(b => b.User_Id)
+                .Include(b => b.Restaurant_Id)
                 .ToListAsync();
         }
 
@@ -56,8 +56,8 @@ namespace RestAPI.Service
         public async Task<List<Booking>> GetBookingsByUserId(int userId)
         {
             return await _Bookingcontext.Bookings
-                .Where(b => b.UserId == userId)
-                .Include(b => b.Restaurant)
+                .Where(b => b.User_Id == userId)
+                .Include(b => b.Restaurant_Id)
                 .ToListAsync();
         }
     }

@@ -13,7 +13,7 @@ namespace RestAPI.Model
         public string Description { get; set; }
 
         [Required]
-        public double Price { get; set; }
+        public Decimal Price { get; set; }
 
         [Required]
         public string Category { get; set; }

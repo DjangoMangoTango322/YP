@@ -7,27 +7,21 @@ namespace RestAPI.Model
     {
         public int Id { get; set; }
 
-        [Required]
-        public int UserId { get; set; }
+        public int User_Id { get; set; }
 
-        [ForeignKey("UserId")]
-        public User User { get; set; } // 🔧 Добавлено свойство навигации
+ 
+        public int Restaurant_Id { get; set; }
 
-        [Required]
-        public int RestaurantId { get; set; }
+        
 
-        [ForeignKey("RestaurantId")]
-        public Restaurant Restaurant { get; set; } // 🔧 Можно добавить, если есть связь
+        public DateTime Booking_Date { get; set; }
 
-        [Required]
-        public DateTime BookingDate { get; set; }
 
-        [Required]
-        public int NumberOfGuests { get; set; }
+        public int Number_Of_Guests { get; set; }
 
         public string Status { get; set; } = "Ожидание";
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime Created_At { get; set; } = DateTime.UtcNow;
 
 
     }

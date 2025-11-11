@@ -14,5 +14,10 @@ namespace RestAPP.Context
         {
             Database.EnsureCreated();
         }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<RestaurantDish>()
+                .HasKey(rd => new { rd.Restaurant_Id, rd.Dish_Id });
+        }
     }
 }

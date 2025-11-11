@@ -2,8 +2,8 @@
 {
     public class RestaurantDish
     {
-        public int RestaurantId { get; set; }
-        public int DishId { get; set; }
+        public int Restaurant_Id { get; set; }
+        public int Dish_Id { get; set; }
 
         
     }

@@ -16,10 +16,10 @@ namespace RestAPI.Model
         public int Capacity { get; set; }
 
         [Required]
-        public DateTime OpenTime { get; set; }
+        public TimeSpan Open_Time { get; set; }
 
         [Required]
-        public DateTime CloseTime { get; set; }
+        public TimeSpan Close_Time { get; set; }
 
         [Required]
         public string Tematic { get; set; }
