@@ -40,9 +40,7 @@ namespace RestAPI.Service
 
         public async Task DeleteBooking(int userId, int restaurantId)
         {
-            var booking = await _Bookingcontext.Bookings
-                .FirstOrDefaultAsync(b => b.User_Id == userId && b.Restaurant_Id == restaurantId);
-
+            var booking = await _Bookingcontext.Bookings.FindAsync(userId, restaurantId);
             if (booking != null)
             {
                 _Bookingcontext.Bookings.Remove(booking);

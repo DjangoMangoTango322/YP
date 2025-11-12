@@ -63,9 +63,9 @@ namespace RestAPI.Controllers
         /// Удаление бронирования
         /// </summary>
         [HttpDelete("DeleteBooking/{id}")]
-        public async Task<IActionResult> DeleteBooking(int id, int restaurantId)
+        public async Task<IActionResult> DeleteBooking(int userId, int restaurantId)
         {
-            await _booking.DeleteBooking(id, restaurantId);
+            await _booking.DeleteBooking(userId, restaurantId);
             return Ok();
         }
 
