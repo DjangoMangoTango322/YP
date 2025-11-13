@@ -11,17 +11,19 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+        <!-- Заголовок -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Регистрация"
+            android:text="Редактирование профиля"
             android:textSize="28sp"
             android:textStyle="bold"
             android:textColor="@color/TextColor"
             android:layout_marginBottom="24dp" />
 
+        <!-- Имя -->
         <EditText
-            android:id="@+id/nameEditText"
+            android:id="@+id/editFirstName"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:hint="Имя"
@@ -31,8 +33,9 @@
             android:textColorHint="@color/TextHintColor"
             android:layout_marginBottom="16dp" />
 
+        <!-- Фамилия -->
         <EditText
-            android:id="@+id/lastNameEditText"
+            android:id="@+id/editLastName"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:hint="Фамилия"
@@ -42,8 +45,9 @@
             android:textColorHint="@color/TextHintColor"
             android:layout_marginBottom="16dp" />
 
+        <!-- Логин -->
         <EditText
-            android:id="@+id/emailEditText"
+            android:id="@+id/editLogin"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:hint="Логин"
@@ -53,8 +57,9 @@
             android:textColorHint="@color/TextHintColor"
             android:layout_marginBottom="16dp" />
 
+        <!-- Телефон -->
         <EditText
-            android:id="@+id/phoneEditText"
+            android:id="@+id/editPhone"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:hint="Телефон"
@@ -64,8 +69,9 @@
             android:textColorHint="@color/TextHintColor"
             android:layout_marginBottom="16dp" />
 
+        <!-- Пароль -->
         <EditText
-            android:id="@+id/passwordEditText"
+            android:id="@+id/editPassword"
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:hint="Пароль"
@@ -75,6 +81,7 @@
             android:textColorHint="@color/TextHintColor"
             android:layout_marginBottom="24dp" />
 
+        <!-- Прогресс загрузки -->
         <ProgressBar
             android:id="@+id/progressBar"
             android:layout_width="wrap_content"
@@ -83,11 +90,12 @@
             android:visibility="gone"
             android:layout_marginBottom="16dp" />
 
+        <!-- Кнопка "Изменить данные" -->
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/registerButton"
+            android:id="@+id/editProfileButton"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:text="Зарегистрироваться"
+            android:text="Изменить данные"
             android:textSize="18sp"
             android:textStyle="bold"
             android:background="@drawable/btn_primary"

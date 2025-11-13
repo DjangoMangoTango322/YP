@@ -1,55 +1,63 @@
 package com.example.a123;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Date;
+import java.util.List;
 
-public class DataModels {   // User Model
+public class DataModels {
+
+    // ---------- USER ----------
     public static class User implements Serializable {
-        public String id, name, email, phone, role, createdAt;
-        public User(String id, String name, String email, String phone, String role) {
-            this.id = id; this.name = name; this.email = email; this.phone = phone; this.role = role;
-        }
+        public int id;
+        public String firstName;
+        public String lastName;
+        public String login;
+        public String phone;
+        public String password;
+
+        // Геттеры для совместимости
+        public int getId() { return id; }
+        public String getFirstName() { return firstName; }
+        public String getLastName() { return lastName; }
+        public String getLogin() { return login; }
+        public String getPhone() { return phone; }
+        public String getPassword() { return password; }
     }
 
-    // Restaurant Model
+    // ---------- RESTAURANT ----------
     public static class Restaurant implements Serializable {
-        public String id, name, address, cuisineType, phone, email, openingHours, imageUrl;
+        public int id;
+        public String name;
+        public String address;
+        public String cuisineType;
         public double rating;
+        public String phone;
+        public String openingHours;
+        public String imageUrl;
         public List<Dish> menu;
-
-        public Restaurant(String id, String name, String address, String cuisineType, double rating,
-                          String phone, String openingHours, String imageUrl) {
-            this.id = id; this.name = name; this.address = address; this.cuisineType = cuisineType;
-            this.rating = rating; this.phone = phone; this.openingHours = openingHours; this.imageUrl = imageUrl;
-        }
     }
 
-    // Dish Model
+    // ---------- DISH ----------
     public static class Dish implements Serializable {
-        public String id, name, description, category, imageUrl, restaurantId;
+        public int id;
+        public String name;
+        public String description;
         public double price;
-        public boolean isVegetarian, isSpicy;
-
-        public Dish(String id, String name, String description, double price, String category,
-                    boolean isVegetarian, boolean isSpicy, String restaurantId) {
-            this.id = id; this.name = name; this.description = description; this.price = price;
-            this.category = category; this.isVegetarian = isVegetarian; this.isSpicy = isSpicy;
-            this.restaurantId = restaurantId;
-        }
+        public String category;
+        public boolean isVegetarian;
+        public boolean isSpicy;
+        public String imageUrl;
     }
 
-    // Booking Model
+    // ---------- BOOKING ----------
     public static class Booking implements Serializable {
-        public String id, userId, restaurantId, restaurantName, status, specialRequests;
-        public Date bookingDate, createdAt;
+        public int id;
+        public int userId;
+        public int restaurantId;
+        public String restaurantName;
+        public Date bookingDate;
         public int numberOfPeople;
-
-        public Booking(String id, String userId, String restaurantId, String restaurantName,
-                       Date bookingDate, int numberOfPeople, String status, String specialRequests) {
-            this.id = id; this.userId = userId; this.restaurantId = restaurantId; this.restaurantName = restaurantName;
-            this.bookingDate = bookingDate; this.numberOfPeople = numberOfPeople;
-            this.status = status; this.specialRequests = specialRequests;
-        }
+        public String status;
+        public String specialRequests;
     }
 }

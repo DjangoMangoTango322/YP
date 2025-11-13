@@ -46,17 +46,17 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Email"
+                    android:text="Логин"
                     android:textSize="14sp"
                     android:textStyle="bold"
                     android:textColor="@color/TextColor"
                     android:layout_marginBottom="8dp" />
 
                 <EditText
-                    android:id="@+id/emailEditText"
+                    android:id="@+id/loginEditText"
                     android:layout_width="match_parent"
                     android:layout_height="56dp"
-                    android:hint="your@email.com"
+                    android:hint="Введите логин"
                     android:textColorHint="@color/TextHintColor"
                     android:inputType="textEmailAddress"
                     android:background="@drawable/edit_text_bg"

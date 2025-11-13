@@ -74,6 +74,16 @@
                     android:layout_marginBottom="24dp" />
 
                 <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/editButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="Изменить данные"
+                    android:textSize="16sp"
+                    android:background="@drawable/button"
+                    android:textColor="@color/TextColor" />
+
+
+                <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/logoutButton"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"

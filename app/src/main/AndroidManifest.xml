@@ -14,23 +14,23 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme._123"
+        android:networkSecurityConfig="@xml/network_security_config"
         tools:targetApi="31">
+
+        <!-- Точка входа в приложение -->
         <activity
-            android:name=".Activities$MainActivity"
+            android:name=".Activities$LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".Activities$LoginActivity" />
-        <activity android:name=".Activities$RegisterActivity" />
-        <activity android:name=".Activities$RestaurantListActivity" />
-        <activity android:name=".Activities$RestaurantDetailActivity" />
-        <activity android:name=".Activities$BookingActivity" />
-        <activity android:name=".Activities$BookingConfirmationActivity" />
-        <activity android:name=".Activities$ProfileActivity" />
 
+        <!-- Остальные реально существующие Activity -->
+        <activity android:name=".Activities$RegisterActivity"/>
+        <activity android:name=".Activities$RestaurantListActivity"/>
+        <activity android:name=".Activities$RestaurantDetailActivity" />
     </application>
 
 </manifest>

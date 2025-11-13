@@ -9,8 +9,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class Utils {// Network Utilities
-    // Network Utilities
+public class Utils {
+
     public static class Network {
         public static boolean isNetworkAvailable(Context context) {
             ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -22,7 +22,6 @@ public class Utils {// Network Utilities
         }
     }
 
-    // SharedPreferences Helper
     public static class Prefs {
         private static final String PREFS_NAME = "RestaurantAppPrefs";
         private static final String KEY_USER_ID = "user_id";
@@ -37,6 +36,7 @@ public class Utils {// Network Utilities
             prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         }
 
+        // keep string version
         public void saveUserData(String userId, String name, String email, String token) {
             SharedPreferences.Editor editor = prefs.edit();
             editor.putString(KEY_USER_ID, userId);
@@ -45,6 +45,11 @@ public class Utils {// Network Utilities
             editor.putString(KEY_AUTH_TOKEN, token);
             editor.putBoolean(KEY_IS_LOGGED_IN, true);
             editor.apply();
+        }
+
+        // convenient overload for int id
+        public void saveUserData(int userIdInt, String name, String email, String token) {
+            saveUserData(String.valueOf(userIdInt), name, email, token);
         }
 
         public void clearUserData() {
@@ -61,8 +66,15 @@ public class Utils {// Network Utilities
             return prefs.getBoolean(KEY_IS_LOGGED_IN, false);
         }
 
-        public String getUserId() {
+        // return string id; use Integer.parseInt where needed
+        public String getUserIdString() {
             return prefs.getString(KEY_USER_ID, null);
+        }
+
+        public int getUserId() {
+            String v = prefs.getString(KEY_USER_ID, null);
+            if (v == null) return -1;
+            try { return Integer.parseInt(v); } catch (Exception ex) { return -1; }
         }
 
         public String getUserName() {
@@ -78,57 +90,31 @@ public class Utils {// Network Utilities
         }
     }
 
-    // UI Utilities
     public static class UI {
         public static void showToast(Context context, String message) {
             Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
         }
-
         public static void showLongToast(Context context, String message) {
             Toast.makeText(context, message, Toast.LENGTH_LONG).show();
         }
     }
 
-    // Date Utilities
     public static class DateUtils {
         public static String formatBookingDate(Date date) {
             return new SimpleDateFormat("dd MMMM yyyy 'в' HH:mm", new Locale("ru")).format(date);
         }
-
-        public static String formatDateTime(Date date) {
-            return new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(date);
-        }
-
-        public static String getCurrentDate() {
-            return new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date());
-        }
-
-        public static String getCurrentTime() {
-            return new SimpleDateFormat("HH:mm", Locale.getDefault()).format(new Date());
-        }
     }
 
-    // Booking Utilities
     public static class BookingHelper {
         public static String getStatusText(String status) {
             if (status == null) return "";
-
             switch (status.toLowerCase()) {
-                case "confirmed":
-                    return "Подтверждено";
-                case "pending":
-                    return "Ожидание подтверждения";
-                case "completed":
-                    return "Завершено";
-                case "cancelled":
-                    return "Отменено";
-                default:
-                    return status;
+                case "confirmed": return "Подтверждено";
+                case "pending": return "Ожидание подтверждения";
+                case "completed": return "Завершено";
+                case "cancelled": return "Отменено";
+                default: return status;
             }
-        }
-
-        public static boolean isValidPeopleCount(int count) {
-            return count > 0 && count <= 20;
         }
     }
 }

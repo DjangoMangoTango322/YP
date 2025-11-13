@@ -1,42 +1,32 @@
 package com.example.a123;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import java.text.ParseException;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import com.example.a123.Adapters.RestaurantAdapter;
+
+
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Locale;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class Activities {
 
-    // Main Activity
-    public static class MainActivity extends AppCompatActivity {
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_main);
-
-            findViewById(R.id.loginButton).setOnClickListener(v ->
-                    startActivity(new Intent(this, Activities.LoginActivity.class)));
-            findViewById(R.id.registerButton).setOnClickListener(v ->
-                    startActivity(new Intent(this, Activities.RegisterActivity.class)));
-            findViewById(R.id.exploreButton).setOnClickListener(v ->
-                    startActivity(new Intent(this, Activities.RestaurantListActivity.class)));
-        }
-    }
-
-    // Login Activity
+    // ---------- ЛОГИН ----------
     public static class LoginActivity extends AppCompatActivity {
-        private EditText emailEditText, passwordEditText;
+        private EditText loginEditText, passwordEditText;
         private ProgressBar progressBar;
 
         @Override
@@ -44,229 +34,276 @@ public class Activities {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_login);
 
-            emailEditText = findViewById(R.id.emailEditText);
+            loginEditText = findViewById(R.id.loginEditText);
             passwordEditText = findViewById(R.id.passwordEditText);
             progressBar = findViewById(R.id.progressBar);
             Button loginButton = findViewById(R.id.loginButton);
             TextView registerLink = findViewById(R.id.registerLink);
-            ImageButton backButton = findViewById(R.id.backButton);
 
-            loginButton.setOnClickListener(v -> performLogin());
-            registerLink.setOnClickListener(v ->
-                    startActivity(new Intent(this, Activities.RegisterActivity.class)));
-            backButton.setOnClickListener(v -> onBackPressed());
+            loginButton.setOnClickListener(v -> loginUser());
+            registerLink.setOnClickListener(v -> startActivity(new Intent(this, RegisterActivity.class)));
         }
 
-        private void performLogin() {
-            String email = emailEditText.getText().toString();
-            String password = passwordEditText.getText().toString();
-
-            if (email.isEmpty() || password.isEmpty()) {
-                Utils.UI.showToast(this, "Заполните все поля");
+        private void loginUser() {
+            String login = loginEditText.getText().toString().trim();
+            String password = passwordEditText.getText().toString().trim();
+            if (login.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Введите логин и пароль", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            progressBar.setVisibility(ProgressBar.VISIBLE);
+            progressBar.setVisibility(View.VISIBLE);
+            ApiClient.getApiService().login(login, password).enqueue(new Callback<ApiClient.LoginResult>() {
+                @Override
+                public void onResponse(Call<ApiClient.LoginResult> call, Response<ApiClient.LoginResult> response) {
+                    progressBar.setVisibility(View.GONE);
+                    if (response.isSuccessful() && response.body() != null) {
+                        int userId = response.body().getUserId();
+                        Intent i = new Intent(LoginActivity.this, RestaurantListActivity.class);
+                        i.putExtra("userId", userId);
+                        startActivity(i);
+                        finish();
+                    } else
+                        Toast.makeText(LoginActivity.this, "Неверные данные", Toast.LENGTH_SHORT).show();
+                }
 
-            ApiClient.getApiService().login(new ApiClient.LoginRequest(email, password))
-                    .enqueue(new Callback<ApiClient.ApiResponse<DataModels.User>>() {
-                        @Override
-                        public void onResponse(Call<ApiClient.ApiResponse<DataModels.User>> call, Response<ApiClient.ApiResponse<DataModels.User>> response) {
-                            progressBar.setVisibility(ProgressBar.GONE);
-                            if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                                DataModels.User user = response.body().getData();
-                                new Utils.Prefs(LoginActivity.this).saveUserData(user.id, user.name, user.email, "token");
-                                startActivity(new Intent(LoginActivity.this, Activities.RestaurantListActivity.class));
-                                finish();
-                            } else {
-                                Utils.UI.showToast(LoginActivity.this, "Ошибка входа");
-                            }
-                        }
-
-                        @Override
-                        public void onFailure(Call<ApiClient.ApiResponse<DataModels.User>> call, Throwable t) {
-                            progressBar.setVisibility(ProgressBar.GONE);
-                            Utils.UI.showToast(LoginActivity.this, "Ошибка сети: " + t.getMessage());
-                        }
-                    });
+                @Override
+                public void onFailure(Call<ApiClient.LoginResult> call, Throwable t) {
+                    progressBar.setVisibility(View.GONE);
+                    Toast.makeText(LoginActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 
-    // Register Activity
+    // ---------- РЕГИСТРАЦИЯ ----------
     public static class RegisterActivity extends AppCompatActivity {
-        private EditText nameEditText, emailEditText, passwordEditText, confirmPasswordEditText;
+        private EditText firstNameEdit, lastNameEdit, loginEdit, phoneEdit, passwordEdit;
         private ProgressBar progressBar;
+        private Button registerButton;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_register);
 
-            nameEditText = findViewById(R.id.nameEditText);
-            emailEditText = findViewById(R.id.emailEditText);
-            passwordEditText = findViewById(R.id.passwordEditText);
-            confirmPasswordEditText = findViewById(R.id.confirmPasswordEditText);
+            firstNameEdit = findViewById(R.id.nameEditText);
+            lastNameEdit = findViewById(R.id.lastNameEditText);
+            loginEdit = findViewById(R.id.emailEditText);
+            phoneEdit = findViewById(R.id.phoneEditText);
+            passwordEdit = findViewById(R.id.passwordEditText);
             progressBar = findViewById(R.id.progressBar);
-            Button registerButton = findViewById(R.id.registerButton);
-            TextView loginLink = findViewById(R.id.loginLink);
-            ImageButton backButton = findViewById(R.id.backButton);
+            registerButton = findViewById(R.id.registerButton);
 
-            registerButton.setOnClickListener(v -> performRegistration());
-            loginLink.setOnClickListener(v -> {
-                startActivity(new Intent(RegisterActivity.this, Activities.LoginActivity.class));
-            });
-            backButton.setOnClickListener(v -> onBackPressed());
+            registerButton.setOnClickListener(v -> registerUser());
         }
 
-        private void performRegistration() {
-            String name = nameEditText.getText().toString().trim();
-            String email = emailEditText.getText().toString().trim();
-            String password = passwordEditText.getText().toString();
-            String confirmPassword = confirmPasswordEditText.getText().toString();
+        private void registerUser() {
+            String f = firstNameEdit.getText().toString().trim();
+            String l = lastNameEdit.getText().toString().trim();
+            String log = loginEdit.getText().toString().trim();
+            String ph = phoneEdit.getText().toString().trim();
+            String pw = passwordEdit.getText().toString().trim();
 
-            // Валидация
-            if (name.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-                Utils.UI.showToast(this, "Заполните все поля");
+            if (f.isEmpty() || l.isEmpty() || log.isEmpty() || ph.isEmpty() || pw.isEmpty()) {
+                Toast.makeText(this, "Заполните все поля", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-                Utils.UI.showToast(this, "Введите корректный email");
-                return;
-            }
-
-            if (password.length() < 6) {
-                Utils.UI.showToast(this, "Пароль должен содержать минимум 6 символов");
-                return;
-            }
-
-            if (!password.equals(confirmPassword)) {
-                Utils.UI.showToast(this, "Пароли не совпадают");
-                return;
-            }
-
-            progressBar.setVisibility(ProgressBar.VISIBLE);
-            Button registerButton = findViewById(R.id.registerButton);
-            registerButton.setEnabled(false);
-
-            ApiClient.RegisterRequest registerRequest = new ApiClient.RegisterRequest(name, email, password, "");
-
-            ApiClient.getApiService().register(registerRequest).enqueue(new Callback<ApiClient.ApiResponse<DataModels.User>>() {
+            progressBar.setVisibility(View.VISIBLE);
+            ApiClient.getApiService().register(f, l, log, ph, pw).enqueue(new Callback<Void>() {
                 @Override
-                public void onResponse(Call<ApiClient.ApiResponse<DataModels.User>> call, Response<ApiClient.ApiResponse<DataModels.User>> response) {
-                    progressBar.setVisibility(ProgressBar.GONE);
-                    registerButton.setEnabled(true);
-
-                    if (response.isSuccessful() && response.body() != null) {
-                        ApiClient.ApiResponse<DataModels.User> apiResponse = response.body();
-
-                        if (apiResponse.isSuccess()) {
-                            DataModels.User user = apiResponse.getData();
-                            new Utils.Prefs(RegisterActivity.this).saveUserData(user.id, user.name, user.email, "auth_token");
-                            Utils.UI.showToast(RegisterActivity.this, "Регистрация успешна!");
-                            startActivity(new Intent(RegisterActivity.this, Activities.RestaurantListActivity.class));
-                            finish();
-                        } else {
-                            String errorMessage = apiResponse.getMessage() != null ?
-                                    apiResponse.getMessage() : "Ошибка регистрации";
-                            Utils.UI.showToast(RegisterActivity.this, errorMessage);
-                        }
-                    } else {
-                        Utils.UI.showToast(RegisterActivity.this, "Ошибка сервера: " + response.code());
-                    }
+                public void onResponse(Call<Void> call, Response<Void> response) {
+                    progressBar.setVisibility(View.GONE);
+                    if (response.isSuccessful()) {
+                        Toast.makeText(RegisterActivity.this, "Регистрация успешна", Toast.LENGTH_SHORT).show();
+                        finish();
+                    } else
+                        Toast.makeText(RegisterActivity.this, "Ошибка регистрации", Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
-                public void onFailure(Call<ApiClient.ApiResponse<DataModels.User>> call, Throwable t) {
-                    progressBar.setVisibility(ProgressBar.GONE);
-                    registerButton.setEnabled(true);
-
-                    if (!Utils.Network.isNetworkAvailable(RegisterActivity.this)) {
-                        Utils.UI.showToast(RegisterActivity.this, "Отсутствует подключение к интернету");
-                    } else {
-                        Utils.UI.showToast(RegisterActivity.this, "Ошибка сети: " + t.getMessage());
-                    }
+                public void onFailure(Call<Void> call, Throwable t) {
+                    progressBar.setVisibility(View.GONE);
+                    Toast.makeText(RegisterActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show();
                 }
             });
         }
     }
 
-    // Restaurant List Activity
-    public static class RestaurantListActivity extends AppCompatActivity
-            implements Adapters.RestaurantAdapter.OnRestaurantClickListener {
+    // ---------- СПИСОК РЕСТОРАНОВ ----------
+     public static class RestaurantListActivity extends AppCompatActivity {
 
         private RecyclerView restaurantRecyclerView;
         private ProgressBar progressBar;
-        private List<DataModels.Restaurant> restaurantList;
-        private Adapters.RestaurantAdapter adapter;
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_restaurant_list);
+            setContentView(R.layout.activity_restaurant_list); // твой XML с RecyclerView
 
             restaurantRecyclerView = findViewById(R.id.restaurantRecyclerView);
             progressBar = findViewById(R.id.progressBar);
-            ImageButton profileButton = findViewById(R.id.profileButton);
-            ImageButton backButton = findViewById(R.id.backButton);
 
-            restaurantList = new ArrayList<>();
-            adapter = new Adapters.RestaurantAdapter(restaurantList, this);
-            restaurantRecyclerView.setLayoutManager(new GridLayoutManager(this, 2));
-            restaurantRecyclerView.setAdapter(adapter);
+            restaurantRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-            loadRestaurantsFromApi();
-            profileButton.setOnClickListener(v ->
-                    startActivity(new Intent(this, Activities.ProfileActivity.class)));
-            backButton.setOnClickListener(v -> onBackPressed());
+            loadRestaurants();
         }
 
-        @Override
-        public void onRestaurantClick(DataModels.Restaurant restaurant) {
-            Intent intent = new Intent(this, Activities.RestaurantDetailActivity.class);
-            intent.putExtra("restaurant", restaurant);
-            startActivity(intent);
-        }
+        private void loadRestaurants() {
+            progressBar.setVisibility(View.VISIBLE);
 
-        private void loadRestaurantsFromApi() {
-            progressBar.setVisibility(ProgressBar.VISIBLE);
-            ApiClient.getApiService().getRestaurants().enqueue(new Callback<ApiClient.ApiResponse<List<DataModels.Restaurant>>>() {
+            ApiClient.getApiService().getRestaurants().enqueue(new Callback<List<DataModels.Restaurant>>() {
                 @Override
-                public void onResponse(Call<ApiClient.ApiResponse<List<DataModels.Restaurant>>> call,
-                                       Response<ApiClient.ApiResponse<List<DataModels.Restaurant>>> response) {
-                    progressBar.setVisibility(ProgressBar.GONE);
-                    if (response.isSuccessful() && response.body() != null && response.body().isSuccess()) {
-                        restaurantList.clear();
-                        restaurantList.addAll(response.body().getData());
-                        adapter.notifyDataSetChanged();
+                public void onResponse(Call<List<DataModels.Restaurant>> call, Response<List<DataModels.Restaurant>> response) {
+                    progressBar.setVisibility(View.GONE);
+                    if (response.isSuccessful() && response.body() != null) {
+                        List<DataModels.Restaurant> list = response.body();
+
+                        // подключаем твой адаптер
+                        Adapters.RestaurantAdapter adapter = new Adapters.RestaurantAdapter(list, restaurant -> {
+                            // открываем страницу деталей ресторана
+                            Intent intent = new Intent(RestaurantListActivity.this, RestaurantDetailActivity.class);
+                            intent.putExtra("restaurantId", restaurant.id);
+                            startActivity(intent);
+                        });
+
+                        restaurantRecyclerView.setAdapter(adapter);
+
                     } else {
-                        Utils.UI.showToast(RestaurantListActivity.this, "Ошибка загрузки ресторанов");
+                        Toast.makeText(RestaurantListActivity.this, "Ошибка загрузки ресторанов", Toast.LENGTH_SHORT).show();
                     }
                 }
 
                 @Override
-                public void onFailure(Call<ApiClient.ApiResponse<List<DataModels.Restaurant>>> call, Throwable t) {
-                    progressBar.setVisibility(ProgressBar.GONE);
-                    Utils.UI.showToast(RestaurantListActivity.this, "Ошибка сети: " + t.getMessage());
+                public void onFailure(Call<List<DataModels.Restaurant>> call, Throwable t) {
+                    progressBar.setVisibility(View.GONE);
+                    Toast.makeText(RestaurantListActivity.this, "Ошибка сети: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
         }
     }
-
-    // Добавьте остальные активности по аналогии
     public static class RestaurantDetailActivity extends AppCompatActivity {
-        // Код для деталей ресторана
-    }
 
-    public static class BookingActivity extends AppCompatActivity {
-        // Код для бронирования
-    }
+        private TextView restaurantNameTextView, restaurantAddressTextView, ratingTextView, cuisineTextView, openingHoursTextView;
+        private RecyclerView menuRecyclerView;
+        private ProgressBar progressBar;
+        private Button bookTableButton;
+        private int restaurantId;
 
-    public static class BookingConfirmationActivity extends AppCompatActivity {
-        // Код для подтверждения бронирования
-    }
+        @Override
+        protected void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setContentView(R.layout.activity_restaurant_detail);
 
-    public static class ProfileActivity extends AppCompatActivity {
-        // Код для профиля
+            // Инициализация элементов интерфейса
+            restaurantNameTextView = findViewById(R.id.restaurantName);
+            restaurantAddressTextView = findViewById(R.id.restaurantAddressTextView);
+            ratingTextView = findViewById(R.id.ratingTextView);
+            cuisineTextView = findViewById(R.id.cuisineTextView);
+            openingHoursTextView = findViewById(R.id.openingHoursTextView);
+            progressBar = findViewById(R.id.progressBar);
+            menuRecyclerView = findViewById(R.id.menuRecyclerView);
+            bookTableButton = findViewById(R.id.bookTableButton);
+
+            // Настраиваем RecyclerView для меню
+            menuRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+            // Получаем ID ресторана
+            restaurantId = getIntent().getIntExtra("restaurantId", 0);
+
+            if (restaurantId == 0) {
+                Toast.makeText(this, "Ошибка: ресторан не найден", Toast.LENGTH_SHORT).show();
+                finish();
+                return;
+            }
+
+            loadRestaurantDetails();
+            loadMenu();
+
+            // Кнопка "Забронировать стол"
+            bookTableButton.setOnClickListener(v -> openBookingDialog());
+        }
+
+        private void loadRestaurantDetails() {
+            progressBar.setVisibility(View.VISIBLE);
+
+            ApiClient.getApiService().getRestaurantById(restaurantId).enqueue(new Callback<DataModels.Restaurant>() {
+                @Override
+                public void onResponse(Call<DataModels.Restaurant> call, Response<DataModels.Restaurant> response) {
+                    progressBar.setVisibility(View.GONE);
+                    if (response.isSuccessful() && response.body() != null) {
+                        DataModels.Restaurant r = response.body();
+                        restaurantNameTextView.setText(r.name);
+                        restaurantAddressTextView.setText(r.address);
+                        ratingTextView.setText(String.format(Locale.getDefault(), "★ %.1f", r.rating));
+                        cuisineTextView.setText(r.cuisineType);
+                        openingHoursTextView.setText("Часы работы: " + (r.openingHours != null ? r.openingHours : "не указаны"));
+                    } else {
+                        Toast.makeText(RestaurantDetailActivity.this, "Ошибка загрузки ресторана", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<DataModels.Restaurant> call, Throwable t) {
+                    progressBar.setVisibility(View.GONE);
+                    Toast.makeText(RestaurantDetailActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+        private void loadMenu() {
+            ApiClient.getApiService().getRestaurantMenu(restaurantId).enqueue(new Callback<List<DataModels.Dish>>() {
+                @Override
+                public void onResponse(Call<List<DataModels.Dish>> call, Response<List<DataModels.Dish>> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        List<DataModels.Dish> menu = response.body();
+                        Adapters.MenuAdapter adapter = new Adapters.MenuAdapter(menu);
+                        menuRecyclerView.setAdapter(adapter);
+                    } else {
+                        Toast.makeText(RestaurantDetailActivity.this, "Ошибка загрузки меню", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<List<DataModels.Dish>> call, Throwable t) {
+                    Toast.makeText(RestaurantDetailActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+        private void openBookingDialog() {
+            Calendar calendar = Calendar.getInstance();
+
+            new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
+                new TimePickerDialog(this, (timeView, hourOfDay, minute) -> {
+                    calendar.set(year, month, dayOfMonth, hourOfDay, minute);
+                    String formattedDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()).format(calendar.getTime());
+
+                    int userId = getIntent().getIntExtra("userId", 0);
+                    if (userId == 0) {
+                        Toast.makeText(this, "Ошибка: пользователь не найден", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    ApiClient.getApiService().createBooking(userId, restaurantId, formattedDate, 2)
+                            .enqueue(new Callback<Void>() {
+                                @Override
+                                public void onResponse(Call<Void> call, Response<Void> response) {
+                                    if (response.isSuccessful()) {
+                                        Toast.makeText(RestaurantDetailActivity.this, "Бронирование успешно", Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(RestaurantDetailActivity.this, "Ошибка бронирования", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<Void> call, Throwable t) {
+                                    Toast.makeText(RestaurantDetailActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show();
+            }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
+        }
     }
 }
