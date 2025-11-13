@@ -80,7 +80,7 @@ namespace RestAPI.Controllers
         /// Удаление пользователя
         /// </summary>
         [HttpDelete("DeleteUser/{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
+        public async Task<IActionResult> DeleteUser(int id) 
         {
             await _user.DeleteUser(id);
             return Ok();
