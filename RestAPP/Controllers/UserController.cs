@@ -30,12 +30,12 @@ namespace RestAPI.Controllers
         /// Авторизация пользователя
         /// </summary>
         [HttpPost("LoginUser")]
-        public async Task<IActionResult> LoginUser([FromForm] string email, [FromForm] string password)
+        public async Task<IActionResult> LoginUser([FromForm] string login, [FromForm] string password)
         {
-            if (string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+            if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password))
                 return BadRequest("Email и пароль обязательны");
 
-            var result = await _user.LoginUser(email, password);
+            var result = await _user.LoginUser(login, password);
 
             if (result <= 0)
                 return Unauthorized();
@@ -90,9 +90,9 @@ namespace RestAPI.Controllers
         /// Проверка учетных данных
         /// </summary>
         [HttpPost("ValidateUserCredentials")]
-        public async Task<IActionResult> ValidateUserCredentials([FromForm] string email, [FromForm] string password)
+        public async Task<IActionResult> ValidateUserCredentials([FromForm] string login, [FromForm] string password)
         {
-            var isValid = await _user.ValidateUserCredentials(email, password);
+            var isValid = await _user.ValidateUserCredentials(login, password);
             return Ok(new { IsValid = isValid });
         }
     }
