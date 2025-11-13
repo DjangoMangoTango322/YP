@@ -5,143 +5,173 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:Desktop.Pages"
       xmlns:items="clr-namespace:Desktop.Pages.Items"
-      mc:Ignorable="d" 
-      Title="UsersPage">
+      mc:Ignorable="d"
+      Title="UsersPage"
+      Loaded="Page_Loaded">
     <Grid Background="{StaticResource BackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-
         <!-- Header -->
-        <Border Grid.Row="0" Background="{StaticResource CardBrush}" 
-                CornerRadius="12" Margin="0,0,0,20" Padding="25,20">
+        <Border Grid.Row="0" Background="{StaticResource CardBrush}"
+                CornerRadius="12" Margin="16,16,16,12" Padding="24,20">
             <Border.Effect>
                 <StaticResource ResourceKey="ShadowEffect"/>
             </Border.Effect>
-
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-
-                <StackPanel Grid.Column="0">
-                    <TextBlock Text="👥 Управление пользователями" 
-                              Foreground="{StaticResource TextBrush}" 
-                              FontSize="20" FontWeight="Bold"/>
-                    <TextBlock Text="Управление пользователями системы" 
-                              Foreground="{StaticResource TextSecondaryBrush}" 
-                              FontSize="14" Margin="0,5,0,0"/>
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <TextBlock Text="👥 Управление пользователями"
+                              Foreground="{StaticResource TextBrush}"
+                              FontSize="18" FontWeight="SemiBold"/>
+                    <TextBlock Text="Управление пользователями системы"
+                              Foreground="{StaticResource TextSecondaryBrush}"
+                              FontSize="13" Margin="0,4,0,0"/>
+                    <!-- Search Box -->
+                    <Grid Margin="0,12,0,0">
+                        <TextBox x:Name="SearchTextBox"
+                                 Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                 TextChanged="SearchTextBox_TextChanged"
+                                 Padding="32,8,12,8" Height="36"
+                                 VerticalAlignment="Center"
+                                 BorderThickness="1" BorderBrush="{StaticResource TextSecondaryBrush}"
+                                 Background="{StaticResource CardBrush}"
+                                 FontSize="13"/>
+                        <TextBlock Text="🔍 Поиск по имени, логину..." 
+                                  Foreground="{StaticResource TextSecondaryBrush}"
+                                  FontSize="13" VerticalAlignment="Center"
+                                  Margin="12,0,0,0" IsHitTestVisible="False"/>
+                    </Grid>
                 </StackPanel>
-
-                <StackPanel Grid.Column="1" Orientation="Horizontal">
-                    <Button Content="➕ Добавить" 
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Content="➕ Добавить"
                            Style="{StaticResource PrimaryButtonStyle}"
-                           Click="BtnAddUser_Click" Width="102"/>
-                    <Button Content="✏️ Изменить" 
+                           Margin="0,0,8,0"
+                           Click="BtnAddUser_Click" Padding="12,6" Width="102"/>
+                    <Button Content="✏️ Изменить"
                            Style="{StaticResource PrimaryButtonStyle}"
-                           Margin="10,0,0,0"
-                           Click="BtnEditSelected_Click" Width="95"/>
-                    <Button Content="🗑️ Удалить" 
+                           Margin="0,0,8,0"
+                           Click="BtnEditSelected_Click" Padding="12,6" Width="95"/>
+                    <Button Content="🗑️ Удалить"
                            Style="{StaticResource SecondaryButtonStyle}"
-                           Margin="10,0,0,0"
-                           Click="BtnDeleteSelected_Click"/>
-                    <Button Content="🔄 Обновить" 
+                           Margin="0,0,8,0"
+                           Click="BtnDeleteSelected_Click" Padding="12,6"/>
+                    <Button Content="🔄 Обновить"
                            Style="{StaticResource SecondaryButtonStyle}"
-                           Margin="10,0,0,0"
-                           Click="BtnRefresh_Click"/>
+                           Margin="0,0,0,0"
+                           Click="BtnRefresh_Click" Padding="12,6"/>
                 </StackPanel>
             </Grid>
         </Border>
-
         <!-- Content -->
-        <Border Grid.Row="1" Background="{StaticResource CardBrush}" 
-                CornerRadius="12" Padding="0">
+        <Border Grid.Row="1" Background="{StaticResource CardBrush}"
+                CornerRadius="12" Margin="16,0,16,12" Padding="1">
             <Border.Effect>
                 <StaticResource ResourceKey="ShadowEffect"/>
             </Border.Effect>
-
-            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                <DataGrid x:Name="UsersGrid" AutoGenerateColumns="False"
-                         IsReadOnly="True" Background="Transparent"
-                         BorderThickness="0" SelectionChanged="UsersGrid_SelectionChanged"
-                         HorizontalScrollBarVisibility="Disabled"
-                         CanUserResizeColumns="False"
-                         CanUserSortColumns="True"
-                         CanUserReorderColumns="False"
-                         Width="Auto">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60" CanUserResize="False"/>
-                        <DataGridTextColumn Header="Имя" Binding="{Binding FirstName}" Width="120" CanUserResize="False"/>
-                        <DataGridTextColumn Header="Фамилия" Binding="{Binding LastName}" Width="120" CanUserResize="False"/>
-                        <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="200" CanUserResize="False"/>
-                        <DataGridTextColumn Header="Телефон" Binding="{Binding Phone}" Width="140" CanUserResize="False"/>
-                        <DataGridTextColumn Header="Дата регистрации" 
-                                           Binding="{Binding CreatedAt, StringFormat=dd.MM.yyyy}" 
-                                           Width="120" CanUserResize="False"/>
-                    </DataGrid.Columns>
-                </DataGrid>
-            </ScrollViewer>
+            <DataGrid x:Name="UsersGrid" 
+                      ItemsSource="{Binding FilteredUsers}"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True" Background="Transparent"
+                      BorderThickness="0" SelectionChanged="UsersGrid_SelectionChanged"
+                      HorizontalScrollBarVisibility="Disabled"
+                      VerticalScrollBarVisibility="Auto"
+                      CanUserResizeColumns="False"
+                      CanUserSortColumns="True"
+                      CanUserReorderColumns="False"
+                      HeadersVisibility="Column"
+                      RowHeight="36"
+                      FontSize="13">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60" CanUserResize="False"/>
+                    <DataGridTextColumn Header="Имя" Binding="{Binding First_Name}" Width="120" CanUserResize="False"/>
+                    <DataGridTextColumn Header="Фамилия" Binding="{Binding Last_Name}" Width="120" CanUserResize="False"/>
+                    <DataGridTextColumn Header="Логин" Binding="{Binding Login}" Width="140" CanUserResize="False"/>
+                    <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="200" CanUserResize="False"/>
+                    <DataGridTextColumn Header="Телефон" Binding="{Binding Phone}" Width="140" CanUserResize="False"/>
+                    <DataGridTextColumn Header="Дата регистрации"
+                                       Binding="{Binding CreatedAt, StringFormat=dd.MM.yyyy}"
+                                       Width="120" CanUserResize="False"/>
+                </DataGrid.Columns>
+            </DataGrid>
         </Border>
-
-        <!-- User Controls Container -->
-        <Border Grid.Row="2" Background="{StaticResource CardBrush}" 
-        CornerRadius="12" Margin="0,20,0,0" Padding="20">
+        <!-- Cards Container -->
+        <Border Grid.Row="2" Background="{StaticResource CardBrush}"
+                CornerRadius="12" Margin="16,0,16,16" Padding="20">
             <Border.Effect>
                 <StaticResource ResourceKey="ShadowEffect"/>
             </Border.Effect>
-
-            <ScrollViewer VerticalScrollBarVisibility="Auto" MaxHeight="300">
-                <ItemsControl x:Name="UsersItemsControl">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Border Background="{StaticResource CardBrush}" CornerRadius="12" 
-                           Padding="20" Margin="0,0,0,10" Cursor="Hand"
-                           MouseEnter="UserCard_MouseEnter"
-                           MouseLeave="UserCard_MouseLeave"
-                           MouseLeftButtonDown="UserCard_MouseLeftButtonDown">
-                                <Border.Effect>
-                                    <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.1"/>
-                                </Border.Effect>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <StackPanel Grid.Column="0">
-                                        <TextBlock Text="{Binding FirstName}" 
-                                          Foreground="{StaticResource TextBrush}" 
-                                          FontSize="16" FontWeight="Bold"/>
-                                        <TextBlock Text="{Binding LastName}" 
-                                          Foreground="{StaticResource TextSecondaryBrush}" 
-                                          FontSize="12" Margin="0,2,0,0"/>
-                                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                                            <TextBlock Text="📧 " FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
-                                            <TextBlock Text="{Binding Email}" 
-                                              FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
-                                            <TextBlock Text="   📞 " FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" Margin="10,0,0,0"/>
-                                            <TextBlock Text="{Binding Phone}" 
-                                              FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Text="Карточки пользователей"
+                          Foreground="{StaticResource TextBrush}"
+                          FontSize="14" FontWeight="SemiBold"
+                          Margin="0,0,0,12"/>
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" MaxHeight="280">
+                    <ItemsControl x:Name="UsersItemsControl" 
+                                  ItemsSource="{Binding FilteredUsers}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="{StaticResource CardBrush}" CornerRadius="10"
+                                       Padding="16"
+                                       Margin="0,0,0,8" Cursor="Hand"
+                                       MouseEnter="UserCard_MouseEnter"
+                                       MouseLeave="UserCard_MouseLeave"
+                                       MouseLeftButtonDown="UserCard_MouseLeftButtonDown">
+                                    <Border.Effect>
+                                        <DropShadowEffect BlurRadius="8" ShadowDepth="1" Opacity="0.08"/>
+                                    </Border.Effect>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="{Binding First_Name}"
+                                                      Foreground="{StaticResource TextBrush}"
+                                                      FontSize="14" FontWeight="SemiBold"/>
+                                            <TextBlock Text="{Binding Last_Name}"
+                                                      Foreground="{StaticResource TextSecondaryBrush}"
+                                                      FontSize="12" Margin="0,2,0,0"/>
+                                            <StackPanel Orientation="Horizontal" Margin="0,8,0,0" VerticalAlignment="Center">
+                                                <StackPanel Orientation="Horizontal" Margin="0,0,16,0">
+                                                    <TextBlock Text="📧" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,4,0"/>
+                                                    <TextBlock Text="{Binding Email}"
+                                                              FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"
+                                                              TextTrimming="CharacterEllipsis"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <TextBlock Text="📞" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,4,0"/>
+                                                    <TextBlock Text="{Binding Phone}"
+                                                              FontSize="11" Foreground="{StaticResource TextSecondaryBrush}"
+                                                              TextTrimming="CharacterEllipsis"/>
+                                                </StackPanel>
+                                            </StackPanel>
                                         </StackPanel>
-                                    </StackPanel>
-
-                                    <StackPanel Grid.Column="1" HorizontalAlignment="Right">
-                                        <TextBlock Text="{Binding CreatedAt, StringFormat=dd.MM.yyyy}" 
-                                          Foreground="{StaticResource TextSecondaryBrush}" 
-                                          FontSize="10"/>
-                                        <TextBlock Text="{Binding Id, StringFormat=ID: #{0}}" 
-                                          Foreground="{StaticResource TextSecondaryBrush}" 
-                                          FontSize="10" Margin="0,5,0,0"/>
-                                    </StackPanel>
-                                </Grid>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
+                                        <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top">
+                                            <TextBlock Text="{Binding CreatedAt, StringFormat=dd.MM.yyyy}"
+                                                      Foreground="{StaticResource TextSecondaryBrush}"
+                                                      FontSize="10" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="{Binding Id, StringFormat='ID: #{0}'}"
+                                                      Foreground="{StaticResource TextSecondaryBrush}"
+                                                      FontSize="10" Margin="0,6,0,0"
+                                                      HorizontalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
         </Border>
     </Grid>
 </Page>

@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Desktop;
 using Desktop.Pages;
 
 namespace Desktop
@@ -21,22 +22,100 @@ namespace Desktop
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static MainWindow Instance { get; private set; }
         public MainWindow()
         {
             InitializeComponent();
-            Instance = this;
-            this.Resources = Application.Current.Resources;
-            NavigateToLogin();
+            MainFrame.Navigate(new AdminLogin());
         }
 
-        public void NavigateToMainPage()
+        public void ShowMenu()
         {
-            MainFrame.Navigate(new MainPage());
+            MenuPanel.Visibility = Visibility.Visible;
         }
-        public void NavigateToLogin()
+
+        public void HideMenu()
         {
-            MainFrame.Navigate(new LoginPage());
+            MenuPanel.Visibility = Visibility.Collapsed;
+        }
+
+        private void BtnHome_Click(object sender, RoutedEventArgs e)
+        {
+            MainFrame.Navigate(new HomePage());
+            SetActiveButton(BtnHome);
+        }
+
+        private void BtnUsers_Click(object sender, RoutedEventArgs e)
+        {
+            MainFrame.Navigate(new UsersPage());
+            SetActiveButton(BtnUsers);
+        }
+
+        private void BtnRestaurants_Click(object sender, RoutedEventArgs e)
+        {
+            MainFrame.Navigate(new RestaurantsPage());
+            SetActiveButton(BtnRestaurants);
+        }
+
+        private void BtnDishes_Click(object sender, RoutedEventArgs e)
+        {
+            MainFrame.Navigate(new DishesPage());
+            SetActiveButton(BtnDishes);
+        }
+
+        private void BtnBookings_Click(object sender, RoutedEventArgs e)
+        {
+            MainFrame.Navigate(new BookingsPage());
+            SetActiveButton(BtnBookings);
+        }
+
+        private void BtnLogout_Click(object sender, RoutedEventArgs e)
+        {
+            App.ApiContext.Logout();
+            App.ClearAdminData();
+            HideMenu();
+            MainFrame.Navigate(new AdminLogin());
+        }
+
+        public void SetActiveButton(Button button)
+        {
+            // Сброс стилей всех кнопок
+            BtnHome.Background = (System.Windows.Media.Brush)FindResource("PrimaryBrush");
+            BtnUsers.Background = (System.Windows.Media.Brush)FindResource("PrimaryBrush");
+            BtnRestaurants.Background = (System.Windows.Media.Brush)FindResource("PrimaryBrush");
+            BtnDishes.Background = (System.Windows.Media.Brush)FindResource("PrimaryBrush");
+            BtnBookings.Background = (System.Windows.Media.Brush)FindResource("PrimaryBrush");
+
+            // Активная
+            button.Background = (System.Windows.Media.Brush)FindResource("AccentBrush");
         }
     }
 }
+//: Window
+//    {
+//        public static MainWindow Instance { get; private set; }
+//public MainWindow()
+//{
+//    InitializeComponent();
+//    Instance = this;
+//    this.Resources = Application.Current.Resources;
+//    NavigateToLogin();
+//}
+//public void ShowMenu()
+//{
+//    MenuPanel.Visibility = Visibility.Visible;
+//}
+
+//public void HideMenu()
+//{
+//    MenuPanel.Visibility = Visibility.Collapsed;
+//}
+//public void NavigateToMainPage()
+//{
+//    MainFrame.Navigate(new MainPage());
+//}
+//public void NavigateToLogin()
+//{
+//    MainFrame.Navigate(new LoginPage());
+//}
+//    }
+//}

@@ -1,57 +1,21 @@
 ﻿using System;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace Desktop.Models
 {
-    public class User : INotifyPropertyChanged
+    public class User 
     {
-        private int _id;
-        private string _firstName;
-        private string _lastName;
-        private string _email;
-        private string _phone;
-        private DateTime _createdAt;
-
-        public int Id
-        {
-            get => _id;
-            set { _id = value; OnPropertyChanged(nameof(Id)); }
-        }
-
-        public string FirstName
-        {
-            get => _firstName;
-            set { _firstName = value; OnPropertyChanged(nameof(FirstName)); }
-        }
-
-        public string LastName
-        {
-            get => _lastName;
-            set { _lastName = value; OnPropertyChanged(nameof(LastName)); }
-        }
-
-        public string Email
-        {
-            get => _email;
-            set { _email = value; OnPropertyChanged(nameof(Email)); }
-        }
-
-        public string Phone
-        {
-            get => _phone;
-            set { _phone = value; OnPropertyChanged(nameof(Phone)); }
-        }
-
-        public DateTime CreatedAt
-        {
-            get => _createdAt;
-            set { _createdAt = value; OnPropertyChanged(nameof(CreatedAt)); }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        public int Id { get; set; }
+        [Required]
+        public string First_Name { get; set; }
+        [Required]
+        public string Last_Name { get; set; }
+        [Required]
+        public string Phone { get; set; }
+        [Required]
+        public string Password { get; set; }
+        public string Login { get; set; }
+        public bool IsSelected { get; set; } = false;
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using Desktop.Models;
 
 namespace Desktop.Pages.Items
@@ -10,12 +11,18 @@ namespace Desktop.Pages.Items
     /// </summary>
     public partial class DishCard : UserControl
     {
-       public static readonly DependencyProperty DishProperty =
-           DependencyProperty.Register("Dish", typeof(Dish), typeof(DishCard),
-               new PropertyMetadata(null, OnDishChanged));
+        public static readonly DependencyProperty DishProperty =
+            DependencyProperty.Register(
+                "Dish",
+                typeof(Dish),
+                typeof(DishCard),
+                new PropertyMetadata(null));
 
         public static readonly DependencyProperty IsSelectedProperty =
-            DependencyProperty.Register("IsSelected", typeof(bool), typeof(DishCard),
+            DependencyProperty.Register(
+                "IsSelected",
+                typeof(bool),
+                typeof(DishCard),
                 new PropertyMetadata(false, OnIsSelectedChanged));
 
         public Dish Dish
@@ -33,34 +40,22 @@ namespace Desktop.Pages.Items
         public DishCard()
         {
             InitializeComponent();
-        }
-
-        private static void OnDishChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var control = d as DishCard;
-            if (control != null && e.NewValue is Dish dish)
-            {
-                control.DataContext = dish; // Устанавливаем DataContext на блюдо
-            }
+            DataContext = this;
+            Loaded += (s, e) => UpdateVisualState(); // Применяем начальное состояние
         }
 
         private static void OnIsSelectedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var control = d as DishCard;
-            control?.UpdateSelectionAppearance();
+            if (d is DishCard control)
+            {
+                control.UpdateVisualState();
+            }
         }
 
-        private void UpdateSelectionAppearance()
+        private void UpdateVisualState()
         {
-            // Обновление внешнего вида при выделении
-            if (IsSelected)
-            {
-                VisualStateManager.GoToElementState(this, "SelectedState", true);
-            }
-            else
-            {
-                VisualStateManager.GoToElementState(this, "NormalState", true);
-            }
+            var state = IsSelected ? "SelectedState" : "NormalState";
+            VisualStateManager.GoToState(this, state, useTransitions: true);
         }
 
         private void UserControl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

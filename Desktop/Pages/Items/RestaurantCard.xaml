@@ -5,89 +5,93 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Desktop.Pages.Items"
              mc:Ignorable="d" 
-             d:DesignHeight="100" d:DesignWidth="400">
-    <UserControl.Resources>
-        <Style x:Key="CardStyle" TargetType="Border">
-            <Setter Property="Background" Value="{StaticResource CardBrush}"/>
-            <Setter Property="CornerRadius" Value="12"/>
-            <Setter Property="Padding" Value="20"/>
-            <Setter Property="Margin" Value="0,0,0,10"/>
-        </Style>
-    </UserControl.Resources>
+             d:DesignHeight="100" d:DesignWidth="400"
+             Cursor="Hand"
+             MouseLeftButtonDown="UserControl_MouseLeftButtonDown">
 
-    <UserControl.Template>
-        <ControlTemplate>
-            <Border x:Name="MainBorder" Style="{StaticResource CardStyle}" Cursor="Hand">
-                <Border.Effect>
-                    <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.1"/>
-                </Border.Effect>
+    <Border x:Name="MainBorder"
+            Background="{StaticResource CardBrush}"
+            CornerRadius="12"
+            Padding="20"
+            Margin="0,0,0,10"
+            BorderThickness="0"
+            BorderBrush="Transparent">
 
-                <VisualStateManager.VisualStateGroups>
-                    <VisualStateGroup x:Name="SelectionStates">
-                        <VisualState x:Name="NormalState">
-                            <Storyboard>
-                                <ColorAnimation To="#2A2A2A" Duration="0:0:0.2"
-                                              Storyboard.TargetName="MainBorder" 
-                                              Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"/>
-                                <ThicknessAnimation To="0" Duration="0:0:0.2"
-                                                 Storyboard.TargetName="MainBorder"
-                                                 Storyboard.TargetProperty="BorderThickness"/>
-                            </Storyboard>
-                        </VisualState>
-                        <VisualState x:Name="SelectedState">
-                            <Storyboard>
-                                <ColorAnimation To="#FF3A3A3A" Duration="0:0:0.2"
-                                              Storyboard.TargetName="MainBorder" 
-                                              Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"/>
-                                <ColorAnimation To="#FF0078D7" Duration="0:0:0.2"
-                                              Storyboard.TargetName="MainBorder" 
-                                              Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"/>
-                                <ThicknessAnimation To="2" Duration="0:0:0.2"
-                                                 Storyboard.TargetName="MainBorder"
-                                                 Storyboard.TargetProperty="BorderThickness"/>
-                            </Storyboard>
-                        </VisualState>
-                    </VisualStateGroup>
-                </VisualStateManager.VisualStateGroups>
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="10" ShadowDepth="2" Opacity="0.1"/>
+        </Border.Effect>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+        <!-- Visual State Manager -->
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="SelectionStates">
+                <VisualState x:Name="NormalState">
+                    <Storyboard>
+                        <ColorAnimation To="#2A2A2A" 
+                                        Duration="0:0:0.2"
+                                        Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"/>
+                        <ThicknessAnimation To="0" 
+                                            Duration="0:0:0.2"
+                                            Storyboard.TargetProperty="BorderThickness"/>
+                        <ColorAnimation To="Transparent"
+                                        Duration="0:0:0.2"
+                                        Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"/>
+                    </Storyboard>
+                </VisualState>
+                <VisualState x:Name="SelectedState">
+                    <Storyboard>
+                        <ColorAnimation To="#FF3A3A3A" 
+                                        Duration="0:0:0.2"
+                                        Storyboard.TargetProperty="(Border.Background).(SolidColorBrush.Color)"/>
+                        <ColorAnimation To="#FF0078D7" 
+                                        Duration="0:0:0.2"
+                                        Storyboard.TargetProperty="(Border.BorderBrush).(SolidColorBrush.Color)"/>
+                        <ThicknessAnimation To="3" 
+                                            Duration="0:0:0.2"
+                                            Storyboard.TargetProperty="BorderThickness"/>
+                    </Storyboard>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
 
-                    <StackPanel Grid.Column="0">
-                        <TextBlock Text="{Binding Name}" 
-                                  Foreground="{StaticResource TextBrush}" 
-                                  FontSize="16" FontWeight="Bold"/>
+        <!-- Контент -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
 
-                        <TextBlock Text="{Binding Address}" 
-                                  Foreground="{StaticResource TextSecondaryBrush}" 
-                                  FontSize="12" Margin="0,5,0,0"/>
+            <StackPanel Grid.Column="0">
+                <TextBlock Text="{Binding Name}"
+                           Foreground="{StaticResource TextBrush}"
+                           FontSize="16" FontWeight="Bold"/>
 
-                        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-                            <TextBlock Text="👥 " FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
-                            <TextBlock Text="{Binding Capacity}" 
-                                      FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                <TextBlock Text="{Binding Address}"
+                           Foreground="{StaticResource TextSecondaryBrush}"
+                           FontSize="12" Margin="0,5,0,0"/>
 
-                            <TextBlock Text="   🕒 " FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" Margin="10,0,0,0"/>
-                            <TextBlock Text="{Binding OpenTime, StringFormat=hh\\:mm}" 
-                                      FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
-                            <TextBlock Text=" - " FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
-                            <TextBlock Text="{Binding CloseTime, StringFormat=hh\\:mm}" 
-                                      FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                    <TextBlock Text="People " FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                    <TextBlock Text="{Binding Capacity}"
+                               FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
 
-                            <TextBlock Text="   🏷️ " FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" Margin="10,0,0,0"/>
-                            <TextBlock Text="{Binding Tematic}" 
-                                      FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
-                        </StackPanel>
-                    </StackPanel>
+                    <TextBlock Text=" Time " FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" Margin="10,0,0,0"/>
+                    <TextBlock Text="{Binding OpenTime, StringFormat=hh\\:mm}"
+                               FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                    <TextBlock Text=" - " FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                    <TextBlock Text="{Binding CloseTime, StringFormat=hh\\:mm}"
+                               FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
 
-                    <TextBlock Grid.Column="1" Text="{Binding Id, StringFormat=#{0}}" 
-                              Foreground="{StaticResource TextSecondaryBrush}" 
-                              FontSize="12" VerticalAlignment="Top"/>
-                </Grid>
-            </Border>
-        </ControlTemplate>
-    </UserControl.Template>
+                    <TextBlock Text=" Tag " FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" Margin="10,0,0,0"/>
+                    <TextBlock Text="{Binding Tematic}"
+                               FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"/>
+                </StackPanel>
+            </StackPanel>
+
+            <TextBlock Grid.Column="1" 
+                       Text="{Binding Id, StringFormat=#{0}}"
+                       Foreground="{StaticResource TextSecondaryBrush}"
+                       FontSize="12" 
+                       VerticalAlignment="Top"/>
+        </Grid>
+    </Border>
 </UserControl>

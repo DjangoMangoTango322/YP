@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using Desktop.Models;
 
 namespace Desktop.Pages.Items
@@ -11,11 +12,17 @@ namespace Desktop.Pages.Items
     public partial class RestaurantCard : UserControl
     {
         public static readonly DependencyProperty RestaurantProperty =
-            DependencyProperty.Register("Restaurant", typeof(Restaurant), typeof(RestaurantCard),
-                new PropertyMetadata(null, OnRestaurantChanged));
+            DependencyProperty.Register(
+                "Restaurant",
+                typeof(Restaurant),
+                typeof(RestaurantCard),
+                new PropertyMetadata(null));
 
         public static readonly DependencyProperty IsSelectedProperty =
-            DependencyProperty.Register("IsSelected", typeof(bool), typeof(RestaurantCard),
+            DependencyProperty.Register(
+                "IsSelected",
+                typeof(bool),
+                typeof(RestaurantCard),
                 new PropertyMetadata(false, OnIsSelectedChanged));
 
         public Restaurant Restaurant
@@ -30,38 +37,25 @@ namespace Desktop.Pages.Items
             set => SetValue(IsSelectedProperty, value);
         }
 
-
         public RestaurantCard()
         {
             InitializeComponent();
-           
-        }
-
-        private static void OnRestaurantChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var control = d as RestaurantCard;
-            if (control != null && e.NewValue is Restaurant restaurant)
-            {
-                control.DataContext = restaurant;
-            }
+            DataContext = this;
+            Loaded += (s, e) => UpdateVisualState(); // Применить начальное состояние
         }
 
         private static void OnIsSelectedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var control = d as RestaurantCard;
-            control?.UpdateSelectionAppearance();
+            if (d is RestaurantCard control)
+            {
+                control.UpdateVisualState();
+            }
         }
 
-        private void UpdateSelectionAppearance()
+        private void UpdateVisualState()
         {
-            if (IsSelected)
-            {
-                VisualStateManager.GoToElementState(this, "SelectedState", true);
-            }
-            else
-            {
-                VisualStateManager.GoToElementState(this, "NormalState", true);
-            }
+            var state = IsSelected ? "SelectedState" : "NormalState";
+            VisualStateManager.GoToState(this, state, useTransitions: true);
         }
 
         private void UserControl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

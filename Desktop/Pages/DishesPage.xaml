@@ -4,55 +4,66 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:Desktop.Pages"
-      mc:Ignorable="d" 
-      Title="DishesPage">
-
+      mc:Ignorable="d"
+      Title="DishesPage"
+      Loaded="Page_Loaded">
     <Grid Background="{StaticResource BackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-
         <!-- Header -->
-        <Border Grid.Row="0" Background="{StaticResource CardBrush}" 
+        <Border Grid.Row="0" Background="{StaticResource CardBrush}"
                 CornerRadius="12" Margin="16,16,16,12" Padding="24,20">
             <Border.Effect>
                 <StaticResource ResourceKey="ShadowEffect"/>
             </Border.Effect>
-
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-
                 <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                    <TextBlock Text="🍕 Управление блюдами" 
-                              Foreground="{StaticResource TextBrush}" 
+                    <TextBlock Text="🍕 Управление блюдами"
+                              Foreground="{StaticResource TextBrush}"
                               FontSize="18" FontWeight="SemiBold"/>
-                    <TextBlock Text="Управление меню всех ресторанов" 
-                              Foreground="{StaticResource TextSecondaryBrush}" 
+                    <TextBlock Text="Управление меню всех ресторанов"
+                              Foreground="{StaticResource TextSecondaryBrush}"
                               FontSize="13" Margin="0,4,0,0"/>
+                    <!-- Search Box -->
+                    <Grid Margin="0,12,0,0">
+                        <TextBox x:Name="SearchTextBox"
+                                 Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                 TextChanged="SearchTextBox_TextChanged"
+                                 Padding="32,8,12,8" Height="36"
+                                 VerticalAlignment="Center"
+                                 BorderThickness="1" BorderBrush="{StaticResource TextSecondaryBrush}"
+                                 Background="{StaticResource CardBrush}"
+                                 FontSize="13"/>
+                        <TextBlock Text="🔍 Поиск по названию, описанию..." 
+                                  Foreground="{StaticResource TextSecondaryBrush}"
+                                  FontSize="13" VerticalAlignment="Center"
+                                  Margin="12,0,0,0" IsHitTestVisible="False"/>
+                    </Grid>
                 </StackPanel>
-
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                    <Button Content="Добавить блюдо" 
+                    <Button Content="Добавить блюдо"
                            Style="{StaticResource PrimaryButtonStyle}"
                            Margin="8,0,0,0"
                            Click="BtnAddDish_Click"
                            Padding="12,6" Height="24" Width="125"/>
-                    <Button Content="Изменить" 
+                    <Button Content="Изменить"
                            Style="{StaticResource PrimaryButtonStyle}"
                            Margin="8,0,0,0"
                            Click="BtnEditSelected_Click"
                            Padding="12,6"/>
-                    <Button Content="Удалить" 
+                    <Button Content="Удалить"
                            Style="{StaticResource SecondaryButtonStyle}"
                            Margin="8,0,0,0"
                            Click="BtnDeleteSelected_Click"
                            Padding="12,6"/>
-                    <Button Content="Обновить" 
+                    <Button Content="Обновить"
                            Style="{StaticResource SecondaryButtonStyle}"
                            Margin="8,0,0,0"
                            Click="BtnRefresh_Click"
@@ -60,25 +71,25 @@
                 </StackPanel>
             </Grid>
         </Border>
-
         <!-- Content -->
-        <Border Grid.Row="1" Background="{StaticResource CardBrush}" 
+        <Border Grid.Row="1" Background="{StaticResource CardBrush}"
                 CornerRadius="12" Margin="16,0,16,12" Padding="1">
             <Border.Effect>
                 <StaticResource ResourceKey="ShadowEffect"/>
             </Border.Effect>
-
-            <DataGrid x:Name="DishesGrid" AutoGenerateColumns="False"
-                     IsReadOnly="True" Background="Transparent"
-                     BorderThickness="0" SelectionChanged="DishesGrid_SelectionChanged"
-                     HorizontalScrollBarVisibility="Disabled"
-                     VerticalScrollBarVisibility="Auto"
-                     CanUserResizeColumns="False"
-                     CanUserSortColumns="True"
-                     CanUserReorderColumns="False"
-                     HeadersVisibility="Column"
-                     RowHeight="36"
-                     FontSize="13">
+            <DataGrid x:Name="DishesGrid" 
+                      ItemsSource="{Binding FilteredDishes}"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True" Background="Transparent"
+                      BorderThickness="0" SelectionChanged="DishesGrid_SelectionChanged"
+                      HorizontalScrollBarVisibility="Disabled"
+                      VerticalScrollBarVisibility="Auto"
+                      CanUserResizeColumns="False"
+                      CanUserSortColumns="True"
+                      CanUserReorderColumns="False"
+                      HeadersVisibility="Column"
+                      RowHeight="36"
+                      FontSize="13">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60" CanUserResize="False"/>
                     <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="180" CanUserResize="False"/>
@@ -88,33 +99,30 @@
                 </DataGrid.Columns>
             </DataGrid>
         </Border>
-
         <!-- Cards Container -->
-        <Border Grid.Row="2" Background="{StaticResource CardBrush}" 
+        <Border Grid.Row="2" Background="{StaticResource CardBrush}"
                 CornerRadius="12" Margin="16,0,16,16" Padding="20">
             <Border.Effect>
                 <StaticResource ResourceKey="ShadowEffect"/>
             </Border.Effect>
-
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-
-                <TextBlock Text="Карточки блюд" 
-                          Foreground="{StaticResource TextBrush}" 
+                <TextBlock Text="Карточки блюд"
+                          Foreground="{StaticResource TextBrush}"
                           FontSize="14" FontWeight="SemiBold"
                           Margin="0,0,0,12"/>
-
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" MaxHeight="280">
-                    <ItemsControl x:Name="DishesItemsControl" Loaded="DishesItemsControl_Loaded">
+                    <ItemsControl x:Name="DishesItemsControl" 
+                                  ItemsSource="{Binding FilteredDishes}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Background="{StaticResource CardBrush}" 
-                                       CornerRadius="10" 
-                                       Padding="16" 
-                                       Margin="0,0,0,8" 
+                                <Border Background="{StaticResource CardBrush}"
+                                       CornerRadius="10"
+                                       Padding="16"
+                                       Margin="0,0,0,8"
                                        Cursor="Hand"
                                        MouseEnter="DishCard_MouseEnter"
                                        MouseLeave="DishCard_MouseLeave"
@@ -122,65 +130,53 @@
                                     <Border.Effect>
                                         <DropShadowEffect BlurRadius="8" ShadowDepth="1" Opacity="0.08"/>
                                     </Border.Effect>
-
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-
                                         <!-- Left Content -->
                                         <StackPanel Grid.Column="0">
-                                            <TextBlock Text="{Binding Name}" 
-                                                      Foreground="{StaticResource TextBrush}" 
-                                                      FontSize="14" 
+                                            <TextBlock Text="{Binding Name}"
+                                                      Foreground="{StaticResource TextBrush}"
+                                                      FontSize="14"
                                                       FontWeight="SemiBold"/>
-                                            <TextBlock Text="{Binding Description}" 
-                                                      Foreground="{StaticResource TextSecondaryBrush}" 
-                                                      FontSize="12" 
+                                            <TextBlock Text="{Binding Description}"
+                                                      Foreground="{StaticResource TextSecondaryBrush}"
+                                                      FontSize="12"
                                                       Margin="0,2,0,0"
                                                       TextTrimming="CharacterEllipsis"
                                                       MaxWidth="300"/>
-
                                             <StackPanel Orientation="Horizontal" Margin="0,8,0,0" VerticalAlignment="Center">
                                                 <StackPanel Orientation="Horizontal" Margin="0,0,16,0">
                                                     <TextBlock Text="💰" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,4,0"/>
-                                                    <TextBlock Text="{Binding Price}" 
-                                                              FontSize="11" 
-                                                              Foreground="{StaticResource TextSecondaryBrush}"/>
-                                                    <TextBlock Text=" ₽" 
-                                                              FontSize="11" 
+                                                    <TextBlock Text="{Binding Price, StringFormat='{}{0}₽'}"
+                                                              FontSize="11"
                                                               Foreground="{StaticResource TextSecondaryBrush}"/>
                                                 </StackPanel>
-
                                                 <StackPanel Orientation="Horizontal">
                                                     <TextBlock Text="📁" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,4,0"/>
-                                                    <TextBlock Text="{Binding Category}" 
-                                                              FontSize="11" 
+                                                    <TextBlock Text="{Binding Category}"
+                                                              FontSize="11"
                                                               Foreground="{StaticResource TextSecondaryBrush}"/>
                                                 </StackPanel>
                                             </StackPanel>
                                         </StackPanel>
-
                                         <!-- Right Content -->
                                         <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Top">
-                                            <Border Background="{StaticResource PrimaryBrush}" 
-                                                   CornerRadius="6" 
+                                            <Border Background="{StaticResource PrimaryBrush}"
+                                                   CornerRadius="6"
                                                    Padding="8,4">
                                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                                    <TextBlock Text="{Binding Price}" 
-                                                              Foreground="White" 
-                                                              FontSize="11" 
-                                                              FontWeight="SemiBold"/>
-                                                    <TextBlock Text=" ₽" 
-                                                              Foreground="White" 
-                                                              FontSize="11" 
+                                                    <TextBlock Text="{Binding Price, StringFormat='{}{0}₽'}"
+                                                              Foreground="White"
+                                                              FontSize="11"
                                                               FontWeight="SemiBold"/>
                                                 </StackPanel>
                                             </Border>
-                                            <TextBlock Text="{Binding Id, StringFormat='#{0}'}" 
-                                                      Foreground="{StaticResource TextSecondaryBrush}" 
-                                                      FontSize="10" 
+                                            <TextBlock Text="{Binding Id, StringFormat='#{0}'}"
+                                                      Foreground="{StaticResource TextSecondaryBrush}"
+                                                      FontSize="10"
                                                       Margin="0,6,0,0"
                                                       HorizontalAlignment="Center"/>
                                         </StackPanel>

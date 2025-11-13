@@ -12,8 +12,8 @@ namespace Desktop.Pages.Items
     public partial class BookingCard : UserControl
     {
         public static readonly DependencyProperty BookingProperty =
-             DependencyProperty.Register("Booking", typeof(Booking), typeof(BookingCard),
-                 new PropertyMetadata(null, OnBookingChanged));
+            DependencyProperty.Register("Booking", typeof(Booking), typeof(BookingCard),
+                new PropertyMetadata(null, OnBookingChanged));
 
         public static readonly DependencyProperty IsSelectedProperty =
             DependencyProperty.Register("IsSelected", typeof(bool), typeof(BookingCard),
@@ -21,37 +21,37 @@ namespace Desktop.Pages.Items
 
         public Booking Booking
         {
-            get { return (Booking)GetValue(BookingProperty); }
-            set { SetValue(BookingProperty, value); }
+            get => (Booking)GetValue(BookingProperty);
+            set => SetValue(BookingProperty, value);
         }
 
         public bool IsSelected
         {
-            get { return (bool)GetValue(IsSelectedProperty); }
-            set { SetValue(IsSelectedProperty, value); }
+            get => (bool)GetValue(IsSelectedProperty);
+            set => SetValue(IsSelectedProperty, value);
         }
+
         public BookingCard()
         {
             InitializeComponent();
-           
+            DataContext = this;
         }
 
         private static void OnBookingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var control = d as BookingCard;
-            control.DataContext = control.Booking;
-            control.UpdateStatusColor();
+            if (d is BookingCard control)
+                control.UpdateStatusColor();
         }
 
         private static void OnIsSelectedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var control = d as BookingCard;
-            control.UpdateSelectionAppearance();
+            if (d is BookingCard control)
+                control.UpdateSelection();
         }
 
         private void UpdateStatusColor()
         {
-            if (Booking == null || StatusBorder == null) return;
+            if (Booking == null) return;
 
             switch (Booking.Status)
             {
@@ -70,23 +70,18 @@ namespace Desktop.Pages.Items
             }
         }
 
-        private void UpdateSelectionAppearance()
+        private void UpdateSelection()
         {
-            if (IsSelected)
-            {
-                MainBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(0, 120, 215));
-                MainBorder.BorderThickness = new Thickness(2);
-            }
-            else
-            {
-                MainBorder.BorderBrush = Brushes.Transparent;
-                MainBorder.BorderThickness = new Thickness(0);
-            }
+            MainBorder.BorderBrush = IsSelected
+                ? new SolidColorBrush(Color.FromRgb(0, 120, 215))
+                : Brushes.Transparent;
+            MainBorder.BorderThickness = IsSelected ? new Thickness(3) : new Thickness(0);
         }
 
         private void UserControl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            IsSelected = !IsSelected; // Переключаем выделение
+            IsSelected = !IsSelected;
+            e.Handled = true;
         }
     }
 }
