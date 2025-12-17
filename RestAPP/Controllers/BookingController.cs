@@ -8,7 +8,7 @@ namespace RestAPI.Controllers
 {
     [Route("api/BookingController")]
     [ApiController]
-    public class BookingController : Controller
+    public class BookingController : ControllerBase
     {
         private readonly IBooking _booking;
 
@@ -17,19 +17,16 @@ namespace RestAPI.Controllers
             _booking = booking;
         }
 
-        /// <summary>
-        /// Создание бронирования
-        /// </summary>
         [HttpPost("CreateBooking")]
-        public async Task<IActionResult> CreateBooking([FromForm] Booking booking)
+        public async Task<IActionResult> CreateBooking([FromBody] Booking booking)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             await _booking.CreateBooking(booking);
             return Ok();
         }
 
-        /// <summary>
-        /// Получение всех бронирований
-        /// </summary>
         [HttpGet("GetAllBookings")]
         public async Task<IActionResult> GetAllBookings()
         {
@@ -37,46 +34,30 @@ namespace RestAPI.Controllers
             return Ok(bookings);
         }
 
-        /// <summary>
-        /// Получение бронирования по ID
-        /// </summary>
-        [HttpGet("GetBookingById/{id}")]
-        public async Task<IActionResult> GetBookingById(int id, int restaurantId)
+        [HttpGet("GetBookingById/{userId}/{restaurantId}")]
+        public async Task<IActionResult> GetBookingById(int userId, int restaurantId)
         {
-            var booking = await _booking.GetBookingById(id, restaurantId);
+            var booking = await _booking.GetBookingById(userId, restaurantId);
             if (booking == null)
                 return NotFound();
             return Ok(booking);
         }
 
-        /// <summary>
-        /// Обновление бронирования
-        /// </summary>
-        [HttpPut("UpdateBooking")]
-        public async Task<IActionResult> UpdateBooking([FromForm] Booking booking)
+        [HttpPost("UpdateBooking")]
+        public async Task<IActionResult> UpdateBooking([FromBody] Booking booking)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             await _booking.UpdateBooking(booking);
             return Ok();
         }
 
-        /// <summary>
-        /// Удаление бронирования
-        /// </summary>
-        [HttpDelete("DeleteBooking/{id}")]
+        [HttpDelete("DeleteBooking/{userId}/{restaurantId}")]
         public async Task<IActionResult> DeleteBooking(int userId, int restaurantId)
         {
             await _booking.DeleteBooking(userId, restaurantId);
             return Ok();
-        }
-
-        /// <summary>
-        /// Получение бронирований пользователя
-        /// </summary>
-        [HttpGet("GetBookingsByUserId/{userId}")]
-        public async Task<IActionResult> GetBookingsByUserId(int userId)
-        {
-            var bookings = await _booking.GetBookingsByUserId(userId);
-            return Ok(bookings);
         }
     }
 }

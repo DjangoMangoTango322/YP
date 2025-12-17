@@ -6,7 +6,7 @@ namespace RestAPI.Controllers
 {
     [Route("api/UserController")]
     [ApiController]
-    public class UserController : Controller
+    public class UserController : ControllerBase
     {
         private readonly IUser _user;
 
@@ -15,37 +15,16 @@ namespace RestAPI.Controllers
             _user = user;
         }
 
-        /// <summary>
-        /// Регистрация пользователя
-        /// </summary>
-        [Route("AddUser")]
-        [HttpPost]
-        public Task AddUser([FromForm] User user)
+        [HttpPost("AddUser")]
+        public async Task<IActionResult> AddUser([FromBody] User user)
         {
-            var res = _user.ReginU(user);
-            return res;
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            await _user.ReginU(user);
+            return Ok();
         }
 
-        /// <summary>
-        /// Авторизация пользователя
-        /// </summary>
-        [HttpPost("LoginUser")]
-        public async Task<IActionResult> LoginUser([FromForm] string login, [FromForm] string password)
-        {
-            if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password))
-                return BadRequest("Email и пароль обязательны");
-
-            var result = await _user.LoginUser(login, password);
-
-            if (result <= 0)
-                return Unauthorized();
-
-            return Ok(new { UserId = result });
-        }
-
-        /// <summary>
-        /// Получение всех пользователей
-        /// </summary>
         [HttpGet("GetAllUsers")]
         public async Task<IActionResult> GetAllUsers()
         {
@@ -53,9 +32,6 @@ namespace RestAPI.Controllers
             return Ok(users);
         }
 
-        /// <summary>
-        /// Получение пользователя по ID
-        /// </summary>
         [HttpGet("GetUserById/{id}")]
         public async Task<IActionResult> GetUserById(int id)
         {
@@ -65,35 +41,21 @@ namespace RestAPI.Controllers
             return Ok(user);
         }
 
-        
-        /// <summary>
-        /// Обновление пользователя
-        /// </summary>
-        [HttpPut("UpdateUser")]
-        public async Task<IActionResult> UpdateUser([FromForm] User user)
+        [HttpPost("UpdateUser")]
+        public async Task<IActionResult> UpdateUser([FromBody] User user)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             await _user.UpdateUser(user);
             return Ok();
         }
 
-        /// <summary>
-        /// Удаление пользователя
-        /// </summary>
         [HttpDelete("DeleteUser/{id}")]
-        public async Task<IActionResult> DeleteUser(int id) 
+        public async Task<IActionResult> DeleteUser(int id)
         {
             await _user.DeleteUser(id);
             return Ok();
-        }
-
-        /// <summary>
-        /// Проверка учетных данных
-        /// </summary>
-        [HttpPost("ValidateUserCredentials")]
-        public async Task<IActionResult> ValidateUserCredentials([FromForm] string login, [FromForm] string password)
-        {
-            var isValid = await _user.ValidateUserCredentials(login, password);
-            return Ok(new { IsValid = isValid });
         }
     }
 }

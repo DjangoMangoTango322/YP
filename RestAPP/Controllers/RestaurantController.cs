@@ -8,7 +8,7 @@ namespace RestAPI.Controllers
 {
     [Route("api/RestaurantController")]
     [ApiController]
-    public class RestaurantController : Controller
+    public class RestaurantController : ControllerBase
     {
         private readonly IRestaurant _restaurant;
 
@@ -17,19 +17,16 @@ namespace RestAPI.Controllers
             _restaurant = restaurant;
         }
 
-        /// <summary>
-        /// Создание ресторана
-        /// </summary>
         [HttpPost("CreateRestaurant")]
-        public async Task<IActionResult> CreateRestaurant([FromForm] Restaurant restaurant)
+        public async Task<IActionResult> CreateRestaurant([FromBody] Restaurant restaurant)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             await _restaurant.CreateRestaurant(restaurant);
             return Ok();
         }
 
-        /// <summary>
-        /// Получение всех ресторанов
-        /// </summary>
         [HttpGet("GetAllRestaurants")]
         public async Task<IActionResult> GetAllRestaurants()
         {
@@ -37,9 +34,6 @@ namespace RestAPI.Controllers
             return Ok(restaurants);
         }
 
-        /// <summary>
-        /// Получение ресторана по ID
-        /// </summary>
         [HttpGet("GetRestaurantById/{id}")]
         public async Task<IActionResult> GetRestaurantById(int id)
         {
@@ -49,34 +43,21 @@ namespace RestAPI.Controllers
             return Ok(restaurant);
         }
 
-        /// <summary>
-        /// Обновление ресторана
-        /// </summary>
-        [HttpPut("UpdateRestaurant")]
-        public async Task<IActionResult> UpdateRestaurant([FromForm] Restaurant restaurant)
+        [HttpPost("UpdateRestaurant")]
+        public async Task<IActionResult> UpdateRestaurant([FromBody] Restaurant restaurant)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             await _restaurant.UpdateRestaurant(restaurant);
             return Ok();
         }
 
-        /// <summary>
-        /// Удаление ресторана
-        /// </summary>
         [HttpDelete("DeleteRestaurant/{id}")]
         public async Task<IActionResult> DeleteRestaurant(int id)
         {
             await _restaurant.DeleteRestaurant(id);
             return Ok();
-        }
-
-        /// <summary>
-        /// Получение ресторанов по тематике
-        /// </summary>
-        [HttpGet("GetRestaurantsByTematic/{tematic}")]
-        public async Task<IActionResult> GetRestaurantsByTematic(string tematic)
-        {
-            var restaurants = await _restaurant.GetRestaurantsByTematic(tematic);
-            return Ok(restaurants);
         }
     }
 }

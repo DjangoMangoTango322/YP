@@ -6,7 +6,7 @@ namespace RestAPI.Controllers
 {
     [Route("api/AdministratorController")]
     [ApiController]
-    public class AdministratorController : Controller
+    public class AdministratorController : ControllerBase
     {
         private readonly IAdministrator _administrator;
 
@@ -15,20 +15,16 @@ namespace RestAPI.Controllers
             _administrator = administrator;
         }
 
-        /// <summary>
-        /// Регистрация Администратора
-        /// </summary>
-        [Route("AddAdministrator")]
-        [HttpPost]
-        public Task AddAdministrator([FromForm] Administrator administrator)
+        [HttpPost("AddAdministrator")]
+        public async Task<IActionResult> AddAdministrator([FromBody] Administrator administrator)
         {
-            var res = _administrator.ReginA(administrator);
-            return res;
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            await _administrator.ReginA(administrator);
+            return Ok();
         }
 
-        /// <summary>
-        /// Авторизация Администратора
-        /// </summary>
         [HttpPost("LoginAdministrator")]
         public async Task<IActionResult> LoginAdministrator([FromForm] string login, [FromForm] string password)
         {
@@ -38,14 +34,12 @@ namespace RestAPI.Controllers
             var result = await _administrator.LoginAdmin(login, password);
 
             if (result <= 0)
-                return Unauthorized();
+                return Unauthorized("Неверный логин или пароль");
 
-            return Ok(new { AdministratorId = result });
+            var admin = await _administrator.GetAdminById(result);
+            return Ok(admin); // Возвращаем объект Administrator, как ожидает клиент
         }
 
-        /// <summary>
-        /// Получение всех администраторов
-        /// </summary>
         [HttpGet("GetAllAdmins")]
         public async Task<IActionResult> GetAllAdmins()
         {
@@ -53,9 +47,6 @@ namespace RestAPI.Controllers
             return Ok(admins);
         }
 
-        /// <summary>
-        /// Получение администратора по ID
-        /// </summary>
         [HttpGet("GetAdminById/{id}")]
         public async Task<IActionResult> GetAdminById(int id)
         {
@@ -65,19 +56,16 @@ namespace RestAPI.Controllers
             return Ok(admin);
         }
 
-        /// <summary>
-        /// Обновление администратора
-        /// </summary>
-        [HttpPut("UpdateAdmin")]
-        public async Task<IActionResult> UpdateAdmin([FromForm] Administrator admin)
+        [HttpPost("UpdateAdmin")]
+        public async Task<IActionResult> UpdateAdmin([FromBody] Administrator admin)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             await _administrator.UpdateAdmin(admin);
             return Ok();
         }
 
-        /// <summary>
-        /// Удаление администратора по ID
-        /// </summary>
         [HttpDelete("DeleteAdmin/{id}")]
         public async Task<IActionResult> DeleteAdmin(int id)
         {

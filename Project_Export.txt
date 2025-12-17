@@ -1,0 +1,1537 @@
+﻿PROJECT EXPORT - 12/17/2025 23:29:42
+Project Path: C:\Users\semen\Desktop\8939405\YP
+Total Files: 37
+
+================================================================================
+FILE: RestAPP.sln
+================================================================================
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113 d17.12
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RestAPP", "RestAPP\RestAPP.csproj", "{ABF018B6-1338-4F90-BB5F-FD1B6C57DC19}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{ABF018B6-1338-4F90-BB5F-FD1B6C57DC19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ABF018B6-1338-4F90-BB5F-FD1B6C57DC19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ABF018B6-1338-4F90-BB5F-FD1B6C57DC19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ABF018B6-1338-4F90-BB5F-FD1B6C57DC19}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
+
+
+
+================================================================================
+FILE: RestAPP\appsettings.Development.json
+================================================================================
+{
+  "DetailedErrors": true,
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  }
+}
+
+
+
+================================================================================
+FILE: RestAPP\appsettings.json
+================================================================================
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*"
+}
+
+
+
+================================================================================
+FILE: RestAPP\Program.cs
+================================================================================
+using Microsoft.EntityFrameworkCore;
+using RestAPI.Context;
+using RestAPP.Context;
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddDbContext<AdminContext>(options =>
+    options.UseSqlServer(DbConnection.config));
+
+builder.Services.AddDbContext<BookingContext>(options =>
+    options.UseSqlServer(DbConnection.config));
+
+builder.Services.AddDbContext<DishContext>(options =>
+    options.UseSqlServer(DbConnection.config));
+
+builder.Services.AddDbContext<RestaurantContext>(options =>
+    options.UseSqlServer(DbConnection.config));
+
+builder.Services.AddDbContext<RestaurantDishContext>(options =>
+    options.UseSqlServer(DbConnection.config));
+
+builder.Services.AddDbContext<UserContext>(options =>
+    options.UseSqlServer(DbConnection.config));
+
+builder.Services.AddScoped<RestAPI.Interfaces.IAdministrator, RestAPI.Service.AdministratorService>();
+builder.Services.AddScoped<RestAPI.Interfaces.IBooking, RestAPI.Service.BookingService>();
+builder.Services.AddScoped<RestAPI.Interfaces.IDish, RestAPI.Service.DishService>();
+builder.Services.AddScoped<RestAPI.Interfaces.IRestaurant, RestAPI.Service.RestaurantService>();
+builder.Services.AddScoped<RestAPI.Interfaces.IRestaurantDish, RestAPI.Service.RestaurantDishService>();
+builder.Services.AddScoped<RestAPI.Interfaces.IUser, RestAPI.Service.UserService>();
+
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseHttpsRedirection();
+app.UseAuthorization();
+app.MapControllers();
+app.Run();
+
+
+
+================================================================================
+FILE: RestAPP\RestAPP.csproj
+================================================================================
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Remove="Pages\**" />
+		<Compile Remove="wwwroot\**" />
+		<Content Remove="Pages\**" />
+		<Content Remove="wwwroot\**" />
+		<EmbeddedResource Remove="Pages\**" />
+		<EmbeddedResource Remove="wwwroot\**" />
+		<None Remove="Pages\**" />
+		<None Remove="wwwroot\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.0" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+	</ItemGroup>
+
+</Project>
+
+
+================================================================================
+FILE: RestAPP\Context\AdminContext.cs
+================================================================================
+using RestAPI.Context;
+using Microsoft.EntityFrameworkCore;
+using RestAPI.Model;
+
+namespace RestAPP.Context
+{
+    public class AdminContext : DbContext
+    {
+        public DbSet<Administrator> Administrators { get; set; }
+
+        public AdminContext(DbContextOptions<AdminContext> options) : base(options)
+        {
+            Database.EnsureCreated();
+        }
+    }
+}
+
+
+================================================================================
+FILE: RestAPP\Context\BookingContext.cs
+================================================================================
+using Microsoft.EntityFrameworkCore;
+using RestAPI.Context;
+using RestAPI.Model;
+
+namespace RestAPP.Context
+{
+    public class BookingContext : DbContext
+    {
+        public DbSet<Booking> Bookings { get; set; }
+        public DbSet<Restaurant> Restaurants { get; set; }
+        public DbSet<User> Users { get; set; }
+        
+
+        public BookingContext(DbContextOptions<BookingContext> options) : base(options)
+        {
+            Database.EnsureCreated();
+        }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Booking>()
+                .HasKey(rd => new { rd.Restaurant_Id, rd.User_Id });
+        }
+    }
+}
+
+
+
+================================================================================
+FILE: RestAPP\Context\DbConnection.cs
+================================================================================
+using Microsoft.EntityFrameworkCore;
+
+namespace RestAPI.Context
+{
+    public class DbConnection : DbContext
+    {
+        //public static readonly string config = "Server=DESKTOP-U29GOO8\\SQLEXPRESS;Trusted_Connection=True;Database=tinder;TrustServerCertificate=True;";
+        public static readonly string config = "Server=10.0.201.112;TrustServerCertificate=True;Database=base1_ISP_22_4_16;User=ISP_22_4_16;PWD=6GdNkdTL69su_";
+    }
+}
+
+
+
+================================================================================
+FILE: RestAPP\Context\DishContext.cs
+================================================================================
+using Microsoft.EntityFrameworkCore;
+using RestAPI.Context;
+using RestAPI.Model;
+
+namespace RestAPP.Context
+{
+    public class DishContext : DbContext
+    {
+        public DbSet<Dish> Dishes { get; set; }
+
+        public DishContext(DbContextOptions<DishContext> options) : base(options)
+        {
+            Database.EnsureCreated();
+        }
+    }
+}
+
+
+
+================================================================================
+FILE: RestAPP\Context\RestaurantContext.cs
+================================================================================
+using Microsoft.EntityFrameworkCore;
+using RestAPI.Context;
+using RestAPI.Model;
+
+namespace RestAPP.Context
+{
+    public class RestaurantContext : DbContext
+    {
+        public DbSet<Restaurant> Restaurants { get; set; }
+
+        public RestaurantContext(DbContextOptions<RestaurantContext> options) : base(options)
+        {
+            Database.EnsureCreated();
+        }
+    }
+}
+ 
+
+
+================================================================================
+FILE: RestAPP\Context\RestaurantDishContext.cs
+================================================================================
+using Microsoft.EntityFrameworkCore;
+using RestAPI.Context;
+using RestAPI.Model;
+
+namespace RestAPP.Context
+{
+    public class RestaurantDishContext : DbContext
+    {
+        public DbSet<RestaurantDish> RestaurantDishes { get; set; }
+        public DbSet<Restaurant> Restaurants { get; set; }
+        public DbSet<Dish> Dishes { get; set; }
+
+        public RestaurantDishContext(DbContextOptions<RestaurantDishContext> options) : base(options)
+        {
+            Database.EnsureCreated();
+        }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<RestaurantDish>()
+                .HasKey(rd => new { rd.Restaurant_Id, rd.Dish_Id });
+        }
+    }
+}
+
+
+================================================================================
+FILE: RestAPP\Context\UserContext.cs
+================================================================================
+using Microsoft.EntityFrameworkCore;
+using RestAPI.Model;
+
+namespace RestAPI.Context
+{
+    public class UserContext : DbContext
+    {
+        public DbSet<User> Users { get; set; }
+
+        public UserContext(DbContextOptions<UserContext> options) : base(options)
+        {
+            Database.EnsureCreated();
+        }
+
+    }
+}
+
+
+================================================================================
+FILE: RestAPP\Controllers\AdministratorController.cs
+================================================================================
+using Microsoft.AspNetCore.Mvc;
+using RestAPI.Interfaces;
+using RestAPI.Model;
+
+namespace RestAPI.Controllers
+{
+    [Route("api/AdministratorController")]
+    [ApiController]
+    public class AdministratorController : Controller
+    {
+        private readonly IAdministrator _administrator;
+
+        public AdministratorController(IAdministrator administrator)
+        {
+            _administrator = administrator;
+        }
+
+        /// <summary>
+        /// Регистрация Администратора
+        /// </summary>
+        [Route("AddAdministrator")]
+        [HttpPost]
+        public Task AddAdministrator([FromForm] Administrator administrator)
+        {
+            var res = _administrator.ReginA(administrator);
+            return res;
+        }
+
+        /// <summary>
+        /// Авторизация Администратора
+        /// </summary>
+        [HttpPost("LoginAdministrator")]
+        public async Task<IActionResult> LoginAdministrator([FromForm] string login, [FromForm] string password)
+        {
+            if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password))
+                return BadRequest("Логин и пароль обязательны");
+
+            var result = await _administrator.LoginAdmin(login, password);
+
+            if (result <= 0)
+                return Unauthorized();
+
+            return Ok(new { AdministratorId = result });
+        }
+
+        /// <summary>
+        /// Получение всех администраторов
+        /// </summary>
+        [HttpGet("GetAllAdmins")]
+        public async Task<IActionResult> GetAllAdmins()
+        {
+            var admins = await _administrator.GetAllAdmins();
+            return Ok(admins);
+        }
+
+        /// <summary>
+        /// Получение администратора по ID
+        /// </summary>
+        [HttpGet("GetAdminById/{id}")]
+        public async Task<IActionResult> GetAdminById(int id)
+        {
+            var admin = await _administrator.GetAdminById(id);
+            if (admin == null)
+                return NotFound();
+            return Ok(admin);
+        }
+
+        /// <summary>
+        /// Обновление администратора
+        /// </summary>
+        [HttpPut("UpdateAdmin")]
+        public async Task<IActionResult> UpdateAdmin([FromForm] Administrator admin)
+        {
+            await _administrator.UpdateAdmin(admin);
+            return Ok();
+        }
+
+        /// <summary>
+        /// Удаление администратора по ID
+        /// </summary>
+        [HttpDelete("DeleteAdmin/{id}")]
+        public async Task<IActionResult> DeleteAdmin(int id)
+        {
+            await _administrator.DeleteAdmin(id);
+            return Ok();
+        }
+    }
+}
+
+
+
+================================================================================
+FILE: RestAPP\Controllers\BookingController.cs
+================================================================================
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using RestAPI.Context;
+using RestAPI.Interfaces;
+using RestAPI.Model;
+
+namespace RestAPI.Controllers
+{
+    [Route("api/BookingController")]
+    [ApiController]
+    public class BookingController : Controller
+    {
+        private readonly IBooking _booking;
+
+        public BookingController(IBooking booking)
+        {
+            _booking = booking;
+        }
+
+        /// <summary>
+        /// Создание бронирования
+        /// </summary>
+        [HttpPost("CreateBooking")]
+        public async Task<IActionResult> CreateBooking([FromForm] Booking booking)
+        {
+            await _booking.CreateBooking(booking);
+            return Ok();
+        }
+
+        /// <summary>
+        /// Получение всех бронирований
+        /// </summary>
+        [HttpGet("GetAllBookings")]
+        public async Task<IActionResult> GetAllBookings()
+        {
+            var bookings = await _booking.GetAllBookings();
+            return Ok(bookings);
+        }
+
+        /// <summary>
+        /// Получение бронирования по ID
+        /// </summary>
+        [HttpGet("GetBookingById/{id}")]
+        public async Task<IActionResult> GetBookingById(int id, int restaurantId)
+        {
+            var booking = await _booking.GetBookingById(id, restaurantId);
+            if (booking == null)
+                return NotFound();
+            return Ok(booking);
+        }
+
+        /// <summary>
+        /// Обновление бронирования
+        /// </summary>
+        [HttpPut("UpdateBooking")]
+        public async Task<IActionResult> UpdateBooking([FromForm] Booking booking)
+        {
+            await _booking.UpdateBooking(booking);
+            return Ok();
+        }
+
+        /// <summary>
+        /// Удаление бронирования
+        /// </summary>
+        [HttpDelete("DeleteBooking/{id}")]
+        public async Task<IActionResult> DeleteBooking(int userId, int restaurantId)
+        {
+            await _booking.DeleteBooking(userId, restaurantId);
+            return Ok();
+        }
+
+        /// <summary>
+        /// Получение бронирований пользователя
+        /// </summary>
+        [HttpGet("GetBookingsByUserId/{userId}")]
+        public async Task<IActionResult> GetBookingsByUserId(int userId)
+        {
+            var bookings = await _booking.GetBookingsByUserId(userId);
+            return Ok(bookings);
+        }
+    }
+}
+
+
+
+================================================================================
+FILE: RestAPP\Controllers\DishController.cs
+================================================================================
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using RestAPI.Context;
+using RestAPI.Interfaces;
+using RestAPI.Model;
+
+namespace RestAPI.Controllers
+{
+    [Route("api/DishController")]
+    [ApiController]
+    public class DishController : Controller
+    {
+        private readonly IDish _dish;
+
+        public DishController(IDish dish)
+        {
+            _dish = dish;
+        }
+
+        /// <summary>
+        /// Создание блюда
+        /// </summary>
+        [HttpPost("CreateDish")]
+        public async Task<IActionResult> CreateDish([FromForm] Dish dish)
+        {
+            await _dish.CreateDish(dish);
+            return Ok();
+        }
+
+        /// <summary>
+        /// Получение всех блюд
+        /// </summary>
+        [HttpGet("GetAllDishes")]
+        public async Task<IActionResult> GetAllDishes()
+        {
+            var dishes = await _dish.GetAllDishes();
+            return Ok(dishes);
+        }
+
+        /// <summary>
+        /// Получение блюда по ID
+        /// </summary>
+        [HttpGet("GetDishById/{id}")]
+        public async Task<IActionResult> GetDishById(int id)
+        {
+            var dish = await _dish.GetDishById(id);
+            if (dish == null)
+                return NotFound();
+            return Ok(dish);
+        }
+
+        /// <summary>
+        /// Обновление блюда
+        /// </summary>
+        [HttpPut("UpdateDish")]
+        public async Task<IActionResult> UpdateDish([FromForm] Dish dish)
+        {
+            await _dish.UpdateDish(dish);
+            return Ok();
+        }
+
+        /// <summary>
+        /// Удаление блюда
+        /// </summary>
+        [HttpDelete("DeleteDish/{id}")]
+        public async Task<IActionResult> DeleteDish(int id)
+        {
+            await _dish.DeleteDish(id);
+            return Ok();
+        }
+
+        /// <summary>
+        /// Получение блюд по категории
+        /// </summary>
+        [HttpGet("GetDishesByCategory/{category}")]
+        public async Task<IActionResult> GetDishesByCategory(string category)
+        {
+            var dishes = await _dish.GetDishesByCategory(category);
+            return Ok(dishes);
+        }
+    }
+}
+
+
+================================================================================
+FILE: RestAPP\Controllers\RestaurantController.cs
+================================================================================
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using RestAPI.Context;
+using RestAPI.Interfaces;
+using RestAPI.Model;
+
+namespace RestAPI.Controllers
+{
+    [Route("api/RestaurantController")]
+    [ApiController]
+    public class RestaurantController : Controller
+    {
+        private readonly IRestaurant _restaurant;
+
+        public RestaurantController(IRestaurant restaurant)
+        {
+            _restaurant = restaurant;
+        }
+
+        /// <summary>
+        /// Создание ресторана
+        /// </summary>
+        [HttpPost("CreateRestaurant")]
+        public async Task<IActionResult> CreateRestaurant([FromForm] Restaurant restaurant)
+        {
+            await _restaurant.CreateRestaurant(restaurant);
+            return Ok();
+        }
+
+        /// <summary>
+        /// Получение всех ресторанов
+        /// </summary>
+        [HttpGet("GetAllRestaurants")]
+        public async Task<IActionResult> GetAllRestaurants()
+        {
+            var restaurants = await _restaurant.GetAllRestaurants();
+            return Ok(restaurants);
+        }
+
+        /// <summary>
+        /// Получение ресторана по ID
+        /// </summary>
+        [HttpGet("GetRestaurantById/{id}")]
+        public async Task<IActionResult> GetRestaurantById(int id)
+        {
+            var restaurant = await _restaurant.GetRestaurantById(id);
+            if (restaurant == null)
+                return NotFound();
+            return Ok(restaurant);
+        }
+
+        /// <summary>
+        /// Обновление ресторана
+        /// </summary>
+        [HttpPut("UpdateRestaurant")]
+        public async Task<IActionResult> UpdateRestaurant([FromForm] Restaurant restaurant)
+        {
+            await _restaurant.UpdateRestaurant(restaurant);
+            return Ok();
+        }
+
+        /// <summary>
+        /// Удаление ресторана
+        /// </summary>
+        [HttpDelete("DeleteRestaurant/{id}")]
+        public async Task<IActionResult> DeleteRestaurant(int id)
+        {
+            await _restaurant.DeleteRestaurant(id);
+            return Ok();
+        }
+
+        /// <summary>
+        /// Получение ресторанов по тематике
+        /// </summary>
+        [HttpGet("GetRestaurantsByTematic/{tematic}")]
+        public async Task<IActionResult> GetRestaurantsByTematic(string tematic)
+        {
+            var restaurants = await _restaurant.GetRestaurantsByTematic(tematic);
+            return Ok(restaurants);
+        }
+    }
+}
+
+
+
+================================================================================
+FILE: RestAPP\Controllers\RestaurantDishController.cs
+================================================================================
+using Microsoft.AspNetCore.Mvc;
+using RestAPI.Interfaces;
+using RestAPI.Model;
+
+namespace RestAPI.Controllers
+{
+    [Route("api/RestaurantDishController")]
+    [ApiController]
+    public class RestaurantDishController : Controller
+    {
+        private readonly IRestaurantDish _restaurantDish;
+
+        public RestaurantDishController(IRestaurantDish restaurantDish)
+        {
+            _restaurantDish = restaurantDish;
+        }
+
+        /// <summary>
+        /// Добавление блюда в ресторан
+        /// </summary>
+        [HttpPost("AddDishToRestaurant")]
+        public async Task<IActionResult> AddDishToRestaurant([FromForm] RestaurantDish restaurantDish)
+        {
+            await _restaurantDish.AddDishToRestaurant(restaurantDish);
+            return Ok();
+        }
+
+        /// <summary>
+        /// Удаление блюда из ресторана
+        /// </summary>
+        [HttpDelete("RemoveDishFromRestaurant")]
+        public async Task<IActionResult> RemoveDishFromRestaurant([FromForm] int restaurantId, [FromForm] int dishId)
+        {
+            await _restaurantDish.RemoveDishFromRestaurant(restaurantId, dishId);
+            return Ok();
+        }
+
+        /// <summary>
+        /// Получение блюд ресторана
+        /// </summary>
+        [HttpGet("GetDishesByRestaurantId/{restaurantId}")]
+        public async Task<IActionResult> GetDishesByRestaurantId(int restaurantId)
+        {
+            var dishes = await _restaurantDish.GetDishesByRestaurantId(restaurantId);
+            return Ok(dishes);
+        }
+
+        /// <summary>
+        /// Получение ресторанов по блюду
+        /// </summary>
+        [HttpGet("GetRestaurantsByDishId/{dishId}")]
+        public async Task<IActionResult> GetRestaurantsByDishId(int dishId)
+        {
+            var restaurants = await _restaurantDish.GetRestaurantsByDishId(dishId);
+            return Ok(restaurants);
+        }
+    }
+}
+
+
+
+================================================================================
+FILE: RestAPP\Controllers\UserController.cs
+================================================================================
+using Microsoft.AspNetCore.Mvc;
+using RestAPI.Interfaces;
+using RestAPI.Model;
+
+namespace RestAPI.Controllers
+{
+    [Route("api/UserController")]
+    [ApiController]
+    public class UserController : Controller
+    {
+        private readonly IUser _user;
+
+        public UserController(IUser user)
+        {
+            _user = user;
+        }
+
+        /// <summary>
+        /// Регистрация пользователя
+        /// </summary>
+        [Route("AddUser")]
+        [HttpPost]
+        public Task AddUser([FromForm] User user)
+        {
+            var res = _user.ReginU(user);
+            return res;
+        }
+
+        /// <summary>
+        /// Авторизация пользователя
+        /// </summary>
+        [HttpPost("LoginUser")]
+        public async Task<IActionResult> LoginUser([FromForm] string login, [FromForm] string password)
+        {
+            if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password))
+                return BadRequest("Email и пароль обязательны");
+
+            var result = await _user.LoginUser(login, password);
+
+            if (result <= 0)
+                return Unauthorized();
+
+            return Ok(new { UserId = result });
+        }
+
+        /// <summary>
+        /// Получение всех пользователей
+        /// </summary>
+        [HttpGet("GetAllUsers")]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            var users = await _user.GetAllUsers();
+            return Ok(users);
+        }
+
+        /// <summary>
+        /// Получение пользователя по ID
+        /// </summary>
+        [HttpGet("GetUserById/{id}")]
+        public async Task<IActionResult> GetUserById(int id)
+        {
+            var user = await _user.GetUserById(id);
+            if (user == null)
+                return NotFound();
+            return Ok(user);
+        }
+
+        
+        /// <summary>
+        /// Обновление пользователя
+        /// </summary>
+        [HttpPut("UpdateUser")]
+        public async Task<IActionResult> UpdateUser([FromForm] User user)
+        {
+            await _user.UpdateUser(user);
+            return Ok();
+        }
+
+        /// <summary>
+        /// Удаление пользователя
+        /// </summary>
+        [HttpDelete("DeleteUser/{id}")]
+        public async Task<IActionResult> DeleteUser(int id) 
+        {
+            await _user.DeleteUser(id);
+            return Ok();
+        }
+
+        /// <summary>
+        /// Проверка учетных данных
+        /// </summary>
+        [HttpPost("ValidateUserCredentials")]
+        public async Task<IActionResult> ValidateUserCredentials([FromForm] string login, [FromForm] string password)
+        {
+            var isValid = await _user.ValidateUserCredentials(login, password);
+            return Ok(new { IsValid = isValid });
+        }
+    }
+}
+
+
+================================================================================
+FILE: RestAPP\Interfaces\IAdministrator.cs
+================================================================================
+using RestAPI.Model;
+
+namespace RestAPI.Interfaces
+{
+    public interface IAdministrator
+    {
+        Task ReginA(Administrator admin);
+        Task<int> LoginAdmin(string login, string password);
+        Task<Administrator> GetAdminById(int id);
+        Task<List<Administrator>> GetAllAdmins();
+        Task UpdateAdmin(Administrator admin);
+        Task DeleteAdmin(int id);
+    }
+}
+
+
+
+================================================================================
+FILE: RestAPP\Interfaces\IBooking.cs
+================================================================================
+using RestAPI.Model;
+
+namespace RestAPI.Interfaces
+{
+    public interface IBooking
+    {
+        Task CreateBooking(Booking booking);
+        Task<Booking> GetBookingById(int userId, int restaurantId);
+        Task<List<Booking>> GetAllBookings();
+        Task UpdateBooking(Booking booking);
+        Task DeleteBooking(int userId, int restaurantId);
+        Task<List<Booking>> GetBookingsByUserId(int userId);
+    }
+}
+
+
+
+================================================================================
+FILE: RestAPP\Interfaces\IDish.cs
+================================================================================
+using RestAPI.Model;
+
+namespace RestAPI.Interfaces
+{
+    public interface IDish
+    {
+        Task CreateDish(Dish dish);
+        Task<Dish> GetDishById(int id);
+        Task<List<Dish>> GetAllDishes();
+        Task UpdateDish(Dish dish);
+        Task DeleteDish(int id);
+        Task<List<Dish>> GetDishesByCategory(string category);
+    }
+}
+
+
+================================================================================
+FILE: RestAPP\Interfaces\IRestaurant.cs
+================================================================================
+using RestAPI.Model;
+
+namespace RestAPI.Interfaces
+{
+    public interface IRestaurant
+    {
+        Task CreateRestaurant(Restaurant restaurant);
+        Task<Restaurant> GetRestaurantById(int id);
+        Task<List<Restaurant>> GetAllRestaurants();
+        Task UpdateRestaurant(Restaurant restaurant);
+        Task DeleteRestaurant(int id);
+        Task<List<Restaurant>> GetRestaurantsByTematic(string tematic);
+    }
+}
+
+
+================================================================================
+FILE: RestAPP\Interfaces\IRestaurantDish.cs
+================================================================================
+using RestAPI.Model;
+
+namespace RestAPI.Interfaces
+{
+    public interface IRestaurantDish
+    {
+        Task AddDishToRestaurant(RestaurantDish restaurantDish);
+        Task RemoveDishFromRestaurant(int RestaurantId, int DishId);
+        Task<List<Dish>> GetDishesByRestaurantId(int restaurantId);
+        Task<List<Restaurant>> GetRestaurantsByDishId(int dishId);
+    }
+}
+
+
+
+================================================================================
+FILE: RestAPP\Interfaces\IUser.cs
+================================================================================
+using RestAPI.Model;
+
+namespace RestAPI.Interfaces
+{
+    public interface IUser
+    {
+        Task ReginU(User users);
+        
+        Task<User> GetUserById(int id);
+        Task<List<User>> GetAllUsers();
+        Task UpdateUser(User user);
+        Task DeleteUser(int id);
+        Task<bool> ValidateUserCredentials(string login, string password);
+        Task<int> LoginUser(string login, string password);
+    }
+}
+
+
+================================================================================
+FILE: RestAPP\Model\Administrator.cs
+================================================================================
+using System.ComponentModel.DataAnnotations;
+
+namespace RestAPI.Model
+{
+    public class Administrator
+    {
+        public int Id { get; set; }
+
+        [Required]
+        [StringLength(100)]
+        public string Login { get; set; }
+
+        [Required]
+        [StringLength(100)]
+        public string Password { get; set; }
+
+        [Required]
+        [StringLength(100)]
+        public string Name { get; set; }
+    }
+}
+
+
+
+================================================================================
+FILE: RestAPP\Model\Booking.cs
+================================================================================
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace RestAPI.Model
+{
+    public class Booking
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
+
+        public int User_Id { get; set; }
+        public int Restaurant_Id { get; set; }
+        public DateTime Booking_Date { get; set; }
+
+        public int Number_Of_Guests { get; set; }
+
+        public string Status { get; set; } = "Ожидание";
+
+        public DateTime Created_At { get; set; } = DateTime.UtcNow;
+
+
+    }
+}
+
+
+
+================================================================================
+FILE: RestAPP\Model\Dish.cs
+================================================================================
+using System.ComponentModel.DataAnnotations;
+
+namespace RestAPI.Model
+{
+    public class Dish
+    {
+        public int Id { get; set; }
+
+        [Required]
+        public string Name { get; set; }
+
+        [Required]
+        public string Description { get; set; }
+
+        [Required]
+        public Decimal Price { get; set; }
+
+        [Required]
+        public string Category { get; set; }
+    }
+}
+
+
+
+================================================================================
+FILE: RestAPP\Model\Restaurant.cs
+================================================================================
+using System.ComponentModel.DataAnnotations;
+
+namespace RestAPI.Model
+{
+    public class Restaurant
+    {
+        public int Id { get; set; }
+
+        [Required]
+        public string Name { get; set; }
+
+        [Required]
+        public string Address { get; set; }
+
+        [Required]
+        public int Capacity { get; set; }
+
+        [Required]
+        public TimeSpan Open_Time { get; set; }
+
+        [Required]
+        public TimeSpan Close_Time { get; set; }
+
+        [Required]
+        public string Tematic { get; set; }
+    }
+}
+
+
+
+================================================================================
+FILE: RestAPP\Model\RestaurantDish.cs
+================================================================================
+namespace RestAPI.Model
+{
+    public class RestaurantDish
+    {
+        public int Restaurant_Id { get; set; }
+        public int Dish_Id { get; set; }
+
+        
+    }
+}
+
+
+
+================================================================================
+FILE: RestAPP\Model\User.cs
+================================================================================
+using System.ComponentModel.DataAnnotations;
+
+namespace RestAPI.Model
+{
+    public class User
+    {
+        public int Id { get; set; }
+
+        [Required]
+        public string First_Name { get; set; }
+
+        [Required]
+        public string Last_Name { get; set; }
+
+        [Required]
+        public string Phone { get; set; }
+
+        [Required]
+        public string Password { get; set; }
+        public string Login { get; set; }
+        
+    }
+}
+
+
+
+================================================================================
+FILE: RestAPP\Properties\launchSettings.json
+================================================================================
+{
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:23809",
+      "sslPort": 44331
+    }
+  },
+  "profiles": {
+    "RestAPP": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": true,
+      "applicationUrl": "https://localhost:7237;http://localhost:5085",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
+
+
+
+================================================================================
+FILE: RestAPP\Service\AdministratorService.cs
+================================================================================
+using Microsoft.EntityFrameworkCore;
+using RestAPI.Context;
+using RestAPI.Interfaces;
+using RestAPI.Model;
+using RestAPP.Context;
+
+namespace RestAPI.Service
+{
+    public class AdministratorService : IAdministrator
+    {
+        private readonly AdminContext _Admincontext;
+
+        public AdministratorService(AdminContext Admincontext)
+        {
+            _Admincontext = Admincontext;
+        }
+        public async Task ReginA(Administrator admin)
+        {
+            _Admincontext.Administrators.Add(admin);
+            await _Admincontext.SaveChangesAsync();
+        }
+
+        public async Task<int> LoginAdmin(string login, string password)
+        {
+            Administrator admin = _Admincontext.Administrators.Where(x => x.Login == login && x.Password == password).First();
+            return admin.Id;
+        }
+        
+        public async Task<Administrator> GetAdminById(int id)
+        {
+            return await _Admincontext.Administrators.FindAsync(id);
+        }
+
+        public async Task<List<Administrator>> GetAllAdmins()
+        {
+            return await _Admincontext.Administrators.ToListAsync();
+        }
+
+        public async Task UpdateAdmin(Administrator admin)
+        {
+            _Admincontext.Administrators.Update(admin);
+            await _Admincontext.SaveChangesAsync();
+        }
+
+        public async Task DeleteAdmin(int id)
+        {
+            var admin = await _Admincontext.Administrators.FindAsync(id);
+            if (admin != null)
+            {
+                _Admincontext.Administrators.Remove(admin);
+                await _Admincontext.SaveChangesAsync();
+            }
+        }
+    }
+}
+
+
+================================================================================
+FILE: RestAPP\Service\BookingService.cs
+================================================================================
+using Microsoft.EntityFrameworkCore;
+using RestAPI.Context;
+using RestAPI.Interfaces;
+using RestAPI.Model;
+using RestAPP.Context;
+
+namespace RestAPI.Service
+{
+    public class BookingService : IBooking
+    {
+        private readonly BookingContext _Bookingcontext;
+        private readonly UserContext _Usercontext;
+
+        public BookingService(BookingContext Bookingcontext, UserContext Usercontext)
+        {
+            _Bookingcontext = Bookingcontext;
+            _Usercontext = Usercontext;
+        }
+
+        public async Task CreateBooking(Booking booking)
+        {
+            _Bookingcontext.Bookings.Add(booking);
+            await _Bookingcontext.SaveChangesAsync();
+        }
+
+        public async Task<Booking> GetBookingById(int userId, int restaurantId)
+        {
+            return await _Bookingcontext.Bookings.FindAsync(userId, restaurantId);
+        }
+
+        public async Task<List<Booking>> GetAllBookings()
+        {
+            return await _Bookingcontext.Bookings.ToListAsync();
+        }
+        public async Task UpdateBooking(Booking booking)
+        {
+            _Bookingcontext.Bookings.Update(booking);
+            await _Bookingcontext.SaveChangesAsync();
+        }
+
+        public async Task DeleteBooking(int userId, int restaurantId)
+        {
+            var booking = await _Bookingcontext.Bookings.FindAsync(userId, restaurantId);
+            if (booking != null)
+            {
+                _Bookingcontext.Bookings.Remove(booking);
+                await _Bookingcontext.SaveChangesAsync();
+            }
+        }
+
+        public async Task<List<Booking>> GetBookingsByUserId(int userId)
+        {
+            return await _Bookingcontext.Bookings
+                .Where(b => b.User_Id == userId)
+                .ToListAsync();
+        }
+    }
+}
+
+
+
+================================================================================
+FILE: RestAPP\Service\DishService.cs
+================================================================================
+using Microsoft.EntityFrameworkCore;
+using RestAPI.Context;
+using RestAPI.Interfaces;
+using RestAPI.Model;
+using RestAPP.Context;
+
+namespace RestAPI.Service
+{
+    public class DishService : IDish
+    {
+        private readonly DishContext _Dishcontext;
+
+        public DishService(DishContext Dishcontext)
+        {
+            _Dishcontext = Dishcontext;
+        }
+
+        public async Task CreateDish(Dish dish)
+        {
+            _Dishcontext.Dishes.Add(dish);
+            await _Dishcontext.SaveChangesAsync();
+        }
+
+        public async Task<Dish> GetDishById(int id)
+        {
+            return await _Dishcontext.Dishes.FindAsync(id);
+        }
+
+        public async Task<List<Dish>> GetAllDishes()
+        {
+            return await _Dishcontext.Dishes.ToListAsync();
+        }
+
+        public async Task UpdateDish(Dish dish)
+        {
+            _Dishcontext.Dishes.Update(dish);
+            await _Dishcontext.SaveChangesAsync();
+        }
+
+        public async Task DeleteDish(int id)
+        {
+            var dish = await _Dishcontext.Dishes.FindAsync(id);
+            if (dish != null)
+            {
+                _Dishcontext.Dishes.Remove(dish);
+                await _Dishcontext.SaveChangesAsync();
+            }
+        }
+
+        public async Task<List<Dish>> GetDishesByCategory(string category)
+        {
+            return await _Dishcontext.Dishes
+                .Where(d => d.Category == category)
+                .ToListAsync();
+        }
+    }
+}
+
+
+================================================================================
+FILE: RestAPP\Service\RestaurantDishService.cs
+================================================================================
+using Microsoft.EntityFrameworkCore;
+using RestAPI.Interfaces;
+using RestAPI.Model;
+using RestAPP.Context;
+
+namespace RestAPI.Service
+{
+    public class RestaurantDishService : IRestaurantDish
+    {
+        private readonly RestaurantDishContext _RestaurantDishcontext;
+        private readonly DishContext _Dishcontext;
+        private readonly RestaurantContext _Restaurantcontext;
+
+        public RestaurantDishService(RestaurantDishContext RestaurantDishcontext, DishContext Dishcontext, RestaurantContext Restaurantcontext)
+        {
+            _RestaurantDishcontext = RestaurantDishcontext;
+            _Dishcontext = Dishcontext;
+            _Restaurantcontext = Restaurantcontext;
+        }
+
+        public async Task AddDishToRestaurant(RestaurantDish restaurantDish)
+        {
+            _RestaurantDishcontext.RestaurantDishes.Add(restaurantDish);
+            await _RestaurantDishcontext.SaveChangesAsync();
+        }
+
+        public async Task RemoveDishFromRestaurant(int restaurantId, int dishId)
+        {
+            var restaurantDish = await _RestaurantDishcontext.RestaurantDishes
+                .FirstOrDefaultAsync(rd => rd.Restaurant_Id == restaurantId && rd.Dish_Id == dishId);
+
+            if (restaurantDish != null)
+            {
+                _RestaurantDishcontext.RestaurantDishes.Remove(restaurantDish);
+                await _RestaurantDishcontext.SaveChangesAsync();
+            }
+        }
+
+        public async Task<List<Dish>> GetDishesByRestaurantId(int restaurantId)
+        {
+            var dishIds = await _RestaurantDishcontext.RestaurantDishes
+                .Where(rd => rd.Restaurant_Id == restaurantId)
+                .Select(rd => rd.Dish_Id)
+                .ToListAsync();
+
+            return await _Dishcontext.Dishes
+                .Where(d => dishIds.Contains(d.Id))
+                .ToListAsync();
+        }
+
+        public async Task<List<Restaurant>> GetRestaurantsByDishId(int dishId)
+        {
+            var restaurantIds = await _RestaurantDishcontext.RestaurantDishes
+                .Where(rd => rd.Dish_Id == dishId)
+                .Select(rd => rd.Restaurant_Id)
+                .ToListAsync();
+
+            return await _Restaurantcontext.Restaurants
+                .Where(r => restaurantIds.Contains(r.Id))
+                .ToListAsync();
+        }
+    }
+}
+
+
+
+================================================================================
+FILE: RestAPP\Service\RestaurantService.cs
+================================================================================
+using Microsoft.EntityFrameworkCore;
+using RestAPI.Context;
+using RestAPI.Interfaces;
+using RestAPI.Model;
+using RestAPP.Context;
+
+namespace RestAPI.Service
+{
+    public class RestaurantService : IRestaurant
+    {
+        private readonly RestaurantContext _Restaurantcontext;
+
+        public RestaurantService(RestaurantContext Restaurantcontext)
+        {
+            _Restaurantcontext = Restaurantcontext;
+        }
+
+        public async Task CreateRestaurant(Restaurant restaurant)
+        {
+            _Restaurantcontext.Restaurants.Add(restaurant);
+            await _Restaurantcontext.SaveChangesAsync();
+        }
+
+        public async Task<Restaurant> GetRestaurantById(int id)
+        {
+            return await _Restaurantcontext.Restaurants.FindAsync(id);
+        }
+
+        public async Task<List<Restaurant>> GetAllRestaurants()
+        {
+            return await _Restaurantcontext.Restaurants.ToListAsync();
+        }
+
+        public async Task UpdateRestaurant(Restaurant restaurant)
+        {
+            _Restaurantcontext.Restaurants.Update(restaurant);
+            await _Restaurantcontext.SaveChangesAsync();
+        }
+
+        public async Task DeleteRestaurant(int id)
+        {
+            var restaurant = await _Restaurantcontext.Restaurants.FindAsync(id);
+            if (restaurant != null)
+            {
+                _Restaurantcontext.Restaurants.Remove(restaurant);
+                await _Restaurantcontext.SaveChangesAsync();
+            }
+        }
+
+        public async Task<List<Restaurant>> GetRestaurantsByTematic(string tematic)
+        {
+            return await _Restaurantcontext.Restaurants
+                .Where(r => r.Tematic == tematic)
+                .ToListAsync();
+        }
+    }
+}
+
+
+================================================================================
+FILE: RestAPP\Service\UserService.cs
+================================================================================
+using Microsoft.EntityFrameworkCore;
+using RestAPI.Context;
+using RestAPI.Interfaces;
+using RestAPI.Model;
+
+namespace RestAPI.Service
+{
+    public class UserService : IUser
+    {
+        private readonly UserContext _Usercontext;
+
+        public UserService(UserContext Usercontext)
+        {
+            _Usercontext = Usercontext;
+        }
+
+        public async Task ReginU(User users)
+        {
+            _Usercontext.Users.Add(users);
+            await _Usercontext.SaveChangesAsync();
+
+        }
+
+        public async Task<int> LoginUser(string login, string password)
+        {
+            User User = _Usercontext.Users.Where(x => x.Login == login && x.Password == password).First();
+            return User.Id;
+        }
+
+
+        public async Task<User> GetUserById(int id)
+        {
+            return await _Usercontext.Users.FindAsync(id);
+        }
+
+        
+
+        public async Task<List<User>> GetAllUsers()
+        {
+            return await _Usercontext.Users.ToListAsync();
+        }
+
+        public async Task UpdateUser(User user)
+        {
+            _Usercontext.Users.Update(user);
+            await _Usercontext.SaveChangesAsync();
+        }
+
+        public async Task DeleteUser(int id)
+        {
+            var user = await _Usercontext.Users.FindAsync(id);
+            if (user != null)
+            {
+                _Usercontext.Users.Remove(user);
+                await _Usercontext.SaveChangesAsync();
+            }
+        }
+
+        public async Task<bool> ValidateUserCredentials(string login, string password)
+        {
+            var user = await _Usercontext.Users
+                .FirstOrDefaultAsync(u => u.Login == login && u.Password == password);
+            return user != null;
+        }
+    }
+}
+
+
