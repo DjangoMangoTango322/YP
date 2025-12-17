@@ -1,0 +1,2576 @@
+﻿PROJECT EXPORT - 12/17/2025 22:56:57
+Project Path: C:\Users\semen\Desktop\7234902\YP
+Total Files: 31
+
+================================================================================
+FILE: Desktop.sln
+================================================================================
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113 d17.12
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Desktop", "Desktop\Desktop.csproj", "{6EF2ABD1-D8D4-4BF5-9B3B-42F872EF36EF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6EF2ABD1-D8D4-4BF5-9B3B-42F872EF36EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6EF2ABD1-D8D4-4BF5-9B3B-42F872EF36EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6EF2ABD1-D8D4-4BF5-9B3B-42F872EF36EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6EF2ABD1-D8D4-4BF5-9B3B-42F872EF36EF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
+
+
+
+================================================================================
+FILE: Desktop\ApiContext.cs
+================================================================================
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Text;
+using Newtonsoft.Json;
+using System.Threading.Tasks;
+using Desktop.Models;
+
+
+namespace Desktop
+{
+    public class ApiContext 
+    {
+        private readonly HttpClient _httpClient;
+        private readonly string _baseUrl = "https://localhost:7237/api/"; // Из YP-RestAPI, настрой по своему
+
+        public ApiContext()
+        {
+            _httpClient = new HttpClient { Timeout = TimeSpan.FromSeconds(30) };
+            _httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
+        }
+
+        public async Task<bool> LoginAdminAsync(string login, string password)
+        {
+            try
+            {
+                var content = new FormUrlEncodedContent(new[]
+                {
+                    new KeyValuePair<string, string>("login", login),
+                    new KeyValuePair<string, string>("password", password)
+                });
+                var response = await _httpClient.PostAsync(_baseUrl + "AdministratorController/LoginAdministrator", content);
+                if (response.IsSuccessStatusCode)
+                {
+                    var admin = JsonConvert.DeserializeObject<Administrator>(await response.Content.ReadAsStringAsync());
+                    App.SetAdminData(login, admin.Name);
+                    return true;
+                }
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public void Logout()
+        {
+            // Очистка, если нужно токен или сессия
+        }
+
+        // Users methods
+        public async Task<List<User>> GetAllUsersAsync() => await GetAsync<List<User>>("UserController/GetAllUsers");
+        public async Task<User> GetUserByIdAsync(int id) => await GetAsync<User>($"UserController/GetUserById/{id}");
+        public async Task CreateUserAsync(User user) => await PostAsync("UserController/AddUser", user);
+        public async Task UpdateUserAsync(User user) => await PostAsync("UserController/UpdateUser", user);
+        public async Task<bool> DeleteUserAsync(int id) => await DeleteAsync($"UserController/DeleteUser/{id}");
+
+        // Restaurants
+        public async Task<List<Restaurant>> GetAllRestaurantsAsync() => await GetAsync<List<Restaurant>>("RestaurantController/GetAllRestaurants");
+        public async Task<Restaurant> GetRestaurantByIdAsync(int id) => await GetAsync<Restaurant>($"RestaurantController/GetRestaurantById/{id}");
+        public async Task CreateRestaurantAsync(Restaurant restaurant) => await PostAsync("RestaurantController/CreateRestaurant", restaurant);
+        public async Task UpdateRestaurantAsync(Restaurant restaurant) => await PostAsync("RestaurantController/UpdateRestaurant", restaurant);
+        public async Task<bool> DeleteRestaurantAsync(int id) => await DeleteAsync($"RestaurantController/DeleteRestaurant/{id}");
+
+        // Dishes
+        public async Task<List<Dish>> GetAllDishesAsync() => await GetAsync<List<Dish>>("DishController/GetAllDishes");
+        public async Task<Dish> GetDishByIdAsync(int id) => await GetAsync<Dish>($"DishController/GetDishById/{id}");
+        public async Task CreateDishAsync(Dish dish) => await PostAsync("DishController/CreateDish", dish);
+        public async Task UpdateDishAsync(Dish dish) => await PostAsync("DishController/UpdateDish", dish);
+        public async Task<bool> DeleteDishAsync(int id) => await DeleteAsync($"DishController/DeleteDish/{id}");
+
+        // Bookings
+        public async Task<List<Booking>> GetAllBookingsAsync() => await GetAsync<List<Booking>>("BookingController/GetAllBookings");
+        public async Task<Booking> GetBookingByIdAsync(int id) => await GetAsync<Booking>($"BookingController/GetBookingById/{id}");
+        public async Task CreateBookingAsync(Booking booking) => await PostAsync("BookingController/CreateBooking", booking);
+        public async Task UpdateBookingAsync(Booking booking) => await PostAsync("BookingController/UpdateBooking", booking);
+        public async Task<bool> DeleteBookingAsync(int id) => await DeleteAsync($"BookingController/DeleteBooking/{id}");
+
+        // Admins (similar)
+        public async Task<List<Administrator>> GetAllAdminsAsync() => await GetAsync<List<Administrator>>("AdministratorController/GetAllAdmins");
+        // ... другие методы для админов, если нужно
+
+        // Generic methods (как в YP-master)
+        private async Task<T> GetAsync<T>(string endpoint)
+        {
+            var response = await _httpClient.GetAsync(_baseUrl + endpoint);
+            response.EnsureSuccessStatusCode();
+            return JsonConvert.DeserializeObject<T>(await response.Content.ReadAsStringAsync());
+        }
+
+        private async Task PostAsync(string endpoint, object data)
+        {
+            var json = JsonConvert.SerializeObject(data);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+            var response = await _httpClient.PostAsync(_baseUrl + endpoint, content);
+            response.EnsureSuccessStatusCode();
+        }
+
+        private async Task<bool> DeleteAsync(string endpoint)
+        {
+            var response = await _httpClient.DeleteAsync(_baseUrl + endpoint);
+            return response.IsSuccessStatusCode;
+        }
+    }
+}
+
+
+================================================================================
+FILE: Desktop\App.config
+================================================================================
+<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+    <startup> 
+        <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.8" />
+    </startup>
+</configuration>
+
+
+================================================================================
+FILE: Desktop\App.xaml.cs
+================================================================================
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Configuration;
+using System.Data;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using System.Windows;
+using Desktop.Models;
+
+namespace Desktop
+{
+    /// <summary>
+    /// Логика взаимодействия для App.xaml
+    /// </summary>
+    public partial class App : Application, INotifyPropertyChanged
+    {
+        private string _currentAdminLogin;
+        private string _currentAdminName;
+
+        public string CurrentAdminLogin
+        {
+            get => _currentAdminLogin;
+            set
+            {
+                _currentAdminLogin = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string CurrentAdminName
+        {
+            get => _currentAdminName;
+            set
+            {
+                _currentAdminName = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public static App Instance { get; private set; }
+
+        public static ApiContext ApiContext { get; private set; }
+
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+            Instance = this;
+            ApiContext = new ApiContext();
+        }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            ApiContext?.Logout();
+            base.OnExit(e);
+        }
+
+        public static void SetAdminData(string login, string name)
+        {
+            if (Instance != null)
+            {
+                Instance.CurrentAdminLogin = login;
+                Instance.CurrentAdminName = name;
+            }
+        }
+
+        public static void ClearAdminData()
+        {
+            if (Instance != null)
+            {
+                Instance.CurrentAdminLogin = null;
+                Instance.CurrentAdminName = null;
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+    }
+}
+
+
+================================================================================
+FILE: Desktop\Desktop.csproj
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{6EF2ABD1-D8D4-4BF5-9B3B-42F872EF36EF}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>Desktop</RootNamespace>
+    <AssemblyName>Desktop</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="ApiContext.cs" />
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="Pages\AddEditDish.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\AddEditRestaurant.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\AddEditUser.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\AdminLogin.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\BookingsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\DishesPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\HomePage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\Items\BookingCard.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\Items\DishCard.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\Items\RestaurantCard.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\Items\UserCard.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\RestaurantsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\UsersPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Resources\Styles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Models\Administrator.cs" />
+    <Compile Include="Models\ApiResponse.cs" />
+    <Compile Include="Models\Booking.cs" />
+    <Compile Include="Models\Dish.cs" />
+    <Compile Include="Models\Restaurant.cs" />
+    <Compile Include="Models\RestaurantDish.cs" />
+    <Compile Include="Models\User.cs" />
+    <Compile Include="Pages\AddEditDish.xaml.cs">
+      <DependentUpon>AddEditDish.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\AddEditRestaurant.xaml.cs">
+      <DependentUpon>AddEditRestaurant.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\AddEditUser.xaml.cs">
+      <DependentUpon>AddEditUser.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\AdminLogin.xaml.cs">
+      <DependentUpon>AdminLogin.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\BookingsPage.xaml.cs">
+      <DependentUpon>BookingsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\DishesPage.xaml.cs">
+      <DependentUpon>DishesPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\HomePage.xaml.cs">
+      <DependentUpon>HomePage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Items\BookingCard.xaml.cs">
+      <DependentUpon>BookingCard.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Items\DishCard.xaml.cs">
+      <DependentUpon>DishCard.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Items\RestaurantCard.xaml.cs">
+      <DependentUpon>RestaurantCard.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\Items\UserCard.xaml.cs">
+      <DependentUpon>UserCard.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\RestaurantsPage.xaml.cs">
+      <DependentUpon>RestaurantsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\UsersPage.xaml.cs">
+      <DependentUpon>UsersPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
+
+
+================================================================================
+FILE: Desktop\MainWindow.xaml.cs
+================================================================================
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using Desktop;
+using Desktop.Pages;
+
+namespace Desktop
+{
+    /// <summary>
+    /// Логика взаимодействия для MainWindow.xaml
+    /// </summary>
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+            MainFrame.Navigate(new AdminLogin());
+        }
+
+        public void ShowMenu()
+        {
+            MenuPanel.Visibility = Visibility.Visible;
+        }
+
+        public void HideMenu()
+        {
+            MenuPanel.Visibility = Visibility.Collapsed;
+        }
+
+        private void BtnHome_Click(object sender, RoutedEventArgs e)
+        {
+            MainFrame.Navigate(new HomePage());
+            SetActiveButton(BtnHome);
+        }
+
+        private void BtnUsers_Click(object sender, RoutedEventArgs e)
+        {
+            MainFrame.Navigate(new UsersPage());
+            SetActiveButton(BtnUsers);
+        }
+
+        private void BtnRestaurants_Click(object sender, RoutedEventArgs e)
+        {
+            MainFrame.Navigate(new RestaurantsPage());
+            SetActiveButton(BtnRestaurants);
+        }
+
+        private void BtnDishes_Click(object sender, RoutedEventArgs e)
+        {
+            MainFrame.Navigate(new DishesPage());
+            SetActiveButton(BtnDishes);
+        }
+
+        private void BtnBookings_Click(object sender, RoutedEventArgs e)
+        {
+            MainFrame.Navigate(new BookingsPage());
+            SetActiveButton(BtnBookings);
+        }
+
+        private void BtnLogout_Click(object sender, RoutedEventArgs e)
+        {
+            App.ApiContext.Logout();
+            App.ClearAdminData();
+            HideMenu();
+            MainFrame.Navigate(new AdminLogin());
+        }
+
+        public void SetActiveButton(Button button)
+        {
+            // Сброс стилей всех кнопок
+            BtnHome.Background = (System.Windows.Media.Brush)FindResource("PrimaryBrush");
+            BtnUsers.Background = (System.Windows.Media.Brush)FindResource("PrimaryBrush");
+            BtnRestaurants.Background = (System.Windows.Media.Brush)FindResource("PrimaryBrush");
+            BtnDishes.Background = (System.Windows.Media.Brush)FindResource("PrimaryBrush");
+            BtnBookings.Background = (System.Windows.Media.Brush)FindResource("PrimaryBrush");
+
+            // Активная
+            button.Background = (System.Windows.Media.Brush)FindResource("AccentBrush");
+        }
+    }
+}
+//: Window
+//    {
+//        public static MainWindow Instance { get; private set; }
+//public MainWindow()
+//{
+//    InitializeComponent();
+//    Instance = this;
+//    this.Resources = Application.Current.Resources;
+//    NavigateToLogin();
+//}
+//public void ShowMenu()
+//{
+//    MenuPanel.Visibility = Visibility.Visible;
+//}
+
+//public void HideMenu()
+//{
+//    MenuPanel.Visibility = Visibility.Collapsed;
+//}
+//public void NavigateToMainPage()
+//{
+//    MainFrame.Navigate(new MainPage());
+//}
+//public void NavigateToLogin()
+//{
+//    MainFrame.Navigate(new LoginPage());
+//}
+//    }
+//}
+
+
+================================================================================
+FILE: Desktop\packages.config
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<packages>
+  <package id="Newtonsoft.Json" version="13.0.4" targetFramework="net48" />
+</packages>
+
+
+================================================================================
+FILE: Desktop\Models\Administrator.cs
+================================================================================
+using System.ComponentModel.DataAnnotations;
+
+namespace Desktop.Models
+{
+    public class Administrator
+    {
+        public int Id { get; set; }
+        [Required]
+        [StringLength(100)]
+        public string Login { get; set; }
+        [Required]
+        [StringLength(100)]
+        public string Password { get; set; }
+        [Required]
+        [StringLength(100)]
+        public string Name { get; set; }
+        public bool IsSelected { get; set; } = false;
+    }
+
+}
+
+
+
+================================================================================
+FILE: Desktop\Models\ApiResponse.cs
+================================================================================
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Desktop.Models
+{
+    public class ApiResponse<T>
+    {
+        public bool Success { get; set; }
+        public T Data { get; set; }
+        public string Message { get; set; }
+
+    }
+}
+
+
+================================================================================
+FILE: Desktop\Models\Booking.cs
+================================================================================
+using System;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+
+namespace Desktop.Models
+{
+    public class Booking
+    {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        public int Id { get; set; }
+        public int User_Id { get; set; }
+        public int Restaurant_Id { get; set; }
+        public DateTime Booking_Date { get; set; }
+        public int Number_Of_Guests { get; set; }
+        public string Status { get; set; } = "Ожидание";
+        public DateTime Created_At { get; set; } = DateTime.UtcNow;
+        public bool IsSelected { get; set; } = false;
+    }
+}
+
+
+================================================================================
+FILE: Desktop\Models\Dish.cs
+================================================================================
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+
+namespace Desktop.Models
+{
+    public class Dish
+    {
+        public int Id { get; set; }
+        [Required]
+        public string Name { get; set; }
+        [Required]
+        public string Description { get; set; }
+        [Required]
+        public decimal Price { get; set; }
+        [Required]
+        public string Category { get; set; }
+        public bool IsSelected { get; set; } = false;
+    }
+}
+
+
+================================================================================
+FILE: Desktop\Models\Restaurant.cs
+================================================================================
+using System;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+
+namespace Desktop.Models
+{
+    public class Restaurant
+    {
+        public int Id { get; set; }
+        [Required]
+        public string Name { get; set; }
+        [Required]
+        public string Address { get; set; }
+        [Required]
+        public int Capacity { get; set; }
+        [Required]
+        public TimeSpan Open_Time { get; set; }
+        [Required]
+        public TimeSpan Close_Time { get; set; }
+        [Required]
+        public string Tematic { get; set; }
+        public bool IsSelected { get; set; } = false;
+    }
+}
+
+
+================================================================================
+FILE: Desktop\Models\RestaurantDish.cs
+================================================================================
+using System.ComponentModel;
+
+namespace Desktop.Models
+{
+    public class RestaurantDish
+    {
+        public int Restaurant_Id { get; set; }
+        public int Dish_Id { get; set; }
+    }
+}
+
+
+================================================================================
+FILE: Desktop\Models\User.cs
+================================================================================
+using System;
+using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
+
+namespace Desktop.Models
+{
+    public class User 
+    {
+        public int Id { get; set; }
+        [Required]
+        public string First_Name { get; set; }
+        [Required]
+        public string Last_Name { get; set; }
+        [Required]
+        public string Phone { get; set; }
+        [Required]
+        public string Password { get; set; }
+        public string Login { get; set; }
+        public bool IsSelected { get; set; } = false;
+    }
+}
+
+
+================================================================================
+FILE: Desktop\Pages\AddEditDish.xaml.cs
+================================================================================
+using System;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Navigation;
+using Desktop.Models;
+
+namespace Desktop.Pages
+{
+    /// <summary>
+    /// Логика взаимодействия для AddEditDish.xaml
+    /// </summary>
+    public partial class AddEditDish : Page
+    {
+        private readonly Dish _dish;
+        private bool _isEditMode;
+
+        public AddEditDish(Dish dish = null)
+        {
+            InitializeComponent();
+            _dish = dish ?? new Dish();
+            _isEditMode = dish != null;
+            LoadData();
+            UpdateTitle();
+        }
+
+        private void LoadData()
+        {
+            NameTxt.Text = _dish.Name ?? string.Empty;
+            DescriptionTxt.Text = _dish.Description ?? string.Empty;
+            PriceTxt.Text = _dish.Price.ToString("F2");
+            CategoryTxt.SelectedItem = CategoryTxt.Items.Cast<ComboBoxItem>().FirstOrDefault(i => i.Content.ToString() == _dish.Category);
+            if (CategoryTxt.SelectedItem == null)
+            {
+                CategoryTxt.SelectedIndex = 0; // Default to first
+            }
+        }
+
+        private void UpdateTitle()
+        {
+            PageTitle.Text = _isEditMode ? "🍕 Редактирование блюда" : "🍕 Добавление блюда";
+        }
+
+        private async void Save_Click(object sender, RoutedEventArgs e)
+        {
+            if (!ValidateInput()) return;
+
+            LoadingOverlay.Visibility = Visibility.Visible;
+            try
+            {
+                // Parse fields
+                _dish.Name = NameTxt.Text.Trim();
+                _dish.Description = DescriptionTxt.Text.Trim();
+                _dish.Price = decimal.Parse(PriceTxt.Text);
+                _dish.Category = ((ComboBoxItem)CategoryTxt.SelectedItem)?.Content?.ToString() ?? string.Empty;
+
+                if (_isEditMode)
+                {
+                    await App.ApiContext.UpdateDishAsync(_dish);
+                }
+                else
+                {
+                    await App.ApiContext.CreateDishAsync(_dish);
+                }
+
+                MessageBox.Show(_isEditMode ? "Блюдо обновлено!" : "Блюдо добавлено!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                NavigationService.Navigate(new DishesPage());
+            }
+            catch (Exception ex)
+            {
+                ShowError($"Ошибка: {ex.Message}");
+            }
+            finally
+            {
+                LoadingOverlay.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void Cancel_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService.Navigate(new DishesPage());
+        }
+
+        private bool ValidateInput()
+        {
+            if (string.IsNullOrWhiteSpace(NameTxt.Text))
+            {
+                ShowError("Название обязательно.");
+                NameTxt.Focus();
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(DescriptionTxt.Text))
+            {
+                ShowError("Описание обязательно.");
+                DescriptionTxt.Focus();
+                return false;
+            }
+            if (!decimal.TryParse(PriceTxt.Text, out decimal price) || price <= 0)
+            {
+                ShowError("Цена должна быть положительным числом.");
+                PriceTxt.Focus();
+                return false;
+            }
+            if (CategoryTxt.SelectedItem == null)
+            {
+                ShowError("Выберите категорию.");
+                CategoryTxt.Focus();
+                return false;
+            }
+            HideError();
+            return true;
+        }
+
+        private void ShowError(string message)
+        {
+            TxtError.Text = message;
+            ErrorBorder.Visibility = Visibility.Visible;
+        }
+
+        private void HideError()
+        {
+            ErrorBorder.Visibility = Visibility.Collapsed;
+        }
+
+        private void DecimalPreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            // Allow digits, one decimal point, and negative sign
+            string text = (sender as TextBox)?.Text ?? string.Empty;
+            string newText = text.Insert((sender as TextBox)?.SelectionStart ?? 0, e.Text);
+            e.Handled = !decimal.TryParse(newText, out _);
+        }
+    }
+}
+
+
+================================================================================
+FILE: Desktop\Pages\AddEditRestaurant.xaml.cs
+================================================================================
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using Desktop.Models;
+
+namespace Desktop.Pages
+{
+    /// <summary>
+    /// Логика взаимодействия для AddEditRestaurant.xaml
+    /// </summary>
+    public partial class AddEditRestaurant : Page
+    {
+        private readonly Restaurant _restaurant;
+        private bool _isEditMode;
+
+        public AddEditRestaurant(Restaurant restaurant = null)
+        {
+            InitializeComponent();
+            _restaurant = restaurant ?? new Restaurant();
+            _isEditMode = restaurant != null;
+            LoadData();
+            UpdateTitle();
+        }
+
+        private void LoadData()
+        {
+            NameTxt.Text = _restaurant.Name ?? string.Empty;
+            AddressTxt.Text = _restaurant.Address ?? string.Empty;
+            CapacityTxt.Text = _restaurant.Capacity.ToString();
+            OpenTimeTxt.Text = _restaurant.Open_Time.ToString(@"hh");
+            CloseTimeTxt.Text = _restaurant.Close_Time.ToString(@"hh");
+            TematicTxt.SelectedItem = TematicTxt.Items.Cast<ComboBoxItem>().FirstOrDefault(i => i.Content.ToString() == _restaurant.Tematic);
+            if (TematicTxt.SelectedItem == null)
+            {
+                TematicTxt.SelectedIndex = 0; // Default to first
+            }
+        }
+
+        private void UpdateTitle()
+        {
+            PageTitle.Text = _isEditMode ? "🍽️ Редактирование ресторана" : "🍽️ Добавление ресторана";
+        }
+
+        private async void Save_Click(object sender, RoutedEventArgs e)
+        {
+            if (!ValidateInput()) return;
+
+            LoadingOverlay.Visibility = Visibility.Visible;
+            try
+            {
+                // Parse fields
+                _restaurant.Name = NameTxt.Text.Trim();
+                _restaurant.Address = AddressTxt.Text.Trim();
+                _restaurant.Capacity = int.Parse(CapacityTxt.Text);
+                _restaurant.Open_Time = TimeSpan.Parse(OpenTimeTxt.Text + ":00");
+                _restaurant.Close_Time = TimeSpan.Parse(CloseTimeTxt.Text + ":00");
+                _restaurant.Tematic = ((ComboBoxItem)TematicTxt.SelectedItem)?.Content?.ToString() ?? string.Empty;
+
+                if (_isEditMode)
+                {
+                    await App.ApiContext.UpdateRestaurantAsync(_restaurant);
+                }
+                else
+                {
+                    await App.ApiContext.CreateRestaurantAsync(_restaurant);
+                }
+
+                MessageBox.Show(_isEditMode ? "Ресторан обновлен!" : "Ресторан добавлен!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                NavigationService.Navigate(new RestaurantsPage());
+            }
+            catch (Exception ex)
+            {
+                ShowError($"Ошибка: {ex.Message}");
+            }
+            finally
+            {
+                LoadingOverlay.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void Cancel_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService.Navigate(new RestaurantsPage());
+        }
+
+        private bool ValidateInput()
+        {
+            if (string.IsNullOrWhiteSpace(NameTxt.Text))
+            {
+                ShowError("Название обязательно.");
+                NameTxt.Focus();
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(AddressTxt.Text))
+            {
+                ShowError("Адрес обязателен.");
+                AddressTxt.Focus();
+                return false;
+            }
+            if (!int.TryParse(CapacityTxt.Text, out int capacity) || capacity <= 0)
+            {
+                ShowError("Вместимость должна быть положительным числом.");
+                CapacityTxt.Focus();
+                return false;
+            }
+            if (!int.TryParse(OpenTimeTxt.Text, out int openHour) || openHour < 0 || openHour > 23)
+            {
+                ShowError("Время открытия должно быть от 00 до 23.");
+                OpenTimeTxt.Focus();
+                return false;
+            }
+            if (!int.TryParse(CloseTimeTxt.Text, out int closeHour) || closeHour < 0 || closeHour > 23 || closeHour <= openHour)
+            {
+                ShowError("Время закрытия должно быть от 00 до 23 и позже открытия.");
+                CloseTimeTxt.Focus();
+                return false;
+            }
+            if (TematicTxt.SelectedItem == null)
+            {
+                ShowError("Выберите тематику.");
+                TematicTxt.Focus();
+                return false;
+            }
+            HideError();
+            return true;
+        }
+
+        private void ShowError(string message)
+        {
+            TxtError.Text = message;
+            ErrorBorder.Visibility = Visibility.Visible;
+        }
+
+        private void HideError()
+        {
+            ErrorBorder.Visibility = Visibility.Collapsed;
+        }
+
+        private void NumberPreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = !int.TryParse(e.Text, out _); // Only allow digits
+        }
+
+        private void TimePreviewTextInput(object sender, TextCompositionEventArgs e)
+        {
+            e.Handled = !int.TryParse(e.Text, out _); // Only allow digits (validation on save)
+        }
+    }
+}
+
+
+================================================================================
+FILE: Desktop\Pages\AddEditUser.xaml.cs
+================================================================================
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Policy;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using Desktop.Models;
+
+namespace Desktop.Pages
+{
+    /// <summary>
+    /// Логика взаимодействия для AddEditUser.xaml
+    /// </summary>
+    public partial class AddEditUser : Page
+    {
+        private User _user;
+
+        public AddEditUser(User user)
+        {
+            InitializeComponent();
+            _user = user ?? new User();
+            LoadData();
+        }
+
+        private void LoadData()
+        {
+            FirstName.Text = _user.First_Name;
+            LastName.Text = _user.Last_Name;
+            Phone.Text = _user.Phone;
+            Login.Text = _user.Login;
+            // Password не загружаем для безопасности
+        }
+
+        private async void Save_Click(object sender, RoutedEventArgs e)
+        {
+            _user.First_Name = FirstName.Text;
+            _user.Last_Name = LastName.Text;
+            _user.Phone = Phone.Text;
+            _user.Login = Login.Text;
+            _user.Password = Password.Password; // Если новый пароль
+
+            try
+            {
+                if (_user.Id == 0)
+                {
+                    await App.ApiContext.CreateUserAsync(_user);
+                }
+                else
+                {
+                    await App.ApiContext.UpdateUserAsync(_user);
+                }
+                NavigationService.GoBack();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+    }
+}
+
+
+================================================================================
+FILE: Desktop\Pages\AdminLogin.xaml.cs
+================================================================================
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+
+namespace Desktop.Pages
+{
+    /// <summary>
+    /// Логика взаимодействия для AdminLogin.xaml
+    /// </summary>
+    public partial class AdminLogin : Page
+    {
+        public AdminLogin()
+        {
+            InitializeComponent();
+            App.ApiContext.Logout(); // Очистка при загрузке
+        }
+
+        private async void LoginButton_Click(object sender, RoutedEventArgs e)
+        {
+            string login = Login.Text.Trim();
+            string password = Password.Password;
+
+            if (string.IsNullOrEmpty(login) || string.IsNullOrEmpty(password))
+            {
+                MessageBox.Show("Введите логин и пароль", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            LoginButton.IsEnabled = false;
+            LoginButton.Content = "Вход...";
+
+            try
+            {
+                bool success = await App.ApiContext.LoginAdminAsync(login, password);
+                if (success)
+                {
+                    if (Window.GetWindow(this) is MainWindow mainWindow)
+                    {
+                        mainWindow.ShowMenu();
+                        mainWindow.MainFrame.Navigate(new HomePage());
+                        mainWindow.SetActiveButton(mainWindow.BtnHome);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Неверный логин или пароль", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                LoginButton.IsEnabled = true;
+                LoginButton.Content = "Войти";
+            }
+        }
+    }
+}
+
+
+================================================================================
+FILE: Desktop\Pages\BookingsPage.xaml.cs
+================================================================================
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
+using Desktop.Models;
+
+namespace Desktop.Pages
+{
+    /// <summary>
+    /// Логика взаимодействия для BookingsPage.xaml
+    /// </summary>
+    public partial class BookingsPage : Page, INotifyPropertyChanged
+    {
+        private ObservableCollection<Booking> _allBookings;
+        private ObservableCollection<Booking> _filteredBookings;
+        private string _searchQuery;
+
+        public ObservableCollection<Booking> AllBookings
+        {
+            get => _allBookings;
+            set { _allBookings = value; OnPropertyChanged(); ApplyFilter(); }
+        }
+
+        public ObservableCollection<Booking> FilteredBookings
+        {
+            get => _filteredBookings;
+            set { _filteredBookings = value; OnPropertyChanged(); }
+        }
+
+        public string SearchQuery
+        {
+            get => _searchQuery;
+            set { _searchQuery = value; OnPropertyChanged(); ApplyFilter(); }
+        }
+
+        public BookingsPage()
+        {
+            InitializeComponent();
+            DataContext = this;
+        }
+
+        private async void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            await LoadBookings();
+        }
+
+        private async Task LoadBookings()
+        {
+            try
+            {
+                var bookings = await App.ApiContext.GetAllBookingsAsync();
+                AllBookings = new ObservableCollection<Booking>(bookings ?? new List<Booking>());
+                foreach (var b in AllBookings) b.IsSelected = false;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                AllBookings = new ObservableCollection<Booking>();
+            }
+        }
+
+        private void ApplyFilter()
+        {
+            if (AllBookings == null)
+            {
+                FilteredBookings = new ObservableCollection<Booking>();
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(SearchQuery))
+            {
+                FilteredBookings = new ObservableCollection<Booking>(AllBookings);
+            }
+            else
+            {
+                var query = SearchQuery.Trim();
+                var filtered = AllBookings.Where(b =>
+                    (b.Status != null && b.Status.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) ||
+                    b.Id.ToString().IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    b.User_Id.ToString().IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                    b.Restaurant_Id.ToString().IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0
+                ).ToList();
+                FilteredBookings = new ObservableCollection<Booking>(filtered);
+            }
+            // No need to set ItemsSource manually—handled by bindings
+        }
+
+        private async void BtnRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            await LoadBookings();
+        }
+
+        private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            SearchQuery = SearchTextBox.Text;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        // TODO: Implement these stubs for full functionality
+        private void BtnAddBooking_Click(object sender, RoutedEventArgs e) { /* Add logic */ }
+        private void BtnEditSelected_Click(object sender, RoutedEventArgs e) { /* Edit logic */ }
+        private void BtnDeleteSelected_Click(object sender, RoutedEventArgs e) { /* Delete logic */ }
+        private void BookingsGrid_SelectionChanged(object sender, SelectionChangedEventArgs e) { /* Selection logic */ }
+        private void BookingCard_MouseEnter(object sender, MouseEventArgs e) { /* Hover logic */ }
+        private void BookingCard_MouseLeave(object sender, MouseEventArgs e) { /* Hover exit logic */ }
+        private void BookingCard_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) { /* Click logic */ }
+    }
+}
+
+
+================================================================================
+FILE: Desktop\Pages\DishesPage.xaml.cs
+================================================================================
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Navigation;
+using Desktop.Models;
+
+namespace Desktop.Pages
+{
+    /// <summary>
+    /// Логика взаимодействия для DishesPage.xaml
+    /// </summary>
+    public partial class DishesPage : Page, INotifyPropertyChanged
+    {
+        private ObservableCollection<Dish> _allDishes;
+        private ObservableCollection<Dish> _filteredDishes;
+        private string _searchQuery;
+
+        public ObservableCollection<Dish> AllDishes
+        {
+            get => _allDishes;
+            set { _allDishes = value; OnPropertyChanged(); ApplyFilter(); }
+        }
+
+        public ObservableCollection<Dish> FilteredDishes
+        {
+            get => _filteredDishes;
+            set { _filteredDishes = value; OnPropertyChanged(); }
+        }
+
+        public string SearchQuery
+        {
+            get => _searchQuery;
+            set { _searchQuery = value; OnPropertyChanged(); ApplyFilter(); }
+        }
+
+        public DishesPage()
+        {
+            InitializeComponent();
+            DataContext = this;
+        }
+
+        private async void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            await LoadDishes();
+        }
+
+        private async Task LoadDishes()
+        {
+            try
+            {
+                var dishes = await App.ApiContext.GetAllDishesAsync();
+                AllDishes = new ObservableCollection<Dish>(dishes ?? new List<Dish>());
+                foreach (var d in AllDishes) d.IsSelected = false;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                AllDishes = new ObservableCollection<Dish>();
+            }
+        }
+
+        private void ApplyFilter()
+        {
+            if (AllDishes == null)
+            {
+                FilteredDishes = new ObservableCollection<Dish>();
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(SearchQuery))
+            {
+                FilteredDishes = new ObservableCollection<Dish>(AllDishes);
+            }
+            else
+            {
+                var query = SearchQuery.Trim();
+                var filtered = AllDishes.Where(d =>
+                    (d.Name?.IndexOf(query, StringComparison.OrdinalIgnoreCase) ?? -1) >= 0 ||
+                    (d.Description?.IndexOf(query, StringComparison.OrdinalIgnoreCase) ?? -1) >= 0 ||
+                    (d.Category?.IndexOf(query, StringComparison.OrdinalIgnoreCase) ?? -1) >= 0 ||
+                    d.Id.ToString().IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0
+                ).ToList();
+                FilteredDishes = new ObservableCollection<Dish>(filtered);
+            }
+            // No need to set ItemsSource manually—handled by bindings
+        }
+
+        private Dish GetSelected() => FilteredDishes.FirstOrDefault(d => d.IsSelected);
+
+        private void BtnAddDish_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService.Navigate(new AddEditDish(null));
+        }
+
+        private void BtnEditSelected_Click(object sender, RoutedEventArgs e)
+        {
+            var selected = GetSelected();
+            if (selected != null)
+                NavigationService.Navigate(new AddEditDish(selected));
+            else
+                MessageBox.Show("Выберите блюдо", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+
+        private async void BtnDeleteSelected_Click(object sender, RoutedEventArgs e)
+        {
+            var selected = GetSelected();
+            if (selected == null) return;
+            var result = MessageBox.Show($"Удалить блюдо «{selected.Name}»?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    var success = await App.ApiContext.DeleteDishAsync(selected.Id);
+                    if (success)
+                    {
+                        AllDishes.Remove(selected);
+                        ApplyFilter();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        private async void BtnRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            await LoadDishes();
+        }
+        private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            SearchQuery = SearchTextBox.Text;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        // TODO: Implement these stubs for full functionality
+        private void DishesGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // Update selection state on dishes
+            if (DishesGrid.SelectedItem is Dish selected)
+            {
+                foreach (var d in FilteredDishes) d.IsSelected = false;
+                selected.IsSelected = true;
+            }
+        }
+
+        private void DishCard_MouseEnter(object sender, MouseEventArgs e)
+        {
+            // Hover effect logic (e.g., scale or highlight)
+            if (sender is Border border) border.Opacity = 0.9;
+        }
+
+        private void DishCard_MouseLeave(object sender, MouseEventArgs e)
+        {
+            // Exit hover logic
+            if (sender is Border border) border.Opacity = 1.0;
+        }
+
+        private void DishCard_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            // Click to select/edit logic
+            if (sender is Border border && border.DataContext is Dish dish)
+            {
+                foreach (var d in FilteredDishes) d.IsSelected = false;
+                dish.IsSelected = true;
+                DishesGrid.SelectedItem = dish; // Sync with grid
+                BtnEditSelected_Click(null, null); // Optional: auto-edit
+            }
+        }
+    }
+}
+
+
+================================================================================
+FILE: Desktop\Pages\HomePage.xaml.cs
+================================================================================
+using System.Windows.Controls;
+
+namespace Desktop.Pages
+{
+    /// <summary>
+    /// Логика взаимодействия для HomePage.xaml
+    /// </summary>
+    public partial class HomePage : Page
+    {
+        public HomePage()
+        {
+            InitializeComponent();
+            DataContext = App.Instance;
+        }
+    }
+}
+
+
+
+================================================================================
+FILE: Desktop\Pages\RestaurantsPage.xaml.cs
+================================================================================
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Navigation;
+using Desktop.Models;
+
+namespace Desktop.Pages
+{
+    /// <summary>
+    /// Логика взаимодействия для RestaurantsPage.xaml
+    /// </summary>
+    public partial class RestaurantsPage : Page, INotifyPropertyChanged
+    {
+        private ObservableCollection<Restaurant> _allRestaurants;
+        private ObservableCollection<Restaurant> _filteredRestaurants;
+        private string _searchQuery;
+
+        public ObservableCollection<Restaurant> AllRestaurants
+        {
+            get => _allRestaurants;
+            set { _allRestaurants = value; OnPropertyChanged(); ApplyFilter(); }
+        }
+
+        public ObservableCollection<Restaurant> FilteredRestaurants
+        {
+            get => _filteredRestaurants;
+            set { _filteredRestaurants = value; OnPropertyChanged(); }
+        }
+
+        public string SearchQuery
+        {
+            get => _searchQuery;
+            set { _searchQuery = value; OnPropertyChanged(); ApplyFilter(); }
+        }
+
+        public RestaurantsPage()
+        {
+            InitializeComponent();
+            DataContext = this;
+        }
+
+        private async void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            await LoadRestaurants();
+        }
+
+        private async Task LoadRestaurants()
+        {
+            try
+            {
+                var restaurants = await App.ApiContext.GetAllRestaurantsAsync();
+                AllRestaurants = new ObservableCollection<Restaurant>(restaurants ?? new List<Restaurant>());
+                foreach (var r in AllRestaurants) r.IsSelected = false;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                AllRestaurants = new ObservableCollection<Restaurant>();
+            }
+        }
+
+        private void ApplyFilter()
+        {
+            if (AllRestaurants == null)
+            {
+                FilteredRestaurants = new ObservableCollection<Restaurant>();
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(SearchQuery))
+            {
+                FilteredRestaurants = new ObservableCollection<Restaurant>(AllRestaurants);
+            }
+            else
+            {
+                var query = SearchQuery.Trim();
+                var filtered = AllRestaurants.Where(r =>
+                    (r.Name != null && r.Name.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) ||
+                    (r.Address != null && r.Address.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) ||
+                    (r.Tematic != null && r.Tematic.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) ||
+                    r.Id.ToString().IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0
+                ).ToList();
+                FilteredRestaurants = new ObservableCollection<Restaurant>(filtered);
+            }
+            // No need to set ItemsSource manually—handled by bindings
+        }
+
+        private Restaurant GetSelected() => FilteredRestaurants.FirstOrDefault(r => r.IsSelected);
+
+        private void BtnAddRestaurant_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService.Navigate(new AddEditRestaurant(null));
+        }
+
+        private void BtnEditSelected_Click(object sender, RoutedEventArgs e)
+        {
+            var selected = GetSelected();
+            if (selected != null)
+                NavigationService.Navigate(new AddEditRestaurant(selected));
+            else
+                MessageBox.Show("Выберите ресторан", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+
+        private async void BtnDeleteSelected_Click(object sender, RoutedEventArgs e)
+        {
+            var selected = GetSelected();
+            if (selected == null) return;
+            var result = MessageBox.Show($"Удалить ресторан «{selected.Name}»?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    var success = await App.ApiContext.DeleteRestaurantAsync(selected.Id);
+                    if (success)
+                    {
+                        AllRestaurants.Remove(selected);
+                        ApplyFilter();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+
+        private async void BtnRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            await LoadRestaurants();
+        }
+        private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            SearchQuery = SearchTextBox.Text;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        // TODO: Implement these stubs for full functionality
+        private void RestaurantsGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // Update selection state on restaurants
+            if (RestaurantsGrid.SelectedItem is Restaurant selected)
+            {
+                foreach (var r in FilteredRestaurants) r.IsSelected = false;
+                selected.IsSelected = true;
+            }
+        }
+
+        private void RestaurantCard_MouseEnter(object sender, MouseEventArgs e)
+        {
+            // Hover effect logic (e.g., scale or highlight)
+            if (sender is Border border) border.Opacity = 0.9;
+        }
+
+        private void RestaurantCard_MouseLeave(object sender, MouseEventArgs e)
+        {
+            // Exit hover logic
+            if (sender is Border border) border.Opacity = 1.0;
+        }
+
+        private void RestaurantCard_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            // Click to select/edit logic
+            if (sender is Border border && border.DataContext is Restaurant restaurant)
+            {
+                foreach (var r in FilteredRestaurants) r.IsSelected = false;
+                restaurant.IsSelected = true;
+                RestaurantsGrid.SelectedItem = restaurant; // Sync with grid
+                BtnEditSelected_Click(null, null); // Optional: auto-edit
+            }
+        }
+    }
+}
+
+
+================================================================================
+FILE: Desktop\Pages\UsersPage.xaml.cs
+================================================================================
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Navigation;
+using Desktop.Models;
+
+namespace Desktop.Pages
+{
+    /// <summary>
+    /// Логика взаимодействия для UsersPage.xaml
+    /// </summary>
+    public partial class UsersPage : Page, INotifyPropertyChanged
+    {
+        private ObservableCollection<User> _allUsers;
+        private ObservableCollection<User> _filteredUsers;
+        private string _searchQuery;
+        private User _selectedUser;
+
+        public ObservableCollection<User> AllUsers
+        {
+            get => _allUsers;
+            set
+            {
+                _allUsers = value;
+                OnPropertyChanged();
+                ApplyFilter();
+            }
+        }
+
+        public ObservableCollection<User> FilteredUsers
+        {
+            get => _filteredUsers;
+            set
+            {
+                _filteredUsers = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string SearchQuery
+        {
+            get => _searchQuery;
+            set
+            {
+                _searchQuery = value;
+                OnPropertyChanged();
+                ApplyFilter();
+            }
+        }
+
+        public UsersPage()
+        {
+            InitializeComponent();
+            DataContext = this;
+        }
+
+        private async void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            await LoadUsers();
+        }
+
+        private async Task LoadUsers()
+        {
+            try
+            {
+                var users = await App.ApiContext.GetAllUsersAsync();
+                AllUsers = new ObservableCollection<User>(users ?? new List<User>());
+                foreach (var u in AllUsers) u.IsSelected = false;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                AllUsers = new ObservableCollection<User>();
+            }
+        }
+
+        private void ApplyFilter()
+        {
+            if (AllUsers == null)
+            {
+                FilteredUsers = new ObservableCollection<User>();
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(SearchQuery))
+            {
+                FilteredUsers = new ObservableCollection<User>(AllUsers);
+            }
+            else
+            {
+                var query = SearchQuery.Trim();
+                var filtered = AllUsers.Where(u =>
+                    (u.First_Name?.IndexOf(query, StringComparison.OrdinalIgnoreCase) ?? -1) >= 0 ||
+                    (u.Last_Name?.IndexOf(query, StringComparison.OrdinalIgnoreCase) ?? -1) >= 0 ||
+                    (u.Login?.IndexOf(query, StringComparison.OrdinalIgnoreCase) ?? -1) >= 0 ||
+                    u.Id.ToString().IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0
+                ).ToList();
+                FilteredUsers = new ObservableCollection<User>(filtered);
+            }
+            // No need to set ItemsSource manually—handled by bindings
+        }
+
+        public void RemoveUser(User user)
+        {
+            AllUsers.Remove(user);
+            if (FilteredUsers.Contains(user)) FilteredUsers.Remove(user);
+        }
+
+        private void BtnAddUser_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService.Navigate(new AddEditUser(null)); // null для создания
+        }
+
+        private void BtnEditSelected_Click(object sender, RoutedEventArgs e)
+        {
+            _selectedUser = FilteredUsers.FirstOrDefault(u => u.IsSelected); // Добавил IsSelected в модель User (добавь bool IsSelected в User.cs)
+            if (_selectedUser != null)
+            {
+                NavigationService.Navigate(new AddEditUser(_selectedUser));
+            }
+            else
+            {
+                MessageBox.Show("Выберите пользователя", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+
+        private async void BtnDeleteSelected_Click(object sender, RoutedEventArgs e)
+        {
+            _selectedUser = FilteredUsers.FirstOrDefault(u => u.IsSelected);
+            if (_selectedUser != null)
+            {
+                var result = MessageBox.Show($"Удалить {_selectedUser.First_Name}?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (result == MessageBoxResult.Yes)
+                {
+                    try
+                    {
+                        await App.ApiContext.DeleteUserAsync(_selectedUser.Id);
+                        RemoveUser(_selectedUser);
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+        }
+
+        private async void BtnRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            await LoadUsers();
+        }
+
+        private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            SearchQuery = SearchTextBox.Text;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        // TODO: Implement these stubs for full functionality
+        private void UsersGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // Update selection state on users
+            if (UsersGrid.SelectedItem is User selected)
+            {
+                foreach (var u in FilteredUsers) u.IsSelected = false;
+                selected.IsSelected = true;
+            }
+        }
+
+        private void UserCard_MouseEnter(object sender, MouseEventArgs e)
+        {
+            // Hover effect logic (e.g., scale or highlight)
+            if (sender is Border border) border.Opacity = 0.9;
+        }
+
+        private void UserCard_MouseLeave(object sender, MouseEventArgs e)
+        {
+            // Exit hover logic
+            if (sender is Border border) border.Opacity = 1.0;
+        }
+
+        private void UserCard_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            // Click to select/edit logic
+            if (sender is Border border && border.DataContext is User user)
+            {
+                foreach (var u in FilteredUsers) u.IsSelected = false;
+                user.IsSelected = true;
+                UsersGrid.SelectedItem = user; // Sync with grid
+                BtnEditSelected_Click(null, null); // Optional: auto-edit
+            }
+        }
+    }
+}
+
+
+================================================================================
+FILE: Desktop\Pages\Items\BookingCard.xaml.cs
+================================================================================
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
+using Desktop.Models;
+
+namespace Desktop.Pages.Items
+{
+    /// <summary>
+    /// Логика взаимодействия для BookingCard.xaml
+    /// </summary>
+    public partial class BookingCard : UserControl
+    {
+        public static readonly DependencyProperty BookingProperty =
+            DependencyProperty.Register("Booking", typeof(Booking), typeof(BookingCard),
+                new PropertyMetadata(null, OnBookingChanged));
+
+        public static readonly DependencyProperty IsSelectedProperty =
+            DependencyProperty.Register("IsSelected", typeof(bool), typeof(BookingCard),
+                new PropertyMetadata(false, OnIsSelectedChanged));
+
+        public Booking Booking
+        {
+            get => (Booking)GetValue(BookingProperty);
+            set => SetValue(BookingProperty, value);
+        }
+
+        public bool IsSelected
+        {
+            get => (bool)GetValue(IsSelectedProperty);
+            set => SetValue(IsSelectedProperty, value);
+        }
+
+        public BookingCard()
+        {
+            InitializeComponent();
+            DataContext = this;
+        }
+
+        private static void OnBookingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is BookingCard control)
+                control.UpdateStatusColor();
+        }
+
+        private static void OnIsSelectedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is BookingCard control)
+                control.UpdateSelection();
+        }
+
+        private void UpdateStatusColor()
+        {
+            if (Booking == null) return;
+
+            switch (Booking.Status)
+            {
+                case "Подтверждено":
+                    StatusBorder.Background = new SolidColorBrush(Color.FromRgb(46, 125, 50));
+                    break;
+                case "Ожидание":
+                    StatusBorder.Background = new SolidColorBrush(Color.FromRgb(251, 140, 0));
+                    break;
+                case "Отменено":
+                    StatusBorder.Background = new SolidColorBrush(Color.FromRgb(198, 40, 40));
+                    break;
+                default:
+                    StatusBorder.Background = new SolidColorBrush(Color.FromRgb(100, 100, 100));
+                    break;
+            }
+        }
+
+        private void UpdateSelection()
+        {
+            MainBorder.BorderBrush = IsSelected
+                ? new SolidColorBrush(Color.FromRgb(0, 120, 215))
+                : Brushes.Transparent;
+            MainBorder.BorderThickness = IsSelected ? new Thickness(3) : new Thickness(0);
+        }
+
+        private void UserControl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            IsSelected = !IsSelected;
+            e.Handled = true;
+        }
+    }
+}
+
+
+================================================================================
+FILE: Desktop\Pages\Items\DishCard.xaml.cs
+================================================================================
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
+using Desktop.Models;
+
+namespace Desktop.Pages.Items
+{
+    /// <summary>
+    /// Логика взаимодействия для DishCard.xaml
+    /// </summary>
+    public partial class DishCard : UserControl
+    {
+        public static readonly DependencyProperty DishProperty =
+            DependencyProperty.Register(
+                "Dish",
+                typeof(Dish),
+                typeof(DishCard),
+                new PropertyMetadata(null));
+
+        public static readonly DependencyProperty IsSelectedProperty =
+            DependencyProperty.Register(
+                "IsSelected",
+                typeof(bool),
+                typeof(DishCard),
+                new PropertyMetadata(false, OnIsSelectedChanged));
+
+        public Dish Dish
+        {
+            get => (Dish)GetValue(DishProperty);
+            set => SetValue(DishProperty, value);
+        }
+
+        public bool IsSelected
+        {
+            get => (bool)GetValue(IsSelectedProperty);
+            set => SetValue(IsSelectedProperty, value);
+        }
+
+        public DishCard()
+        {
+            InitializeComponent();
+            DataContext = this;
+            Loaded += (s, e) => UpdateVisualState(); // Применяем начальное состояние
+        }
+
+        private static void OnIsSelectedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is DishCard control)
+            {
+                control.UpdateVisualState();
+            }
+        }
+
+        private void UpdateVisualState()
+        {
+            var state = IsSelected ? "SelectedState" : "NormalState";
+            VisualStateManager.GoToState(this, state, useTransitions: true);
+        }
+
+        private void UserControl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            IsSelected = !IsSelected;
+            e.Handled = true;
+        }
+    }
+}
+
+
+================================================================================
+FILE: Desktop\Pages\Items\RestaurantCard.xaml.cs
+================================================================================
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
+using Desktop.Models;
+
+namespace Desktop.Pages.Items
+{
+    /// <summary>
+    /// Логика взаимодействия для RestaurantCard.xaml
+    /// </summary>
+    public partial class RestaurantCard : UserControl
+    {
+        public static readonly DependencyProperty RestaurantProperty =
+            DependencyProperty.Register(
+                "Restaurant",
+                typeof(Restaurant),
+                typeof(RestaurantCard),
+                new PropertyMetadata(null));
+
+        public static readonly DependencyProperty IsSelectedProperty =
+            DependencyProperty.Register(
+                "IsSelected",
+                typeof(bool),
+                typeof(RestaurantCard),
+                new PropertyMetadata(false, OnIsSelectedChanged));
+
+        public Restaurant Restaurant
+        {
+            get => (Restaurant)GetValue(RestaurantProperty);
+            set => SetValue(RestaurantProperty, value);
+        }
+
+        public bool IsSelected
+        {
+            get => (bool)GetValue(IsSelectedProperty);
+            set => SetValue(IsSelectedProperty, value);
+        }
+
+        public RestaurantCard()
+        {
+            InitializeComponent();
+            DataContext = this;
+            Loaded += (s, e) => UpdateVisualState(); // Применить начальное состояние
+        }
+
+        private static void OnIsSelectedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is RestaurantCard control)
+            {
+                control.UpdateVisualState();
+            }
+        }
+
+        private void UpdateVisualState()
+        {
+            var state = IsSelected ? "SelectedState" : "NormalState";
+            VisualStateManager.GoToState(this, state, useTransitions: true);
+        }
+
+        private void UserControl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            IsSelected = !IsSelected;
+            e.Handled = true;
+        }
+    }
+}
+
+
+================================================================================
+FILE: Desktop\Pages\Items\UserCard.xaml.cs
+================================================================================
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
+using Desktop.Models;
+
+namespace Desktop.Pages.Items
+{
+    /// <summary>
+    /// Логика взаимодействия для UserCard.xaml
+    /// </summary>
+    public partial class UserCard : UserControl
+    {
+        public static readonly DependencyProperty UserProperty =
+             DependencyProperty.Register("User", typeof(User), typeof(UserCard),
+                 new PropertyMetadata(null, OnUserChanged));
+
+        public static readonly DependencyProperty IsSelectedProperty =
+            DependencyProperty.Register("IsSelected", typeof(bool), typeof(UserCard),
+                new PropertyMetadata(false, OnIsSelectedChanged));
+
+        public User User
+        {
+            get { return (User)GetValue(UserProperty); }
+            set { SetValue(UserProperty, value); }
+        }
+
+        public bool IsSelected
+        {
+            get { return (bool)GetValue(IsSelectedProperty); }
+            set { SetValue(IsSelectedProperty, value); }
+        }
+
+        public UserCard()
+        {
+            InitializeComponent();
+           
+        }
+        private static void OnUserChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var control = d as UserCard;
+            control.DataContext = control.User;
+        }
+
+        private static void OnIsSelectedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var control = d as UserCard;
+            control.UpdateSelectionAppearance();
+        }
+
+        private void UpdateSelectionAppearance()
+        {
+            if (IsSelected)
+            {
+                MainBorder.BorderBrush = new SolidColorBrush(Color.FromRgb(0, 120, 215));
+                MainBorder.BorderThickness = new Thickness(2);
+            }
+            else
+            {
+                MainBorder.BorderBrush = Brushes.Transparent;
+                MainBorder.BorderThickness = new Thickness(0);
+            }
+        }
+
+        private void UserControl_MouseEnter(object sender, MouseEventArgs e)
+        {
+            if (!IsSelected)
+            {
+                MainBorder.Background = new SolidColorBrush(Color.FromRgb(45, 45, 45));
+            }
+        }
+
+        private void UserControl_MouseLeave(object sender, MouseEventArgs e)
+        {
+            if (!IsSelected)
+            {
+                MainBorder.Background = new SolidColorBrush(Color.FromRgb(30, 30, 30));
+            }
+        }
+
+        private void UserControl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            IsSelected = !IsSelected; // Переключаем выделение
+        }
+    }
+}
+
+
+
+
+================================================================================
+FILE: Desktop\Properties\AssemblyInfo.cs
+================================================================================
+using System.Reflection;
+using System.Resources;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Windows;
+
+// Общие сведения об этой сборке предоставляются следующим набором
+// набор атрибутов. Измените значения этих атрибутов, чтобы изменить сведения,
+// связанные со сборкой.
+[assembly: AssemblyTitle("Desktop")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("Desktop")]
+[assembly: AssemblyCopyright("Copyright ©  2025")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
+
+// Установка значения False для параметра ComVisible делает типы в этой сборке невидимыми
+// для компонентов COM. Если необходимо обратиться к типу в этой сборке через
+// из модели COM, установите атрибут ComVisible для этого типа в значение true.
+[assembly: ComVisible(false)]
+
+//Чтобы начать создание локализуемых приложений, задайте
+//<UICulture>CultureYouAreCodingWith</UICulture> в файле .csproj
+//в <PropertyGroup>. Например, при использовании английского (США)
+//в своих исходных файлах установите <UICulture> в en-US.  Затем отмените преобразование в комментарий
+//атрибута NeutralResourceLanguage ниже.  Обновите "en-US" в
+//строка внизу для обеспечения соответствия настройки UICulture в файле проекта.
+
+//[assembly: NeutralResourcesLanguage("en-US", UltimateResourceFallbackLocation.Satellite)]
+
+
+[assembly: ThemeInfo(
+    ResourceDictionaryLocation.None, //где расположены словари ресурсов по конкретным тематикам
+                                     //(используется, если ресурс не найден на странице,
+                                     // или в словарях ресурсов приложения)
+    ResourceDictionaryLocation.SourceAssembly //где расположен словарь универсальных ресурсов
+                                              //(используется, если ресурс не найден на странице,
+                                              // в приложении или в каких-либо словарях ресурсов для конкретной темы)
+)]
+
+
+// Сведения о версии для сборки включают четыре следующих значения:
+//
+//      Основной номер версии
+//      Дополнительный номер версии
+//      Номер сборки
+//      Номер редакции
+//
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]
+
+
+
+================================================================================
+FILE: Desktop\Properties\Resources.Designer.cs
+================================================================================
+//------------------------------------------------------------------------------
+// <auto-generated>
+//     Этот код был создан программным средством.
+//     Версия среды выполнения: 4.0.30319.42000
+//
+//     Изменения в этом файле могут привести к неправильному поведению и будут утрачены, если
+//     код создан повторно.
+// </auto-generated>
+//------------------------------------------------------------------------------
+
+namespace Desktop.Properties
+{
+
+
+    /// <summary>
+    ///   Класс ресурсов со строгим типом для поиска локализованных строк и пр.
+    /// </summary>
+    // Этот класс был автоматически создан при помощи StronglyTypedResourceBuilder
+    // класс с помощью таких средств, как ResGen или Visual Studio.
+    // Для добавления или удаления члена измените файл .ResX, а затем перезапустите ResGen
+    // с параметром /str или заново постройте свой VS-проект.
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+    [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
+    internal class Resources
+    {
+
+        private static global::System.Resources.ResourceManager resourceMan;
+
+        private static global::System.Globalization.CultureInfo resourceCulture;
+
+        [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
+        internal Resources()
+        {
+        }
+
+        /// <summary>
+        ///   Возврат кэшированного экземпляра ResourceManager, используемого этим классом.
+        /// </summary>
+        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
+        internal static global::System.Resources.ResourceManager ResourceManager
+        {
+            get
+            {
+                if ((resourceMan == null))
+                {
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Desktop.Properties.Resources", typeof(Resources).Assembly);
+                    resourceMan = temp;
+                }
+                return resourceMan;
+            }
+        }
+
+        /// <summary>
+        ///   Переопределяет свойство CurrentUICulture текущего потока для всех
+        ///   подстановки ресурсов с помощью этого класса ресурсов со строгим типом.
+        /// </summary>
+        [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
+        internal static global::System.Globalization.CultureInfo Culture
+        {
+            get
+            {
+                return resourceCulture;
+            }
+            set
+            {
+                resourceCulture = value;
+            }
+        }
+    }
+}
+
+
+
+================================================================================
+FILE: Desktop\Properties\Resources.resx
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+</root>
+
+
+================================================================================
+FILE: Desktop\Properties\Settings.Designer.cs
+================================================================================
+//------------------------------------------------------------------------------
+// <auto-generated>
+//     This code was generated by a tool.
+//     Runtime Version:4.0.30319.42000
+//
+//     Changes to this file may cause incorrect behavior and will be lost if
+//     the code is regenerated.
+// </auto-generated>
+//------------------------------------------------------------------------------
+
+namespace Desktop.Properties
+{
+
+
+    [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "11.0.0.0")]
+    internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase
+    {
+
+        private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
+
+        public static Settings Default
+        {
+            get
+            {
+                return defaultInstance;
+            }
+        }
+    }
+}
+
+
+

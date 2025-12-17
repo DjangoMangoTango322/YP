@@ -122,7 +122,9 @@
                                  Background="#2A2A2A" Foreground="{StaticResource TextBrush}"
                                  BorderThickness="0" Tag="Пароль">
                         </PasswordBox>
+                        
                     </Border>
+                    
                                 <!-- Error Message -->
                     <Border x:Name="ErrorBorder" Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2"
                            Background="#5A0000" CornerRadius="6" Padding="12,8" 

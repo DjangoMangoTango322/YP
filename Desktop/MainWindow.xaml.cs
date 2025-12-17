@@ -78,18 +78,19 @@ namespace Desktop
 
         public void SetActiveButton(Button button)
         {
-            // Сброс стилей всех кнопок
-            BtnHome.Background = (System.Windows.Media.Brush)FindResource("PrimaryBrush");
-            BtnUsers.Background = (System.Windows.Media.Brush)FindResource("PrimaryBrush");
-            BtnRestaurants.Background = (System.Windows.Media.Brush)FindResource("PrimaryBrush");
-            BtnDishes.Background = (System.Windows.Media.Brush)FindResource("PrimaryBrush");
-            BtnBookings.Background = (System.Windows.Media.Brush)FindResource("PrimaryBrush");
+            // Сброс всех кнопок
+            BtnHome.Background = (Brush)FindResource("PrimaryBrush");
+            BtnUsers.Background = (Brush)FindResource("PrimaryBrush");
+            BtnRestaurants.Background = (Brush)FindResource("PrimaryBrush");
+            BtnDishes.Background = (Brush)FindResource("PrimaryBrush");
+            BtnBookings.Background = (Brush)FindResource("PrimaryBrush");
 
-            // Активная
-            button.Background = (System.Windows.Media.Brush)FindResource("AccentBrush");
+            // Активная кнопка
+            button.Background = (Brush)FindResource("AccentBrush");
         }
     }
 }
+
 //: Window
 //    {
 //        public static MainWindow Instance { get; private set; }

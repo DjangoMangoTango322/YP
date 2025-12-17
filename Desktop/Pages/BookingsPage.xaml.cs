@@ -7,15 +7,10 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
 using Desktop.Models;
 
 namespace Desktop.Pages
 {
-    /// <summary>
-    /// Логика взаимодействия для BookingsPage.xaml
-    /// </summary>
     public partial class BookingsPage : Page, INotifyPropertyChanged
     {
         private ObservableCollection<Booking> _allBookings;
@@ -40,6 +35,10 @@ namespace Desktop.Pages
             set { _searchQuery = value; OnPropertyChanged(); ApplyFilter(); }
         }
 
+        // Словари для поиска (private, не public)
+        private readonly Dictionary<int, string> _userLastNames = new Dictionary<int, string>();
+        private readonly Dictionary<int, string> _restaurantNames = new Dictionary<int, string>();
+
         public BookingsPage()
         {
             InitializeComponent();
@@ -53,16 +52,43 @@ namespace Desktop.Pages
 
         private async Task LoadBookings()
         {
+            LoadingOverlay.Visibility = Visibility.Visible;
+
             try
             {
                 var bookings = await App.ApiContext.GetAllBookingsAsync();
+                var users = await App.ApiContext.GetAllUsersAsync();
+                var restaurants = await App.ApiContext.GetAllRestaurantsAsync();
+
+                // Заполняем словари
+                _userLastNames.Clear();
+                foreach (var user in users ?? new List<User>())
+                {
+                    _userLastNames[user.Id] = user.Last_Name;
+                }
+
+                _restaurantNames.Clear();
+                foreach (var rest in restaurants ?? new List<Restaurant>())
+                {
+                    _restaurantNames[rest.Id] = rest.Name;
+                }
+
                 AllBookings = new ObservableCollection<Booking>(bookings ?? new List<Booking>());
-                foreach (var b in AllBookings) b.IsSelected = false;
+                foreach (var b in AllBookings)
+                {
+                    b.IsSelected = false;
+                }
+
+                ApplyFilter();
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Ошибка загрузки: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 AllBookings = new ObservableCollection<Booking>();
+            }
+            finally
+            {
+                LoadingOverlay.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -80,26 +106,70 @@ namespace Desktop.Pages
             }
             else
             {
-                var query = SearchQuery.Trim();
+                var query = SearchQuery.Trim().ToLowerInvariant();
                 var filtered = AllBookings.Where(b =>
-                    (b.Status != null && b.Status.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) ||
-                    b.Id.ToString().IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0 ||
-                    b.User_Id.ToString().IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0 ||
-                    b.Restaurant_Id.ToString().IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0
+                    b.Id.ToString().Contains(query) ||
+                    (_userLastNames.TryGetValue(b.User_Id, out var lastName) && lastName.ToLowerInvariant().Contains(query)) ||
+                    (_restaurantNames.TryGetValue(b.Restaurant_Id, out var restName) && restName.ToLowerInvariant().Contains(query)) ||
+                    b.Booking_Date.ToString("dd.MM.yyyy").Contains(query) ||
+                    b.Number_Of_Guests.ToString().Contains(query) ||
+                    (b.Status?.ToLowerInvariant().Contains(query) ?? false)
                 ).ToList();
+
                 FilteredBookings = new ObservableCollection<Booking>(filtered);
             }
-            // No need to set ItemsSource manually—handled by bindings
         }
 
-        private async void BtnRefresh_Click(object sender, RoutedEventArgs e)
+        private void BtnRefresh_Click(object sender, RoutedEventArgs e) => LoadBookings();
+
+        private void BtnAddBooking_Click(object sender, RoutedEventArgs e)
         {
-            await LoadBookings();
+            NavigationService.Navigate(new AddEditBooking());
         }
 
-        private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void BtnEditSelected_Click(object sender, RoutedEventArgs e)
         {
-            SearchQuery = SearchTextBox.Text;
+            var selected = FilteredBookings.FirstOrDefault(b => b.IsSelected);
+            if (selected == null)
+            {
+                MessageBox.Show("Выберите бронирование для редактирования.", "Внимание");
+                return;
+            }
+            MessageBox.Show("Редактирование пока не реализовано.", "Информация");
+        }
+
+        private async void BtnDeleteSelected_Click(object sender, RoutedEventArgs e)
+        {
+            var selected = FilteredBookings.FirstOrDefault(b => b.IsSelected);
+            if (selected == null)
+            {
+                MessageBox.Show("Выберите бронирование для удаления.", "Внимание");
+                return;
+            }
+
+            var result = MessageBox.Show($"Удалить бронирование №{selected.Id}?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    var success = await App.ApiContext.DeleteBookingAsync(selected.Id); // Если метод принимает Id
+                    if (success)
+                    {
+                        AllBookings.Remove(selected);
+                        ApplyFilter();
+                        MessageBox.Show("Бронирование удалено.", "Успех");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка удаления: {ex.Message}", "Ошибка");
+                }
+            }
+        }
+
+        private void BookingsGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            // Можно оставить пустым
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -108,14 +178,5 @@ namespace Desktop.Pages
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
-        // TODO: Implement these stubs for full functionality
-        private void BtnAddBooking_Click(object sender, RoutedEventArgs e) { /* Add logic */ }
-        private void BtnEditSelected_Click(object sender, RoutedEventArgs e) { /* Edit logic */ }
-        private void BtnDeleteSelected_Click(object sender, RoutedEventArgs e) { /* Delete logic */ }
-        private void BookingsGrid_SelectionChanged(object sender, SelectionChangedEventArgs e) { /* Selection logic */ }
-        private void BookingCard_MouseEnter(object sender, MouseEventArgs e) { /* Hover logic */ }
-        private void BookingCard_MouseLeave(object sender, MouseEventArgs e) { /* Hover exit logic */ }
-        private void BookingCard_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) { /* Click logic */ }
     }
 }
