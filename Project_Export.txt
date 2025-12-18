@@ -1,6 +1,6 @@
-﻿PROJECT EXPORT - 12/17/2025 22:56:57
-Project Path: C:\Users\semen\Desktop\7234902\YP
-Total Files: 31
+﻿PROJECT EXPORT - 12/18/2025 20:49:03
+Project Path: C:\Users\semen\Desktop\123\YP
+Total Files: 33
 
 ================================================================================
 FILE: Desktop.sln
@@ -316,10 +316,15 @@ FILE: Desktop\Desktop.csproj
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Converters\IdToNameConverter.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Pages\AddEditBooking.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\AddEditDish.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -385,6 +390,9 @@ FILE: Desktop\Desktop.csproj
     <Compile Include="Models\Restaurant.cs" />
     <Compile Include="Models\RestaurantDish.cs" />
     <Compile Include="Models\User.cs" />
+    <Compile Include="Pages\AddEditBooking.xaml.cs">
+      <DependentUpon>AddEditBooking.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\AddEditDish.xaml.cs">
       <DependentUpon>AddEditDish.xaml</DependentUpon>
     </Compile>
@@ -485,12 +493,13 @@ namespace Desktop
         public MainWindow()
         {
             InitializeComponent();
+            MenuPanel.Visibility = Visibility.Collapsed;               // ← добавь эту строку (было забыто)
             MainFrame.Navigate(new AdminLogin());
         }
 
         public void ShowMenu()
         {
-            MenuPanel.Visibility = Visibility.Visible;
+            MenuPanel.Visibility = Visibility.Visible;                 // ← только после логина
         }
 
         public void HideMenu()
@@ -538,18 +547,19 @@ namespace Desktop
 
         public void SetActiveButton(Button button)
         {
-            // Сброс стилей всех кнопок
-            BtnHome.Background = (System.Windows.Media.Brush)FindResource("PrimaryBrush");
-            BtnUsers.Background = (System.Windows.Media.Brush)FindResource("PrimaryBrush");
-            BtnRestaurants.Background = (System.Windows.Media.Brush)FindResource("PrimaryBrush");
-            BtnDishes.Background = (System.Windows.Media.Brush)FindResource("PrimaryBrush");
-            BtnBookings.Background = (System.Windows.Media.Brush)FindResource("PrimaryBrush");
+            // Сброс всех кнопок
+            BtnHome.Background = (Brush)FindResource("PrimaryBrush");
+            BtnUsers.Background = (Brush)FindResource("PrimaryBrush");
+            BtnRestaurants.Background = (Brush)FindResource("PrimaryBrush");
+            BtnDishes.Background = (Brush)FindResource("PrimaryBrush");
+            BtnBookings.Background = (Brush)FindResource("PrimaryBrush");
 
-            // Активная
-            button.Background = (System.Windows.Media.Brush)FindResource("AccentBrush");
+            // Активная кнопка
+            button.Background = (Brush)FindResource("AccentBrush");
         }
     }
 }
+
 //: Window
 //    {
 //        public static MainWindow Instance { get; private set; }
@@ -588,6 +598,37 @@ FILE: Desktop\packages.config
 <packages>
   <package id="Newtonsoft.Json" version="13.0.4" targetFramework="net48" />
 </packages>
+
+
+================================================================================
+FILE: Desktop\Converters\IdToNameConverter.cs
+================================================================================
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Windows.Data;
+
+namespace Desktop.Converters
+{
+    public class IdToNameConverter : IValueConverter
+    {
+        public Dictionary<int, string> NameDictionary { get; set; } = new Dictionary<int, string>();
+
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            if (value is int id && NameDictionary.TryGetValue(id, out string name))
+            {
+                return name;
+            }
+            return "Неизвестно";
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            throw new NotImplementedException();
+        }
+    }
+}
 
 
 ================================================================================
@@ -753,6 +794,138 @@ namespace Desktop.Models
         public string Password { get; set; }
         public string Login { get; set; }
         public bool IsSelected { get; set; } = false;
+    }
+}
+
+
+================================================================================
+FILE: Desktop\Pages\AddEditBooking.xaml.cs
+================================================================================
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Navigation;
+using Desktop.Models;
+
+namespace Desktop.Pages
+{
+    public partial class AddEditBooking : Page
+    {
+        private readonly Booking _booking = new Booking
+        {
+            Status = "Ожидание",
+            Created_At = DateTime.Now
+        };
+
+        private List<User> _users;
+        private List<Restaurant> _restaurants;
+        private bool _isEditMode;
+
+        public AddEditBooking(Booking booking = null)
+        {
+            InitializeComponent();
+            _booking = booking ?? new Booking
+            {
+                Status = "Ожидание",
+                Created_At = DateTime.Now
+            };
+            _isEditMode = booking != null;
+            Loaded += AddEditBooking_Loaded;
+        }
+
+        private async void AddEditBooking_Loaded(object sender, RoutedEventArgs e)
+        {
+            LoadingOverlay.Visibility = Visibility.Visible;
+
+            try
+            {
+                _users = await App.ApiContext.GetAllUsersAsync() ?? new List<User>();
+                _restaurants = await App.ApiContext.GetAllRestaurantsAsync() ?? new List<Restaurant>();
+
+                UserComboBox.ItemsSource = _users;
+                UserComboBox.SelectedValuePath = "Id";
+
+                RestaurantComboBox.ItemsSource = _restaurants;
+                RestaurantComboBox.SelectedValuePath = "Id";
+
+                if (_isEditMode)
+                {
+                    UserComboBox.SelectedValue = _booking.User_Id;
+                    RestaurantComboBox.SelectedValue = _booking.Restaurant_Id;
+                    BookingDatePicker.SelectedDate = _booking.Booking_Date;
+                    GuestsTxt.Text = _booking.Number_Of_Guests.ToString();
+                }
+                else
+                {
+                    if (_users.Count > 0) UserComboBox.SelectedIndex = 0;
+                    if (_restaurants.Count > 0) RestaurantComboBox.SelectedIndex = 0;
+                    BookingDatePicker.SelectedDate = DateTime.Today.AddDays(1);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки данных: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                LoadingOverlay.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        // Метод Save_Click — добавь его!
+        private async void Save_Click(object sender, RoutedEventArgs e)
+        {
+            if (!ValidateInput()) return;
+
+            LoadingOverlay.Visibility = Visibility.Visible;
+
+            try
+            {
+                _booking.User_Id = (int)UserComboBox.SelectedValue;
+                _booking.Restaurant_Id = (int)RestaurantComboBox.SelectedValue;
+                _booking.Number_Of_Guests = int.Parse(GuestsTxt.Text.Trim());
+                _booking.Booking_Date = BookingDatePicker.SelectedDate.Value;
+
+                if (_isEditMode)
+                {
+                    await App.ApiContext.UpdateBookingAsync(_booking);
+                    MessageBox.Show("Бронирование обновлено!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    await App.ApiContext.CreateBookingAsync(_booking);
+                    MessageBox.Show("Бронирование создано!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+
+                // Вместо GoBack — переходим на BookingsPage заново (это гарантированно обновит список)
+                NavigationService.Navigate(new BookingsPage());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при сохранении: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                LoadingOverlay.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void Cancel_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService.GoBack();
+        }
+
+        private bool ValidateInput()
+        {
+            // Твоя валидация из исходного кода
+            if (UserComboBox.SelectedItem == null) { MessageBox.Show("Выберите пользователя"); return false; }
+            if (RestaurantComboBox.SelectedItem == null) { MessageBox.Show("Выберите ресторан"); return false; }
+            if (BookingDatePicker.SelectedDate == null) { MessageBox.Show("Выберите дату"); return false; }
+            if (!int.TryParse(GuestsTxt.Text.Trim(), out int guests) || guests < 1) { MessageBox.Show("Гости от 1"); return false; }
+            return true;
+        }
     }
 }
 
@@ -1089,47 +1262,120 @@ namespace Desktop.Pages
     public partial class AddEditUser : Page
     {
         private User _user;
+        private readonly bool _isEditMode;
 
-        public AddEditUser(User user)
+        public AddEditUser(User user = null)
         {
             InitializeComponent();
             _user = user ?? new User();
+            _isEditMode = user != null;
             LoadData();
+            UpdateTitle();
         }
 
         private void LoadData()
         {
-            FirstName.Text = _user.First_Name;
-            LastName.Text = _user.Last_Name;
-            Phone.Text = _user.Phone;
-            Login.Text = _user.Login;
-            // Password не загружаем для безопасности
+            FirstName.Text = _user.First_Name ?? string.Empty;
+            LastName.Text = _user.Last_Name ?? string.Empty;
+            Phone.Text = _user.Phone ?? string.Empty;
+            Login.Text = _user.Login ?? string.Empty;
+
+            // Пароль не загружаем — поле остаётся пустым
+            Password.Password = string.Empty;
+
+            PageTitle.Text = _isEditMode ? "👤 Редактирование пользователя" : "👤 Добавление пользователя";
+        }
+
+        private void UpdateTitle()
+        {
+            PageTitle.Text = _isEditMode ? "👤 Редактирование пользователя" : "👤 Добавление пользователя";
         }
 
         private async void Save_Click(object sender, RoutedEventArgs e)
         {
-            _user.First_Name = FirstName.Text;
-            _user.Last_Name = LastName.Text;
-            _user.Phone = Phone.Text;
-            _user.Login = Login.Text;
-            _user.Password = Password.Password; // Если новый пароль
+            if (!ValidateInput()) return;
+
+            LoadingOverlay.Visibility = Visibility.Visible;
 
             try
             {
-                if (_user.Id == 0)
+                _user.First_Name = FirstName.Text.Trim();
+                _user.Last_Name = LastName.Text.Trim();
+                _user.Phone = Phone.Text.Trim();
+                _user.Login = Login.Text.Trim();
+
+                // Меняем пароль ТОЛЬКО если введён новый
+                string newPassword = Password.Password.Trim();
+                if (!string.IsNullOrEmpty(newPassword))
                 {
-                    await App.ApiContext.CreateUserAsync(_user);
+                    _user.Password = newPassword;
+                }
+                // Если поле пустое — сервер не получит новый пароль и оставит старый
+
+                if (_isEditMode)
+                {
+                    await App.ApiContext.UpdateUserAsync(_user);
+                    MessageBox.Show("Пользователь обновлён!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
                 {
-                    await App.ApiContext.UpdateUserAsync(_user);
+                    await App.ApiContext.CreateUserAsync(_user);
+                    MessageBox.Show("Пользователь добавлен!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
+
                 NavigationService.GoBack();
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            finally
+            {
+                LoadingOverlay.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void Cancel_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService.GoBack();
+        }
+
+        private bool ValidateInput()
+        {
+            if (string.IsNullOrWhiteSpace(FirstName.Text))
+            {
+                MessageBox.Show("Введите имя.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                FirstName.Focus();
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(LastName.Text))
+            {
+                MessageBox.Show("Введите фамилию.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                LastName.Focus();
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(Phone.Text))
+            {
+                MessageBox.Show("Введите телефон.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Phone.Focus();
+                return false;
+            }
+            if (string.IsNullOrWhiteSpace(Login.Text))
+            {
+                MessageBox.Show("Введите логин.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Login.Focus();
+                return false;
+            }
+
+            string newPassword = Password.Password.Trim();
+            if (!_isEditMode && string.IsNullOrEmpty(newPassword))
+            {
+                MessageBox.Show("Введите пароль для нового пользователя.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                Password.Focus();
+                return false;
+            }
+
+            return true;
         }
     }
 }
@@ -1223,15 +1469,11 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
 using Desktop.Models;
+using Desktop.Converters;  // ← добавь это, если Visual Studio ругается на IdToNameConverter
 
 namespace Desktop.Pages
 {
-    /// <summary>
-    /// Логика взаимодействия для BookingsPage.xaml
-    /// </summary>
     public partial class BookingsPage : Page, INotifyPropertyChanged
     {
         private ObservableCollection<Booking> _allBookings;
@@ -1256,6 +1498,9 @@ namespace Desktop.Pages
             set { _searchQuery = value; OnPropertyChanged(); ApplyFilter(); }
         }
 
+        private readonly Dictionary<int, string> _userLastNames = new Dictionary<int, string>();
+        private readonly Dictionary<int, string> _restaurantNames = new Dictionary<int, string>();
+
         public BookingsPage()
         {
             InitializeComponent();
@@ -1267,18 +1512,55 @@ namespace Desktop.Pages
             await LoadBookings();
         }
 
-        private async Task LoadBookings()
+        public async Task LoadBookings()
         {
+            LoadingOverlay.Visibility = Visibility.Visible;
+
             try
             {
                 var bookings = await App.ApiContext.GetAllBookingsAsync();
+                var users = await App.ApiContext.GetAllUsersAsync();
+                var restaurants = await App.ApiContext.GetAllRestaurantsAsync();
+
+                _userLastNames.Clear();
+                foreach (var user in users ?? new List<User>())
+                {
+                    _userLastNames[user.Id] = user.Last_Name;
+                }
+
+                _restaurantNames.Clear();
+                foreach (var rest in restaurants ?? new List<Restaurant>())
+                {
+                    _restaurantNames[rest.Id] = rest.Name;
+                }
+
                 AllBookings = new ObservableCollection<Booking>(bookings ?? new List<Booking>());
-                foreach (var b in AllBookings) b.IsSelected = false;
+                foreach (var b in AllBookings)
+                {
+                    b.IsSelected = false;
+                }
+
+                // Установка словарей в конвертеры (без ошибок)
+                if (Resources["UserConverter"] is IdToNameConverter userConv)
+                {
+                    userConv.NameDictionary = _userLastNames;
+                }
+
+                if (Resources["RestaurantConverter"] is IdToNameConverter restConv)
+                {
+                    restConv.NameDictionary = _restaurantNames;
+                }
+
+                ApplyFilter();
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Ошибка загрузки: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
                 AllBookings = new ObservableCollection<Booking>();
+            }
+            finally
+            {
+                LoadingOverlay.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -1296,26 +1578,94 @@ namespace Desktop.Pages
             }
             else
             {
-                var query = SearchQuery.Trim();
+                var query = SearchQuery.Trim().ToLowerInvariant();
                 var filtered = AllBookings.Where(b =>
-                    (b.Status != null && b.Status.IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0) ||
-                    b.Id.ToString().IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0 ||
-                    b.User_Id.ToString().IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0 ||
-                    b.Restaurant_Id.ToString().IndexOf(query, StringComparison.OrdinalIgnoreCase) >= 0
+                    b.Id.ToString().Contains(query) ||
+                    (_userLastNames.ContainsKey(b.User_Id) && _userLastNames[b.User_Id].ToLowerInvariant().Contains(query)) ||
+                    (_restaurantNames.ContainsKey(b.Restaurant_Id) && _restaurantNames[b.Restaurant_Id].ToLowerInvariant().Contains(query)) ||
+                    b.Booking_Date.ToString("dd.MM.yyyy").Contains(query) ||
+                    b.Number_Of_Guests.ToString().Contains(query) ||
+                    (b.Status?.ToLowerInvariant().Contains(query) ?? false)
                 ).ToList();
+
                 FilteredBookings = new ObservableCollection<Booking>(filtered);
             }
-            // No need to set ItemsSource manually—handled by bindings
-        }
-
-        private async void BtnRefresh_Click(object sender, RoutedEventArgs e)
-        {
-            await LoadBookings();
         }
 
         private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             SearchQuery = SearchTextBox.Text;
+        }
+
+        private void BtnRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            _ = LoadBookings();
+        }
+
+        private void BtnAddBooking_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService.Navigate(new AddEditBooking());
+        }
+
+        private void BtnEditSelected_Click(object sender, RoutedEventArgs e)
+        {
+            var selected = FilteredBookings.FirstOrDefault(b => b.IsSelected);
+            if (selected == null)
+            {
+                MessageBox.Show("Выберите бронирование для редактирования.", "Внимание");
+                return;
+            }
+            NavigationService.Navigate(new AddEditBooking(selected));  // Теперь работает!
+        }
+
+        private async void BtnDeleteSelected_Click(object sender, RoutedEventArgs e)
+        {
+            var selected = FilteredBookings.FirstOrDefault(b => b.IsSelected);
+            if (selected == null)
+            {
+                MessageBox.Show("Выберите бронирование для удаления.", "Внимание");
+                return;
+            }
+
+            var result = MessageBox.Show($"Удалить бронирование №{selected.Id}?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+                LoadingOverlay.Visibility = Visibility.Visible;
+                try
+                {
+                    bool success = await App.ApiContext.DeleteBookingAsync(selected.Id);
+                    if (success)
+                    {
+                        AllBookings.Remove(selected);
+                        ApplyFilter();
+                        MessageBox.Show("Бронирование удалено.", "Успех");
+                    }
+                    else
+                    {
+                        MessageBox.Show("Не удалось удалить.", "Ошибка");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка удаления: {ex.Message}", "Ошибка");
+                }
+                finally
+                {
+                    LoadingOverlay.Visibility = Visibility.Collapsed;
+                }
+            }
+        }
+
+        private void BookingsGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (BookingsGrid.SelectedItem is Booking selected)
+            {
+                foreach (var b in FilteredBookings)
+                {
+                    b.IsSelected = false;
+                }
+                selected.IsSelected = true;
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -1324,15 +1674,6 @@ namespace Desktop.Pages
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
-        // TODO: Implement these stubs for full functionality
-        private void BtnAddBooking_Click(object sender, RoutedEventArgs e) { /* Add logic */ }
-        private void BtnEditSelected_Click(object sender, RoutedEventArgs e) { /* Edit logic */ }
-        private void BtnDeleteSelected_Click(object sender, RoutedEventArgs e) { /* Delete logic */ }
-        private void BookingsGrid_SelectionChanged(object sender, SelectionChangedEventArgs e) { /* Selection logic */ }
-        private void BookingCard_MouseEnter(object sender, MouseEventArgs e) { /* Hover logic */ }
-        private void BookingCard_MouseLeave(object sender, MouseEventArgs e) { /* Hover exit logic */ }
-        private void BookingCard_MouseLeftButtonDown(object sender, MouseButtonEventArgs e) { /* Click logic */ }
     }
 }
 
@@ -1958,29 +2299,20 @@ FILE: Desktop\Pages\Items\BookingCard.xaml.cs
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using Desktop.Models;
 
 namespace Desktop.Pages.Items
 {
-    /// <summary>
-    /// Логика взаимодействия для BookingCard.xaml
-    /// </summary>
-    public partial class BookingCard : UserControl
+    public partial class BookingCard : System.Windows.Controls.UserControl
     {
-        public static readonly DependencyProperty BookingProperty =
-            DependencyProperty.Register("Booking", typeof(Booking), typeof(BookingCard),
-                new PropertyMetadata(null, OnBookingChanged));
-
-        public static readonly DependencyProperty IsSelectedProperty =
-            DependencyProperty.Register("IsSelected", typeof(bool), typeof(BookingCard),
-                new PropertyMetadata(false, OnIsSelectedChanged));
-
         public Booking Booking
         {
             get => (Booking)GetValue(BookingProperty);
             set => SetValue(BookingProperty, value);
         }
+
+        public static readonly DependencyProperty BookingProperty =
+            DependencyProperty.Register("Booking", typeof(Booking), typeof(BookingCard), new PropertyMetadata(null));
 
         public bool IsSelected
         {
@@ -1988,56 +2320,33 @@ namespace Desktop.Pages.Items
             set => SetValue(IsSelectedProperty, value);
         }
 
+        public static readonly DependencyProperty IsSelectedProperty =
+            DependencyProperty.Register("IsSelected", typeof(bool), typeof(BookingCard), new PropertyMetadata(false));
+
         public BookingCard()
         {
             InitializeComponent();
             DataContext = this;
         }
 
-        private static void OnBookingChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private void BookingCard_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (d is BookingCard control)
-                control.UpdateStatusColor();
-        }
-
-        private static void OnIsSelectedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (d is BookingCard control)
-                control.UpdateSelection();
-        }
-
-        private void UpdateStatusColor()
-        {
-            if (Booking == null) return;
-
-            switch (Booking.Status)
+            if (ItemsControl.ItemsControlFromItemContainer(this) is ItemsControl parent)
             {
-                case "Подтверждено":
-                    StatusBorder.Background = new SolidColorBrush(Color.FromRgb(46, 125, 50));
-                    break;
-                case "Ожидание":
-                    StatusBorder.Background = new SolidColorBrush(Color.FromRgb(251, 140, 0));
-                    break;
-                case "Отменено":
-                    StatusBorder.Background = new SolidColorBrush(Color.FromRgb(198, 40, 40));
-                    break;
-                default:
-                    StatusBorder.Background = new SolidColorBrush(Color.FromRgb(100, 100, 100));
-                    break;
+                foreach (var item in parent.Items)
+                {
+                    if (item is Booking booking)
+                    {
+                        booking.IsSelected = false;
+                    }
+                }
             }
-        }
 
-        private void UpdateSelection()
-        {
-            MainBorder.BorderBrush = IsSelected
-                ? new SolidColorBrush(Color.FromRgb(0, 120, 215))
-                : Brushes.Transparent;
-            MainBorder.BorderThickness = IsSelected ? new Thickness(3) : new Thickness(0);
-        }
+            if (Booking != null)
+            {
+                Booking.IsSelected = true;
+            }
 
-        private void UserControl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            IsSelected = !IsSelected;
             e.Handled = true;
         }
     }

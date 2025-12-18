@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using Desktop.Models;
+using Desktop.Converters;  // ← добавь это, если Visual Studio ругается на IdToNameConverter
 
 namespace Desktop.Pages
 {
@@ -35,7 +36,6 @@ namespace Desktop.Pages
             set { _searchQuery = value; OnPropertyChanged(); ApplyFilter(); }
         }
 
-        // Словари для поиска (private, не public)
         private readonly Dictionary<int, string> _userLastNames = new Dictionary<int, string>();
         private readonly Dictionary<int, string> _restaurantNames = new Dictionary<int, string>();
 
@@ -50,7 +50,7 @@ namespace Desktop.Pages
             await LoadBookings();
         }
 
-        private async Task LoadBookings()
+        public async Task LoadBookings()
         {
             LoadingOverlay.Visibility = Visibility.Visible;
 
@@ -60,7 +60,6 @@ namespace Desktop.Pages
                 var users = await App.ApiContext.GetAllUsersAsync();
                 var restaurants = await App.ApiContext.GetAllRestaurantsAsync();
 
-                // Заполняем словари
                 _userLastNames.Clear();
                 foreach (var user in users ?? new List<User>())
                 {
@@ -79,7 +78,17 @@ namespace Desktop.Pages
                     b.IsSelected = false;
                 }
 
-                ApplyFilter();
+                if (Resources["UserConverter"] is IdToNameConverter userConv)
+                {
+                    userConv.NameDictionary = _userLastNames;
+                }
+
+                if (Resources["RestaurantConverter"] is IdToNameConverter restConv)
+                {
+                    restConv.NameDictionary = _restaurantNames;
+                }
+
+                ApplyFilter();  // Обновляем FilteredBookings
             }
             catch (Exception ex)
             {
@@ -109,8 +118,8 @@ namespace Desktop.Pages
                 var query = SearchQuery.Trim().ToLowerInvariant();
                 var filtered = AllBookings.Where(b =>
                     b.Id.ToString().Contains(query) ||
-                    (_userLastNames.TryGetValue(b.User_Id, out var lastName) && lastName.ToLowerInvariant().Contains(query)) ||
-                    (_restaurantNames.TryGetValue(b.Restaurant_Id, out var restName) && restName.ToLowerInvariant().Contains(query)) ||
+                    (_userLastNames.ContainsKey(b.User_Id) && _userLastNames[b.User_Id].ToLowerInvariant().Contains(query)) ||
+                    (_restaurantNames.ContainsKey(b.Restaurant_Id) && _restaurantNames[b.Restaurant_Id].ToLowerInvariant().Contains(query)) ||
                     b.Booking_Date.ToString("dd.MM.yyyy").Contains(query) ||
                     b.Number_Of_Guests.ToString().Contains(query) ||
                     (b.Status?.ToLowerInvariant().Contains(query) ?? false)
@@ -120,7 +129,15 @@ namespace Desktop.Pages
             }
         }
 
-        private void BtnRefresh_Click(object sender, RoutedEventArgs e) => LoadBookings();
+        private void SearchTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            SearchQuery = SearchTextBox.Text;
+        }
+
+        private void BtnRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            _ = LoadBookings();
+        }
 
         private void BtnAddBooking_Click(object sender, RoutedEventArgs e)
         {
@@ -135,7 +152,7 @@ namespace Desktop.Pages
                 MessageBox.Show("Выберите бронирование для редактирования.", "Внимание");
                 return;
             }
-            MessageBox.Show("Редактирование пока не реализовано.", "Информация");
+            NavigationService.Navigate(new AddEditBooking(selected));  // Теперь работает!
         }
 
         private async void BtnDeleteSelected_Click(object sender, RoutedEventArgs e)
@@ -150,26 +167,42 @@ namespace Desktop.Pages
             var result = MessageBox.Show($"Удалить бронирование №{selected.Id}?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (result == MessageBoxResult.Yes)
             {
+                LoadingOverlay.Visibility = Visibility.Visible;
                 try
                 {
-                    var success = await App.ApiContext.DeleteBookingAsync(selected.Id); // Если метод принимает Id
+                    bool success = await App.ApiContext.DeleteBookingAsync(selected.Id);
                     if (success)
                     {
                         AllBookings.Remove(selected);
                         ApplyFilter();
                         MessageBox.Show("Бронирование удалено.", "Успех");
                     }
+                    else
+                    {
+                        MessageBox.Show("Не удалось удалить.", "Ошибка");
+                    }
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show($"Ошибка удаления: {ex.Message}", "Ошибка");
+                }
+                finally
+                {
+                    LoadingOverlay.Visibility = Visibility.Collapsed;
                 }
             }
         }
 
         private void BookingsGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            // Можно оставить пустым
+            if (BookingsGrid.SelectedItem is Booking selected)
+            {
+                foreach (var b in FilteredBookings)
+                {
+                    b.IsSelected = false;
+                }
+                selected.IsSelected = true;
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

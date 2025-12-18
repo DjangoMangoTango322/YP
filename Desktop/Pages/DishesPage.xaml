@@ -56,18 +56,18 @@
                     <Button Content="Изменить"
                            Style="{StaticResource PrimaryButtonStyle}"
                            Margin="8,0,0,0"
-                           Click="BtnEditSelected_Click"
-                           Padding="12,6"/>
+                          
+                           Padding="12,6" Click="BtnEditSelected_Click"/>
                     <Button Content="Удалить"
                            Style="{StaticResource SecondaryButtonStyle}"
                            Margin="8,0,0,0"
-                           Click="BtnDeleteSelected_Click"
-                           Padding="12,6"/>
+                          
+                           Padding="12,6" Click="BtnDeleteSelected_Click"/>
                     <Button Content="Обновить"
                            Style="{StaticResource SecondaryButtonStyle}"
                            Margin="8,0,0,0"
-                           Click="BtnRefresh_Click"
-                           Padding="12,6"/>
+                          
+                           Padding="12,6" Click="BtnRefresh_Click"/>
                 </StackPanel>
             </Grid>
         </Border>
@@ -106,6 +106,10 @@
                 <StaticResource ResourceKey="ShadowEffect"/>
             </Border.Effect>
             <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="37*"/>
+                    <ColumnDefinition Width="309*"/>
+                </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
@@ -113,8 +117,8 @@
                 <TextBlock Text="Карточки блюд"
                           Foreground="{StaticResource TextBrush}"
                           FontSize="14" FontWeight="SemiBold"
-                          Margin="0,0,0,12"/>
-                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" MaxHeight="280">
+                          Margin="0,0,0,12" Grid.ColumnSpan="2"/>
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" MaxHeight="280" Grid.ColumnSpan="2">
                     <ItemsControl x:Name="DishesItemsControl" 
                                   ItemsSource="{Binding FilteredDishes}">
                         <ItemsControl.ItemTemplate>

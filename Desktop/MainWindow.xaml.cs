@@ -25,12 +25,13 @@ namespace Desktop
         public MainWindow()
         {
             InitializeComponent();
+            MenuPanel.Visibility = Visibility.Collapsed;               // ← добавь эту строку (было забыто)
             MainFrame.Navigate(new AdminLogin());
         }
 
         public void ShowMenu()
         {
-            MenuPanel.Visibility = Visibility.Visible;
+            MenuPanel.Visibility = Visibility.Visible;                 // ← только после логина
         }
 
         public void HideMenu()
