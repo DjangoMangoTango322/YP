@@ -3,10 +3,17 @@ package com.example.a123;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.*;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.a123.DataModels.Booking;
+import com.example.a123.DataModels.Dish;
+import com.example.a123.DataModels.Restaurant;
 
 import java.util.List;
 import java.util.Locale;
@@ -17,22 +24,23 @@ import retrofit2.Response;
 
 public class Adapters {
 
-    // RestaurantAdapter (RecyclerView)
+    // RestaurantAdapter
     public static class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.ViewHolder> {
 
         public interface OnRestaurantClickListener {
-            void onRestaurantClick(DataModels.Restaurant restaurant);
+            void onRestaurantClick(Restaurant restaurant);
         }
 
-        private List<DataModels.Restaurant> restaurantList;
+        private List<Restaurant> restaurantList;
         private OnRestaurantClickListener listener;
 
-        public RestaurantAdapter(List<DataModels.Restaurant> restaurantList, OnRestaurantClickListener listener) {
+        public RestaurantAdapter(List<Restaurant> restaurantList, OnRestaurantClickListener listener) {
             this.restaurantList = restaurantList;
             this.listener = listener;
         }
 
-        @NonNull @Override
+        @NonNull
+        @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_restaurant, parent, false);
             return new ViewHolder(view);
@@ -40,19 +48,25 @@ public class Adapters {
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            DataModels.Restaurant r = restaurantList.get(position);
-            holder.nameTextView.setText(r.name);
-            holder.addressTextView.setText(r.address);
-            holder.ratingTextView.setText(String.format(Locale.getDefault(), "★ %.1f", r.rating));
-            holder.cuisineTextView.setText(r.cuisineType != null ? r.cuisineType : "");
-            holder.cardView.setOnClickListener(v -> { if (listener != null) listener.onRestaurantClick(r); });
+            Restaurant r = restaurantList.get(position);
+            holder.nameTextView.setText(r.Name);
+            holder.addressTextView.setText(r.Address);
+            holder.ratingTextView.setText(String.format(Locale.getDefault(), "★ %.1f", 4.5));
+            holder.cuisineTextView.setText(r.Tematic != null ? r.Tematic : "");
+            holder.cardView.setOnClickListener(v -> {
+                if (listener != null) listener.onRestaurantClick(r);
+            });
         }
 
-        @Override public int getItemCount() { return restaurantList != null ? restaurantList.size() : 0; }
+        @Override
+        public int getItemCount() {
+            return restaurantList != null ? restaurantList.size() : 0;
+        }
 
         public static class ViewHolder extends RecyclerView.ViewHolder {
             CardView cardView;
             TextView nameTextView, addressTextView, ratingTextView, cuisineTextView;
+
             public ViewHolder(@NonNull View itemView) {
                 super(itemView);
                 cardView = itemView.findViewById(R.id.cardView);
@@ -66,10 +80,14 @@ public class Adapters {
 
     // MenuAdapter
     public static class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.ViewHolder> {
-        private List<DataModels.Dish> menuList;
-        public MenuAdapter(List<DataModels.Dish> menuList) { this.menuList = menuList; }
+        private List<Dish> menuList;
 
-        @NonNull @Override
+        public MenuAdapter(List<Dish> menuList) {
+            this.menuList = menuList;
+        }
+
+        @NonNull
+        @Override
         public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_menu, parent, false);
             return new ViewHolder(view);
@@ -77,18 +95,22 @@ public class Adapters {
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            DataModels.Dish d = menuList.get(position);
-            holder.dishNameTextView.setText(d.name);
-            holder.dishDescriptionTextView.setText(d.description);
-            holder.dishPriceTextView.setText(String.format(Locale.getDefault(), "%.0f ₽", d.price));
-            holder.dishCategoryTextView.setText(d.category != null ? d.category : "");
+            Dish d = menuList.get(position);
+            holder.dishNameTextView.setText(d.Name);
+            holder.dishDescriptionTextView.setText(d.Description);
+            holder.dishPriceTextView.setText(String.format(Locale.getDefault(), "%.0f ₽", d.Price));
+            holder.dishCategoryTextView.setText(d.Category != null ? d.Category : "");
             holder.vegetarianBadge.setVisibility(d.isVegetarian ? View.VISIBLE : View.GONE);
         }
 
-        @Override public int getItemCount() { return menuList != null ? menuList.size() : 0; }
+        @Override
+        public int getItemCount() {
+            return menuList != null ? menuList.size() : 0;
+        }
 
         public static class ViewHolder extends RecyclerView.ViewHolder {
             TextView dishNameTextView, dishDescriptionTextView, dishPriceTextView, dishCategoryTextView, vegetarianBadge;
+
             public ViewHolder(@NonNull View itemView) {
                 super(itemView);
                 dishNameTextView = itemView.findViewById(R.id.dishNameTextView);
@@ -100,12 +122,11 @@ public class Adapters {
         }
     }
 
-    // BookingsAdapter (kept simple — uses item_booking layout)
-    // BookingsAdapter (исправлено: безопасное обращение к position)
+    // BookingsAdapter
     public static class BookingsAdapter extends RecyclerView.Adapter<BookingsAdapter.ViewHolder> {
-        private List<DataModels.Booking> bookingList;
+        private List<Booking> bookingList;
 
-        public BookingsAdapter(List<DataModels.Booking> bookingList) {
+        public BookingsAdapter(List<Booking> bookingList) {
             this.bookingList = bookingList;
         }
 
@@ -118,13 +139,13 @@ public class Adapters {
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            DataModels.Booking b = bookingList.get(position);
-            holder.restaurantNameTextView.setText(b.restaurantName != null ? b.restaurantName : "");
-            holder.bookingDateTextView.setText(b.bookingDate != null ? Utils.DateUtils.formatBookingDate(b.bookingDate) : "");
-            holder.peopleCountTextView.setText((b.numberOfPeople) + " чел.");
-            holder.statusTextView.setText(Utils.BookingHelper.getStatusText(b.status));
+            Booking b = bookingList.get(position);
+            holder.restaurantNameTextView.setText(b.restaurantName != null ? b.restaurantName : "Загрузка...");
+            holder.bookingDateTextView.setText(b.Booking_Date != null ? formatBookingDate(b.Booking_Date) : "");
+            holder.peopleCountTextView.setText(b.Number_Of_Guests + " чел.");
+            holder.statusTextView.setText(getStatusText(b.Status));
             holder.cancelButton.setVisibility(
-                    ("completed".equalsIgnoreCase(b.status) || "cancelled".equalsIgnoreCase(b.status))
+                    ("completed".equalsIgnoreCase(b.Status) || "cancelled".equalsIgnoreCase(b.Status))
                             ? View.GONE : View.VISIBLE
             );
 
@@ -132,30 +153,58 @@ public class Adapters {
                 int currentPosition = holder.getAdapterPosition();
                 if (currentPosition == RecyclerView.NO_POSITION) return;
 
-                DataModels.Booking booking = bookingList.get(currentPosition);
+                Booking booking = bookingList.get(currentPosition);
 
-                ApiClient.getApiService().cancelBooking(booking.id).enqueue(new Callback<Void>() {
-                    @Override
-                    public void onResponse(Call<Void> call, Response<Void> response) {
-                        if (response.isSuccessful()) {
-                            booking.status = "cancelled";
-                            notifyItemChanged(currentPosition);
-                        } else {
-                            Utils.UI.showToast(v.getContext(), "Ошибка отмены бронирования");
-                        }
-                    }
+                ApiClient.getApiService().cancelBooking(booking.User_Id, booking.Restaurant_Id)
+                        .enqueue(new Callback<Void>() {
+                            @Override
+                            public void onResponse(Call<Void> call, Response<Void> response) {
+                                if (response.isSuccessful()) {
+                                    booking.Status = "cancelled";
+                                    notifyItemChanged(currentPosition);
+                                } else {
+                                    Toast.makeText(v.getContext(), "Ошибка отмены бронирования", Toast.LENGTH_SHORT).show();
+                                }
+                            }
 
-                    @Override
-                    public void onFailure(Call<Void> call, Throwable t) {
-                        Utils.UI.showToast(v.getContext(), "Ошибка соединения");
-                    }
-                });
+                            @Override
+                            public void onFailure(Call<Void> call, Throwable t) {
+                                Toast.makeText(v.getContext(), "Ошибка соединения", Toast.LENGTH_SHORT).show();
+                            }
+                        });
             });
         }
 
         @Override
         public int getItemCount() {
             return bookingList != null ? bookingList.size() : 0;
+        }
+
+        // Простая функция форматирования даты (вместо Utils.DateUtils)
+        private String formatBookingDate(String isoDate) {
+            if (isoDate == null) return "";
+            // Пример: "2025-12-21T18:00:00" → "21.12.2025 18:00"
+            try {
+                String[] parts = isoDate.split("T");
+                String date = parts[0].replace("-", ".");
+                String time = parts[1].substring(0, 5);
+                String[] d = date.split("\\.");
+                return d[2] + "." + d[1] + "." + d[0] + " " + time;
+            } catch (Exception e) {
+                return isoDate;
+            }
+        }
+
+        // Простая функция для статуса (вместо Utils.BookingHelper)
+        private String getStatusText(String status) {
+            if (status == null) return "Неизвестно";
+            switch (status.toLowerCase()) {
+                case "ожидание": return "Ожидает подтверждения";
+                case "confirmed": return "Подтверждено";
+                case "completed": return "Завершено";
+                case "cancelled": return "Отменено";
+                default: return status;
+            }
         }
 
         public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -173,4 +222,3 @@ public class Adapters {
         }
     }
 }
-

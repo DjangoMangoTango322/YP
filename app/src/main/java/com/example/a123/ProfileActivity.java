@@ -52,11 +52,11 @@ public class ProfileActivity extends AppCompatActivity {
                 progressBar.setVisibility(View.GONE);
                 if (response.isSuccessful() && response.body() != null) {
                     User user = response.body();
-                    editFirstName.setText(user.firstName);
-                    editLastName.setText(user.lastName);
-                    editLogin.setText(user.login);
-                    editPhone.setText(user.phone);
-                    editPassword.setText(user.password);
+                    editFirstName.setText(user.First_Name);
+                    editLastName.setText(user.Last_Name);
+                    editLogin.setText(user.Login);
+                    editPhone.setText(user.Phone);
+                    editPassword.setText(user.Password);
                 } else {
                     Toast.makeText(ProfileActivity.this, "Ошибка загрузки данных", Toast.LENGTH_SHORT).show();
                 }

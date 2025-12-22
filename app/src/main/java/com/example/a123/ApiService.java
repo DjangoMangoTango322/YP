@@ -1,66 +1,84 @@
 package com.example.a123;
 
-import com.example.a123.DataModels;
+import com.example.a123.DataModels.Booking;
+import com.example.a123.DataModels.Dish;
+import com.example.a123.DataModels.Restaurant;
+import com.example.a123.DataModels.User;
+
 import java.util.List;
+
 import retrofit2.Call;
-import retrofit2.http.*;
+import retrofit2.http.DELETE;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.GET;
+import retrofit2.http.POST;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface ApiService {
 
-    // ---------- USER ----------
+    // Регистрация
     @FormUrlEncoded
-    @POST("api/UserController/AddUser")
+    @POST("api/UserController/ReginU")
     Call<Void> register(
-            @Field("FirstName") String firstName,
-            @Field("LastName") String lastName,
+            @Field("First_Name") String firstName,
+            @Field("Last_Name") String lastName,
             @Field("Login") String login,
             @Field("Phone") String phone,
             @Field("Password") String password
     );
 
-    @FormUrlEncoded
-    @POST("api/UserController/LoginUser")
-    Call<ApiClient.LoginResult> login(
-            @Field("login") String login,
-            @Field("password") String password
+    // Безопасный логин
+    @GET("api/UserController/Login")
+    Call<UserIdResponse> loginUser(
+            @Query("login") String login,
+            @Query("password") String password
     );
 
-    @GET("api/UserController/GetUserById/{id}")
-    Call<DataModels.User> getUserById(@Path("id") int id);
+    // Получение пользователя по ID — НОВЫЙ МЕТОД
+    @GET("api/UserController/GetUserById")
+    Call<User> getUserById(@Query("id") int id);
 
+    // Обновление пользователя — НОВЫЙ МЕТОД
     @FormUrlEncoded
-    @PUT("api/UserController/UpdateUser")
+    @POST("api/UserController/UpdateUser")
     Call<Void> updateUser(
             @Field("Id") int id,
-            @Field("FirstName") String firstName,
-            @Field("LastName") String lastName,
+            @Field("First_Name") String firstName,
+            @Field("Last_Name") String lastName,
             @Field("Login") String login,
             @Field("Phone") String phone,
             @Field("Password") String password
     );
 
-    // ---------- RESTAURANTS ----------
+    // Остальные методы (рестораны, меню, брони и т.д.)
     @GET("api/RestaurantController/GetAllRestaurants")
-    Call<List<DataModels.Restaurant>> getRestaurants();
+    Call<List<Restaurant>> getRestaurants();
 
-    @GET("api/RestaurantController/GetRestaurantById/{id}")
-    Call<DataModels.Restaurant> getRestaurantById(@Path("id") int id);
+    @GET("api/RestaurantController/GetRestaurantById")
+    Call<Restaurant> getRestaurantById(@Query("id") int id);
 
-    // ---------- BOOKINGS ----------
+    @GET("api/RestaurantDishController/GetDishesByRestaurantId")
+    Call<List<Dish>> getRestaurantMenu(@Query("restaurantId") int restaurantId);
+
     @FormUrlEncoded
     @POST("api/BookingController/CreateBooking")
     Call<Void> createBooking(
-            @Field("UserId") int userId,
-            @Field("RestaurantId") int restaurantId,
-            @Field("BookingDate") String bookingDate,
-            @Field("NumberOfPeople") int numberOfPeople,
+            @Field("User_Id") int userId,
+            @Field("Restaurant_Id") int restaurantId,
+            @Field("Booking_Date") String date,
+            @Field("Number_Of_Guests") int guests,
             @Field("Status") String status,
-            @Field("SpecialRequests") String specialRequests
+            @Field("Created_At") String createdAt
     );
 
-    @GET("api/BookingController/GetBookingsByUserId/{userId}")
-    Call<List<DataModels.Booking>> getBookingsByUserId(@Path("userId") int userId);
+    @GET("api/BookingController/GetAllBookings")
+    Call<List<Booking>> getAllBookings();
 
-    @DELETE("api/BookingController/DeleteBooking/{userId}")
-    Call<Void> cancelBooking(@Path("userId") int userId);
+    @DELETE("api/BookingController/DeleteBooking/{userId}/{restaurantId}")
+    Call<Void> cancelBooking(
+            @Path("userId") int userId,
+            @Path("restaurantId") int restaurantId
+    );
 }

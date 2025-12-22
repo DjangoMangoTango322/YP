@@ -1,63 +1,67 @@
 package com.example.a123;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
+import com.google.gson.annotations.SerializedName;
 
 public class DataModels {
 
-    // ---------- USER ----------
-    public static class User implements Serializable {
-        public int id;
-        public String firstName;
-        public String lastName;
-        public String login;
-        public String phone;
-        public String password;
 
-        // Геттеры для совместимости
-        public int getId() { return id; }
-        public String getFirstName() { return firstName; }
-        public String getLastName() { return lastName; }
-        public String getLogin() { return login; }
-        public String getPhone() { return phone; }
-        public String getPassword() { return password; }
+
+    public class User {
+
+        public int Id;
+
+        @SerializedName("First_Name")
+        public String First_Name;
+
+        @SerializedName("Last_Name")
+        public String Last_Name;
+
+        @SerializedName("Phone")
+        public String Phone;
+
+        @SerializedName("Password")
+        public String Password;
+
+        @SerializedName("Login")
+        public String Login;
+
+        // Обязательно пустой конструктор для Gson
+        public User() {
+        }
     }
 
-    // ---------- RESTAURANT ----------
     public static class Restaurant implements Serializable {
-        public int id;
-        public String name;
-        public String address;
-        public String cuisineType;
-        public double rating;
-        public String phone;
-        public String openingHours;
-        public String imageUrl;
-        public List<Dish> menu;
+        public int Id;
+        public String Name;
+        public String Address;
+        public int Capacity;
+        public String Open_Time;
+        public String Close_Time;
+        public String Tematic;
+
+        // Для UI
+        public double rating = 4.5;
     }
 
-    // ---------- DISH ----------
     public static class Dish implements Serializable {
-        public int id;
-        public String name;
-        public String description;
-        public double price;
-        public String category;
-        public boolean isVegetarian;
-        public boolean isSpicy;
-        public String imageUrl;
+        public int Id;
+        public String Name;
+        public String Description;
+        public double Price;
+        public String Category;
+        public boolean isVegetarian = false;
     }
 
-    // ---------- BOOKING ----------
     public static class Booking implements Serializable {
-        public int id;
-        public int userId;
-        public int restaurantId;
-        public String restaurantName;
-        public Date bookingDate;
-        public int numberOfPeople;
-        public String status;
-        public String specialRequests;
+        public int Id;
+        public int User_Id;
+        public int Restaurant_Id;
+        public String Booking_Date;
+        public int Number_Of_Guests;
+        public String Status;
+        public String Created_At;
+
+        public String restaurantName; // заполняется вручную
     }
 }
