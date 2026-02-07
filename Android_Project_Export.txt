@@ -1,0 +1,3917 @@
+﻿ANDROID PROJECT EXPORT - 02/07/2026 16:50:47
+Project Path: C:\Users\student-a502.PERMAVIAT\Desktop\dfdsfddsfsdfdsfsdfsdfsdf\YP
+Total Files: 62
+Project Structure:
+
+================================================================================
+IMPORTANT CONFIG FILE: build.gradle
+================================================================================
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+plugins {
+alias(libs.plugins.android.application) apply false
+
+}
+
+
+================================================================================
+IMPORTANT CONFIG FILE: app\build.gradle
+================================================================================
+plugins {
+    alias(libs.plugins.android.application)
+}
+
+android {
+    namespace 'com.example.a123'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId "com.example.a123"
+        minSdk 27
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+    buildFeatures {
+        viewBinding true
+    }
+}
+
+
+dependencies {
+
+    implementation 'com.github.bumptech.glide:glide:4.16.0'
+    implementation libs.appcompat
+    implementation libs.material
+    implementation libs.activity
+    implementation libs.constraintlayout
+    testImplementation libs.junit
+    androidTestImplementation libs.ext.junit
+    androidTestImplementation libs.espresso.core
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation libs.navigation.fragment
+    implementation libs.navigation.ui
+    implementation libs.recyclerview
+    implementation libs.cardview
+    implementation libs.retrofit
+    implementation libs.retrofit.converter.gson
+    implementation libs.glide
+    implementation libs.okhttp.logging
+    implementation libs.lifecycle.viewmodel
+    implementation libs.lifecycle.livedata
+}
+
+
+================================================================================
+IMPORTANT CONFIG FILE: settings.gradle
+================================================================================
+pluginManagement {
+    repositories {
+        google {
+            content {
+                includeGroupByRegex("com\\.android.*")
+                includeGroupByRegex("com\\.google.*")
+                includeGroupByRegex("androidx.*")
+            }
+        }
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.name = "123"
+include ':app'
+
+
+
+================================================================================
+IMPORTANT CONFIG FILE: gradle.properties
+================================================================================
+# Project-wide Gradle settings.
+# IDE (e.g. Android Studio) users:
+# Gradle settings configured through the IDE *will override*
+# any settings specified in this file.
+# For more details on how to configure your build environment visit
+# http://www.gradle.org/docs/current/userguide/build_environment.html
+# Specifies the JVM arguments used for the daemon process.
+# The setting is particularly useful for tweaking memory settings.
+org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
+# When configured, Gradle will run in incubating parallel mode.
+# This option should only be used with decoupled projects. For more details, visit
+# https://developer.android.com/r/tools/gradle-multi-project-decoupled-projects
+# org.gradle.parallel=true
+# AndroidX package structure to make it clearer which packages are bundled with the
+# Android operating system, and which are packaged with your app's APK
+# https://developer.android.com/topic/libraries/support-library/androidx-rn
+android.useAndroidX=true
+# Enables namespacing of each library's R class so that its R class includes only the
+# resources declared in the library itself and none from the library's dependencies,
+# thereby reducing the size of the R class for that library
+android.nonTransitiveRClass=true
+
+
+================================================================================
+IMPORTANT CONFIG FILE: app\src\main\AndroidManifest.xml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+
+        android:allowBackup="true"
+
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme._123"
+        android:networkSecurityConfig="@xml/network_security_config"
+        tools:targetApi="31">
+
+
+        <!-- Точка входа в приложение -->
+        <activity
+            android:name=".LoginActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Остальные реально существующие Activity -->
+        <activity android:name=".RegisterActivity"/>
+        <activity android:name=".RestaurantListActivity"/>
+        <activity android:name=".RestaurantDetailActivity" />
+        <activity android:name=".NewsActivity" />
+        <activity android:name=".ProfileActivity" />
+        <activity android:name=".EditProfileActivity" />
+    </application>
+
+</manifest>
+
+
+================================================================================
+IMPORTANT CONFIG FILE: app\proguard-rules.pro
+================================================================================
+# Add project specific ProGuard rules here.
+# You can control the set of applied configuration files using the
+# proguardFiles setting in build.gradle.
+#
+# For more details, see
+#   http://developer.android.com/guide/developing/tools/proguard.html
+
+# If your project uses WebView with JS, uncomment the following
+# and specify the fully qualified class name to the JavaScript interface
+# class:
+#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
+#   public *;
+#}
+
+# Uncomment this to preserve the line number information for
+# debugging stack traces.
+#-keepattributes SourceFile,LineNumberTable
+
+# If you keep the line number information, uncomment this to
+# hide the original source file name.
+#-renamesourcefileattribute SourceFile
+
+
+================================================================================
+IMPORTANT CONFIG FILE: local.properties
+================================================================================
+## This file must *NOT* be checked into Version Control Systems,
+# as it contains information specific to your local configuration.
+#
+# Location of the SDK. This is only used by Gradle.
+# For customization when using a Version Control System, please read the
+# header note.
+#Sat Feb 07 16:05:58 YEKT 2026
+sdk.dir=C\:\\Users\\student-a502.PERMAVIAT\\AppData\\Local\\Android\\Sdk
+
+
+
+DIRECTORY STRUCTURE:
+-------------------
+app\
+app\src\
+app\src\androidTest\
+app\src\main\
+app\src\test\
+app\src\androidTest\java\
+app\src\androidTest\java\com\
+app\src\androidTest\java\com\example\
+app\src\androidTest\java\com\example\a123\
+app\src\main\java\
+app\src\main\res\
+app\src\main\java\com\
+app\src\main\java\com\example\
+app\src\main\java\com\example\a123\
+app\src\main\res\drawable\
+app\src\main\res\layout\
+app\src\main\res\mipmap-anydpi\
+app\src\main\res\mipmap-hdpi\
+app\src\main\res\mipmap-mdpi\
+app\src\main\res\mipmap-xhdpi\
+app\src\main\res\mipmap-xxhdpi\
+app\src\main\res\mipmap-xxxhdpi\
+app\src\main\res\values\
+app\src\main\res\values-night\
+app\src\main\res\xml\
+app\src\test\java\
+app\src\test\java\com\
+app\src\test\java\com\example\
+app\src\test\java\com\example\a123\
+
+================================================================================
+FILE: gradlew.bat
+================================================================================
+@rem
+@rem Copyright 2015 the original author or authors.
+@rem
+@rem Licensed under the Apache License, Version 2.0 (the "License");
+@rem you may not use this file except in compliance with the License.
+@rem You may obtain a copy of the License at
+@rem
+@rem      https://www.apache.org/licenses/LICENSE-2.0
+@rem
+@rem Unless required by applicable law or agreed to in writing, software
+@rem distributed under the License is distributed on an "AS IS" BASIS,
+@rem WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+@rem See the License for the specific language governing permissions and
+@rem limitations under the License.
+@rem
+
+@if "%DEBUG%" == "" @echo off
+@rem ##########################################################################
+@rem
+@rem  Gradle startup script for Windows
+@rem
+@rem ##########################################################################
+
+@rem Set local scope for the variables with windows NT shell
+if "%OS%"=="Windows_NT" setlocal
+
+set DIRNAME=%~dp0
+if "%DIRNAME%" == "" set DIRNAME=.
+set APP_BASE_NAME=%~n0
+set APP_HOME=%DIRNAME%
+
+@rem Resolve any "." and ".." in APP_HOME to make it shorter.
+for %%i in ("%APP_HOME%") do set APP_HOME=%%~fi
+
+@rem Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
+set DEFAULT_JVM_OPTS="-Xmx64m" "-Xms64m"
+
+@rem Find java.exe
+if defined JAVA_HOME goto findJavaFromJavaHome
+
+set JAVA_EXE=java.exe
+%JAVA_EXE% -version >NUL 2>&1
+if "%ERRORLEVEL%" == "0" goto execute
+
+echo.
+echo ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
+echo.
+echo Please set the JAVA_HOME variable in your environment to match the
+echo location of your Java installation.
+
+goto fail
+
+:findJavaFromJavaHome
+set JAVA_HOME=%JAVA_HOME:"=%
+set JAVA_EXE=%JAVA_HOME%/bin/java.exe
+
+if exist "%JAVA_EXE%" goto execute
+
+echo.
+echo ERROR: JAVA_HOME is set to an invalid directory: %JAVA_HOME%
+echo.
+echo Please set the JAVA_HOME variable in your environment to match the
+echo location of your Java installation.
+
+goto fail
+
+:execute
+@rem Setup the command line
+
+set CLASSPATH=%APP_HOME%\gradle\wrapper\gradle-wrapper.jar
+
+
+@rem Execute Gradle
+"%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %GRADLE_OPTS% "-Dorg.gradle.appname=%APP_BASE_NAME%" -classpath "%CLASSPATH%" org.gradle.wrapper.GradleWrapperMain %*
+
+:end
+@rem End local scope for the variables with windows NT shell
+if "%ERRORLEVEL%"=="0" goto mainEnd
+
+:fail
+rem Set variable GRADLE_EXIT_CONSOLE if you need the _script_ return code instead of
+rem the _cmd.exe /c_ return code!
+if  not "" == "%GRADLE_EXIT_CONSOLE%" exit 1
+exit /b 1
+
+:mainEnd
+if "%OS%"=="Windows_NT" endlocal
+
+:omega
+
+
+
+================================================================================
+FILE: app\src\androidTest\java\com\example\a123\ExampleInstrumentedTest.java
+================================================================================
+package com.example.a123;
+
+import android.content.Context;
+
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
+import static org.junit.Assert.*;
+
+/**
+ * Instrumented test, which will execute on an Android device.
+ *
+ * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
+ */
+@RunWith(AndroidJUnit4.class)
+public class ExampleInstrumentedTest {
+    @Test
+    public void useAppContext() {
+        // Context of the app under test.
+        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        assertEquals("com.example.a123", appContext.getPackageName());
+    }
+}
+
+
+================================================================================
+FILE: app\src\main\java\com\example\a123\Activities.java
+================================================================================
+package com.example.a123;
+
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
+import retrofit2.Call;
+import retrofit2.http.DELETE;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.GET;
+import retrofit2.http.POST;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.a123.Adapters.MenuAdapter;
+import com.example.a123.Adapters.RestaurantAdapter;
+import com.example.a123.DataModels.Booking;
+import com.example.a123.DataModels.Dish;
+import com.example.a123.DataModels.Restaurant;
+import com.example.a123.DataModels.User;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class Activities {
+
+    // ---------- ЛОГИН ----------
+
+
+    // ---------- РЕГИСТРАЦИЯ ----------
+
+
+    // ---------- СПИСОК РЕСТОРАНОВ ----------
+
+
+
+
+    // ---------- ПРОФИЛЬ ----------
+
+}
+
+
+================================================================================
+FILE: app\src\main\java\com\example\a123\Adapters.java
+================================================================================
+package com.example.a123;
+
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.a123.DataModels.Booking;
+import com.example.a123.DataModels.Dish;
+import com.example.a123.DataModels.Restaurant;
+
+import java.util.List;
+import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class Adapters {
+
+    // RestaurantAdapter
+    public static class RestaurantAdapter extends RecyclerView.Adapter<RestaurantAdapter.ViewHolder> {
+
+        public interface OnRestaurantClickListener {
+            void onRestaurantClick(Restaurant restaurant);
+        }
+
+        private List<Restaurant> restaurantList;
+        private OnRestaurantClickListener listener;
+
+        public RestaurantAdapter(List<Restaurant> restaurantList, OnRestaurantClickListener listener) {
+            this.restaurantList = restaurantList;
+            this.listener = listener;
+        }
+
+        @NonNull
+        @Override
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_restaurant, parent, false);
+            return new ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+            Restaurant r = restaurantList.get(position);
+            holder.nameTextView.setText(r.name);
+            holder.addressTextView.setText(r.address);
+            holder.ratingTextView.setText(String.format(Locale.getDefault(), "★ %.1f", 4.5));
+            holder.cuisineTextView.setText(r.tematic != null ? r.tematic : "");
+            holder.cardView.setOnClickListener(v -> {
+                if (listener != null) listener.onRestaurantClick(r);
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            return restaurantList != null ? restaurantList.size() : 0;
+        }
+
+        public static class ViewHolder extends RecyclerView.ViewHolder {
+            CardView cardView;
+            TextView nameTextView, addressTextView, ratingTextView, cuisineTextView;
+
+            public ViewHolder(@NonNull View itemView) {
+                super(itemView);
+                cardView = itemView.findViewById(R.id.cardView);
+                nameTextView = itemView.findViewById(R.id.restaurantName);
+                addressTextView = itemView.findViewById(R.id.addressTextView);
+                ratingTextView = itemView.findViewById(R.id.ratingTextView);
+                cuisineTextView = itemView.findViewById(R.id.cuisineTextView);
+            }
+        }
+    }
+
+    // MenuAdapter
+    public static class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.ViewHolder> {
+        private List<Dish> menuList;
+
+        public MenuAdapter(List<Dish> menuList) {
+            this.menuList = menuList;
+        }
+
+        @NonNull
+        @Override
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_menu, parent, false);
+            return new ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+            Dish d = menuList.get(position);
+            holder.dishNameTextView.setText(d.name);
+            holder.dishDescriptionTextView.setText(d.description);
+            holder.dishPriceTextView.setText(String.format(Locale.getDefault(), "%.0f ₽", d.price));
+            holder.dishCategoryTextView.setText(d.category != null ? d.category : "");
+            holder.vegetarianBadge.setVisibility(d.isVegetarian ? View.VISIBLE : View.GONE);
+        }
+
+        @Override
+        public int getItemCount() {
+            return menuList != null ? menuList.size() : 0;
+        }
+
+        public static class ViewHolder extends RecyclerView.ViewHolder {
+            TextView dishNameTextView, dishDescriptionTextView, dishPriceTextView, dishCategoryTextView, vegetarianBadge;
+
+            public ViewHolder(@NonNull View itemView) {
+                super(itemView);
+                dishNameTextView = itemView.findViewById(R.id.dishNameTextView);
+                dishDescriptionTextView = itemView.findViewById(R.id.dishDescriptionTextView);
+                dishPriceTextView = itemView.findViewById(R.id.dishPriceTextView);
+                dishCategoryTextView = itemView.findViewById(R.id.dishCategoryTextView);
+                vegetarianBadge = itemView.findViewById(R.id.vegetarianBadge);
+            }
+        }
+    }
+
+    // BookingsAdapter
+    public static class BookingsAdapter extends RecyclerView.Adapter<BookingsAdapter.ViewHolder> {
+        private List<Booking> bookingList;
+
+        public BookingsAdapter(List<Booking> bookingList) {
+            this.bookingList = bookingList;
+        }
+
+        @NonNull
+        @Override
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_booking, parent, false);
+            return new ViewHolder(view);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+            Booking b = bookingList.get(position);
+            holder.restaurantNameTextView.setText(b.restaurantName != null ? b.restaurantName : "Загрузка...");
+            holder.bookingDateTextView.setText(b.booking_Date != null ? formatBookingDate(b.booking_Date) : "");
+            holder.peopleCountTextView.setText(b.number_Of_Guests + " чел.");
+            holder.statusTextView.setText(getStatusText(b.status));
+            holder.cancelButton.setVisibility(
+                    ("completed".equalsIgnoreCase(b.status) || "cancelled".equalsIgnoreCase(b.status))
+                            ? View.GONE : View.VISIBLE
+            );
+
+            holder.cancelButton.setOnClickListener(v -> {
+                int currentPosition = holder.getAdapterPosition();
+                if (currentPosition == RecyclerView.NO_POSITION) return;
+
+                Booking booking = bookingList.get(currentPosition);
+
+                ApiClient.getApiService().cancelBooking(booking.user_Id, booking.restaurant_Id)
+                        .enqueue(new Callback<Void>() {
+                            @Override
+                            public void onResponse(Call<Void> call, Response<Void> response) {
+                                if (response.isSuccessful()) {
+                                    booking.status = "cancelled";
+                                    notifyItemChanged(currentPosition);
+                                } else {
+                                    Toast.makeText(v.getContext(), "Ошибка отмены бронирования", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<Void> call, Throwable t) {
+                                Toast.makeText(v.getContext(), "Ошибка соединения", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            return bookingList != null ? bookingList.size() : 0;
+        }
+
+        private String formatBookingDate(String isoDate) {
+            if (isoDate == null) return "";
+            // Пример: "2025-12-21T18:00:00" → "21.12.2025 18:00"
+            try {
+                String[] parts = isoDate.split("T");
+                String date = parts[0].replace("-", ".");
+                String time = parts[1].substring(0, 5);
+                String[] d = date.split("\\.");
+                return d[2] + "." + d[1] + "." + d[0] + " " + time;
+            } catch (Exception e) {
+                return isoDate;
+            }
+        }
+
+        private String getStatusText(String status) {
+            if (status == null) return "Неизвестно";
+            switch (status.toLowerCase()) {
+                case "ожидание": return "Ожидает подтверждения";
+                case "confirmed": return "Подтверждено";
+                case "completed": return "Завершено";
+                case "cancelled": return "Отменено";
+                default: return status;
+            }
+        }
+
+        public static class ViewHolder extends RecyclerView.ViewHolder {
+            TextView restaurantNameTextView, bookingDateTextView, peopleCountTextView, statusTextView;
+            Button cancelButton;
+
+            public ViewHolder(@NonNull View itemView) {
+                super(itemView);
+                restaurantNameTextView = itemView.findViewById(R.id.restaurantNameTextView);
+                bookingDateTextView = itemView.findViewById(R.id.bookingDateTextView);
+                peopleCountTextView = itemView.findViewById(R.id.peopleCountTextView);
+                statusTextView = itemView.findViewById(R.id.statusTextView);
+                cancelButton = itemView.findViewById(R.id.cancelButton);
+            }
+        }
+    }
+}
+
+
+================================================================================
+FILE: app\src\main\java\com\example\a123\ApiClient.java
+================================================================================
+package com.example.a123;
+
+import com.google.gson.GsonBuilder;
+
+import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+import javax.net.ssl.*;
+import java.security.cert.X509Certificate;
+import java.util.concurrent.TimeUnit;
+
+public class ApiClient {
+
+    private static final String BASE_URL = "http://10.0.2.2:5085/";
+    private static Retrofit retrofit;
+
+    public static ApiService getApiService() {
+
+
+        if (retrofit == null) {
+            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+            OkHttpClient client = new OkHttpClient.Builder()
+                    .followRedirects(true)
+                    .followSslRedirects(true)
+                    .addInterceptor(logging)
+                    .connectTimeout(15, TimeUnit.SECONDS)
+                    .readTimeout(30, TimeUnit.SECONDS)
+                    .build();
+
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(BASE_URL)
+                    .client(client)
+                    .addConverterFactory(GsonConverterFactory.create(
+                            new GsonBuilder()
+                                    .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+                                    .create()
+                    ))
+                    .build();
+        }
+        return retrofit.create(ApiService.class);
+    }
+}
+
+
+================================================================================
+FILE: app\src\main\java\com\example\a123\ApiService.java
+================================================================================
+package com.example.a123;
+
+import com.example.a123.DataModels.Booking;
+import com.example.a123.DataModels.Dish;
+import com.example.a123.DataModels.Restaurant;
+import com.example.a123.DataModels.User;
+import com.example.a123.DataModels.News;
+import java.util.List;
+import retrofit2.Call;
+import retrofit2.http.GET;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.http.Body;
+import retrofit2.http.DELETE;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.GET;
+import retrofit2.http.POST;
+import retrofit2.http.Path;
+import retrofit2.http.Query;
+
+public interface ApiService {
+
+    // Регистрация
+    @POST("api/UserController/AddUser")
+    Call<Void> register(@Body UserRequest user);
+    // Безопасный логин
+    @GET("api/UserController/GetAllUsers")
+    Call<List<UserIdResponse>> getAllUsers();
+
+    @GET("api/UserController/GetUserById/{id}")
+    Call<UserRequest> getUserById(@Path("id") int id);
+
+    // Обновление пользователя — НОВЫЙ МЕТОД
+    @POST("api/UserController/UpdateUser")
+    Call<Void> updateUser(@Body UserRequest user);
+
+    // Остальные методы (рестораны, меню, брони и т.д.)
+    @GET("api/RestaurantController/GetAllRestaurants")
+    Call<List<Restaurant>> getRestaurants();
+
+    @GET("api/RestaurantController/GetRestaurantById/{id}")
+    Call<DataModels.Restaurant> getRestaurantById(@Path("id") int id);
+    @GET("api/RestaurantDishController/GetDishesByRestaurantId/{restaurantId}")
+    Call<List<DataModels.Dish>> getRestaurantMenu(@Path("restaurantId") int id);
+
+    @POST("api/BookingController/CreateBooking")
+    Call<Void> createBooking(@Body BookingRequest booking);
+    @GET("api/BookingController/GetAllBookings")
+    Call<List<Booking>> getAllBookings();
+
+    @DELETE("api/BookingController/DeleteBooking/{userId}/{restaurantId}")
+    Call<Void> cancelBooking(
+            @Path("userId") int userId,
+            @Path("restaurantId") int restaurantId
+    );
+    @GET("api/News/GetAllNews")
+    Call<List<News>> getAllNews();
+}
+
+
+================================================================================
+FILE: app\src\main\java\com\example\a123\BookingRequest.java
+================================================================================
+package com.example.a123;
+
+public class BookingRequest {
+    public int id;
+    public int user_Id;
+    public int restaurant_Id;
+    public String booking_Date;
+    public int number_Of_Guests;
+    public String status;
+    public String created_At;
+}
+
+
+
+================================================================================
+FILE: app\src\main\java\com\example\a123\DataModels.java
+================================================================================
+package com.example.a123;
+
+import java.io.Serializable;
+import com.google.gson.annotations.SerializedName;
+import java.util.Date;
+
+public class DataModels {
+
+
+
+    public class User {
+        @SerializedName("id")
+        public int Id;
+
+        @SerializedName("first_Name")
+        public String First_Name;
+
+        @SerializedName("last_Name")
+        public String Last_Name;
+
+        @SerializedName("login")
+        public String Login;
+
+        @SerializedName("phone")
+        public String Phone;
+
+        @SerializedName("password")
+        public String Password;
+    }
+
+    public static class Restaurant implements Serializable {
+        public int id;
+        public String name;
+        public String address;
+        public int capacity;
+        public String open_Time;
+        public String close_Time;
+        public String tematic;
+
+        // Для UI
+        public double rating = 4.5;
+    }
+    public class News {
+        private int id;
+        private String title;
+        private String description;
+        private String imageUrl;
+        private Date publishDate;
+
+        // Геттеры
+        public int getId() { return id; }
+        public String getTitle() { return title; }
+        public String getDescription() { return description; }
+        public String getImageUrl() { return imageUrl; }
+        public Date getPublishDate() { return publishDate; }
+    }
+    public static class Dish implements Serializable {
+        public int id;
+        public String name;
+        public String description;
+        public double price;
+        public String category;
+        public boolean isVegetarian;
+    }
+
+
+    public class Booking {
+        public int id;
+        public int user_Id;
+        public int restaurant_Id;
+        public String booking_Date;
+        public int number_Of_Guests;
+        public String status;
+        public String created_At;
+
+        public String restaurantName;
+        public String restaurantAddress;
+        public String restaurantCuisine;
+    }
+}
+
+
+================================================================================
+FILE: app\src\main\java\com\example\a123\EditProfileActivity.java
+================================================================================
+package com.example.a123;
+
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class EditProfileActivity extends AppCompatActivity {
+
+    private EditText editFirstName, editLastName, editLogin, editPhone, editPassword;
+    private ProgressBar progressBar;
+    private Button saveButton;
+    private int userId;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_edit_profile);
+
+        editFirstName = findViewById(R.id.editFirstName);
+        editLastName = findViewById(R.id.editLastName);
+        editLogin = findViewById(R.id.editLogin);
+        editPhone = findViewById(R.id.editPhone);
+        editPassword = findViewById(R.id.editPassword);
+        progressBar = findViewById(R.id.progressBar);
+        saveButton = findViewById(R.id.editProfileButton);
+
+        userId = getIntent().getIntExtra("userId", 0);
+        if (userId == 0) {
+            Toast.makeText(this, "Ошибка: не найден пользователь", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        loadUserData();
+
+        saveButton.setOnClickListener(v -> saveChanges());
+    }
+
+    private void loadUserData() {
+        progressBar.setVisibility(ProgressBar.VISIBLE);
+
+        ApiClient.getApiService().getUserById(userId).enqueue(new Callback<UserRequest>() {
+            @Override
+            public void onResponse(Call<UserRequest> call, Response<UserRequest> response) {
+                progressBar.setVisibility(ProgressBar.GONE);
+                if (response.isSuccessful() && response.body() != null) {
+                    UserRequest user = response.body();
+                    editFirstName.setText(user.first_Name);
+                    editLastName.setText(user.last_Name);
+                    editLogin.setText(user.login);
+                    editPhone.setText(user.phone);
+                    editPassword.setText(user.password);
+                } else {
+                    Toast.makeText(EditProfileActivity.this, "Ошибка загрузки данных", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserRequest> call, Throwable t) {
+                progressBar.setVisibility(ProgressBar.GONE);
+                Toast.makeText(EditProfileActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void saveChanges() {
+        UserRequest user = new UserRequest();
+        user.id = userId;
+        user.first_Name = editFirstName.getText().toString().trim();
+        user.last_Name = editLastName.getText().toString().trim();
+        user.login = editLogin.getText().toString().trim();
+        user.phone = editPhone.getText().toString().trim();
+        user.password = editPassword.getText().toString().trim();
+
+        ApiClient.getApiService().updateUser(user).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                progressBar.setVisibility(ProgressBar.GONE);
+
+                if (response.isSuccessful()) {
+                    Toast.makeText(EditProfileActivity.this, "Профиль успешно обновлён!", Toast.LENGTH_SHORT).show();
+                    setResult(RESULT_OK);
+                    finish();
+                } else {
+                    Toast.makeText(EditProfileActivity.this, "Ошибка при сохранении изменений", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                progressBar.setVisibility(ProgressBar.GONE);
+                Toast.makeText(EditProfileActivity.this, "Ошибка сети: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+}
+
+
+
+================================================================================
+FILE: app\src\main\java\com\example\a123\LoginActivity.java
+================================================================================
+package com.example.a123;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class LoginActivity extends AppCompatActivity {
+    private EditText loginEditText, passwordEditText;
+    private ProgressBar progressBar;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_login);
+
+        loginEditText = findViewById(R.id.loginEditText);
+        passwordEditText = findViewById(R.id.passwordEditText);
+        progressBar = findViewById(R.id.progressBar);
+        Button loginButton = findViewById(R.id.loginButton);
+        TextView registerLink = findViewById(R.id.registerLink);
+
+        loginButton.setOnClickListener(v -> loginUser());
+        registerLink.setOnClickListener(v -> startActivity(new Intent(this, RegisterActivity.class)));
+    }
+
+    private void loginUser() {
+        String enteredLogin = loginEditText.getText().toString().trim();
+        String enteredPassword = passwordEditText.getText().toString().trim();
+
+        if (enteredLogin.isEmpty() || enteredPassword.isEmpty()) {
+            Toast.makeText(this, "Введите логин и пароль", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        progressBar.setVisibility(View.VISIBLE);
+
+        ApiClient.getApiService().getAllUsers()
+                .enqueue(new Callback<List<UserIdResponse>>() {
+                    @Override
+                    public void onResponse(Call<List<UserIdResponse>> call,
+                                           Response<List<UserIdResponse>> response) {
+                        progressBar.setVisibility(View.GONE);
+
+                        if (!response.isSuccessful() || response.body() == null) {
+                            Toast.makeText(LoginActivity.this, "Ошибка сервера", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        UserIdResponse foundUser = null;
+
+                        for (UserIdResponse user : response.body()) {
+                            if (enteredLogin.equals(user.login)
+                                    && enteredPassword.equals(user.password)) {
+                                foundUser = user;
+                                break;
+                            }
+                        }
+
+                        if (foundUser != null) {
+                            saveUserId(foundUser.id);
+
+                            Toast.makeText(
+                                    LoginActivity.this,
+                                    "Добро пожаловать, " + foundUser.first_Name,
+                                    Toast.LENGTH_SHORT
+                            ).show();
+
+                            startActivity(
+                                    new Intent(LoginActivity.this, RestaurantListActivity.class)
+                            );
+                            finish();
+
+                        } else {
+                            Toast.makeText(
+                                    LoginActivity.this,
+                                    "Неверный логин или пароль",
+                                    Toast.LENGTH_SHORT
+                            ).show();
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<UserIdResponse>> call, Throwable t) {
+                        progressBar.setVisibility(View.GONE);
+                        Toast.makeText(LoginActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+    private void saveUserId(int userId) {
+        getSharedPreferences("app_prefs", MODE_PRIVATE)
+                .edit()
+                .putInt("user_id", userId)
+                .apply();
+    }
+}
+
+
+================================================================================
+FILE: app\src\main\java\com\example\a123\NewsActivity.java
+================================================================================
+package com.example.a123;
+
+import android.os.Bundle;
+import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import com.example.a123.DataModels.News;
+import java.util.List;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class NewsActivity extends AppCompatActivity {
+    private RecyclerView recyclerView;
+    private NewsAdapter adapter;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_news);
+
+        recyclerView = findViewById(R.id.recyclerViewNews);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        loadNewsFromApi();
+    }
+
+    private void loadNewsFromApi() {
+        // ИСПРАВЛЕНО: Вместо RetrofitInstance используем ваш ApiClient
+        ApiClient.getApiService().getAllNews().enqueue(new Callback<List<News>>() {
+            @Override
+            public void onResponse(Call<List<News>> call, Response<List<News>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    adapter = new NewsAdapter(response.body());
+                    recyclerView.setAdapter(adapter);
+                } else {
+                    Toast.makeText(NewsActivity.this, "Ошибка сервера: " + response.code(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<News>> call, Throwable t) {
+                Toast.makeText(NewsActivity.this, "Ошибка сети: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+}
+
+
+================================================================================
+FILE: app\src\main\java\com\example\a123\NewsAdapter.java
+================================================================================
+package com.example.a123;
+
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+import com.bumptech.glide.Glide;
+import com.example.a123.DataModels.News;
+import java.util.List;
+
+public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.ViewHolder> {
+    private List<News> newsList;
+
+    public NewsAdapter(List<News> newsList) {
+        this.newsList = newsList;
+    }
+
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_news, parent, false);
+        return new ViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        News news = newsList.get(position);
+        holder.title.setText(news.getTitle());
+        holder.desc.setText(news.getDescription());
+
+        // Загрузка изображения по URL
+        Glide.with(holder.itemView.getContext())
+                .load(news.getImageUrl())
+                .placeholder(R.drawable.ic_launcher_background) // заглушка пока грузится
+                .into(holder.image);
+    }
+
+    @Override
+    public int getItemCount() {
+        return newsList.size();
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        TextView title, desc;
+        ImageView image;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+            title = itemView.findViewById(R.id.newsTitle);
+            desc = itemView.findViewById(R.id.newsDesc);
+            image = itemView.findViewById(R.id.newsImage);
+        }
+    }
+}
+
+
+================================================================================
+FILE: app\src\main\java\com\example\a123\ProfileActivity.java
+================================================================================
+package com.example.a123;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class ProfileActivity extends AppCompatActivity {
+
+    private TextView userNameTextView, userEmailTextView;
+    private ProgressBar progressBar;
+    private AppCompatButton editButton;
+    private RecyclerView bookingsRecyclerView;
+    private int userId;
+
+    private List<DataModels.Restaurant> allRestaurants = new ArrayList<>();
+    private List<DataModels.Booking> filteredBookings = new ArrayList<>();
+    private Adapters.BookingsAdapter bookingsAdapter;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_profile);
+
+        userNameTextView = findViewById(R.id.userNameTextView);
+        userEmailTextView = findViewById(R.id.userEmailTextView);
+        progressBar = findViewById(R.id.progressBar);
+        editButton = findViewById(R.id.editButton);
+        bookingsRecyclerView = findViewById(R.id.bookingsRecyclerView);
+
+        bookingsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        bookingsAdapter = new Adapters.BookingsAdapter(filteredBookings);
+        bookingsRecyclerView.setAdapter(bookingsAdapter);
+
+        // Получаем ID пользователя
+        userId = getIntent().getIntExtra("userId", 0);
+        if (userId == 0) {
+            Toast.makeText(this, "Пользователь не авторизован", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        loadUserData();
+
+        editButton.setOnClickListener(v -> {
+            Intent intent = new Intent(ProfileActivity.this, EditProfileActivity.class);
+            intent.putExtra("userId", userId);
+            startActivityForResult(intent, 101);
+        });
+    }
+
+    private void loadUserData() {
+        progressBar.setVisibility(View.VISIBLE);
+
+        // 1. Загружаем пользователя
+        ApiClient.getApiService().getUserById(userId).enqueue(new Callback<UserRequest>() {
+            @Override
+            public void onResponse(Call<UserRequest> call, Response<UserRequest> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    UserRequest user = response.body();
+                    userNameTextView.setText(user.first_Name + " " + user.last_Name);
+                    userEmailTextView.setText(user.login);
+
+                    // После этого загружаем рестораны
+                    loadRestaurants();
+                } else {
+                    progressBar.setVisibility(View.GONE);
+                    Toast.makeText(ProfileActivity.this, "Ошибка загрузки данных пользователя", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserRequest> call, Throwable t) {
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(ProfileActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void loadRestaurants() {
+        ApiClient.getApiService().getRestaurants().enqueue(new Callback<List<DataModels.Restaurant>>() {
+            @Override
+            public void onResponse(Call<List<DataModels.Restaurant>> call, Response<List<DataModels.Restaurant>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    allRestaurants.clear();
+                    allRestaurants.addAll(response.body());
+
+                    // После ресторанов загружаем бронирования
+                    loadBookings();
+                } else {
+                    progressBar.setVisibility(View.GONE);
+                    Toast.makeText(ProfileActivity.this, "Ошибка загрузки ресторанов", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<DataModels.Restaurant>> call, Throwable t) {
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(ProfileActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void loadBookings() {
+        ApiClient.getApiService().getAllBookings().enqueue(new Callback<List<DataModels.Booking>>() {
+            @Override
+            public void onResponse(Call<List<DataModels.Booking>> call, Response<List<DataModels.Booking>> response) {
+                progressBar.setVisibility(View.GONE);
+                if (response.isSuccessful() && response.body() != null) {
+                    filteredBookings.clear();
+
+                    for (DataModels.Booking b : response.body()) {
+                        if (b.user_Id == userId) {
+                            // Находим ресторан для бронирования
+                            for (DataModels.Restaurant r : allRestaurants) {
+                                if (r.id == b.restaurant_Id) {
+                                    b.restaurantName = r.name;
+                                    b.restaurantAddress = r.address;
+                                    b.restaurantCuisine = r.tematic;
+                                    break;
+                                }
+                            }
+                            filteredBookings.add(b);
+                        }
+                    }
+
+                    bookingsAdapter.notifyDataSetChanged();
+
+                    if (filteredBookings.isEmpty()) {
+                        Toast.makeText(ProfileActivity.this, "У вас нет бронирований", Toast.LENGTH_SHORT).show();
+                    }
+
+                } else {
+                    Toast.makeText(ProfileActivity.this, "Ошибка загрузки бронирований", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<DataModels.Booking>> call, Throwable t) {
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(ProfileActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 101 && resultCode == RESULT_OK) {
+            loadUserData();
+        }
+    }
+}
+
+
+
+================================================================================
+FILE: app\src\main\java\com\example\a123\RegisterActivity.java
+================================================================================
+package com.example.a123;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.a123.ApiClient;
+import com.example.a123.R;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class RegisterActivity extends AppCompatActivity {
+    private EditText firstNameEdit, lastNameEdit, loginEdit, phoneEdit, passwordEdit;
+    private ProgressBar progressBar;
+    private Button registerButton;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_register);
+
+        firstNameEdit = findViewById(R.id.nameEditText);
+        lastNameEdit = findViewById(R.id.lastNameEditText);
+        loginEdit = findViewById(R.id.emailEditText);
+        phoneEdit = findViewById(R.id.phoneEditText);
+        passwordEdit = findViewById(R.id.passwordEditText);
+        progressBar = findViewById(R.id.progressBar);
+        registerButton = findViewById(R.id.registerButton);
+
+        registerButton.setOnClickListener(v -> registerUser());
+    }
+
+    private void registerUser() {
+        String f = firstNameEdit.getText().toString().trim();
+        String l = lastNameEdit.getText().toString().trim();
+        String log = loginEdit.getText().toString().trim();
+        String ph = phoneEdit.getText().toString().trim();
+        String pw = passwordEdit.getText().toString().trim();
+
+        if (f.isEmpty() || l.isEmpty() || log.isEmpty() || ph.isEmpty() || pw.isEmpty()) {
+            Toast.makeText(this, "Заполните все поля", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        UserRequest user = new UserRequest();
+        user.first_Name = f;
+        user.last_Name = l;
+        user.login = log;
+        user.phone = ph;
+        user.password = pw;
+
+        progressBar.setVisibility(View.VISIBLE);
+        ApiClient.getApiService().register(user).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call<Void> call, Response<Void> response) {
+                progressBar.setVisibility(View.GONE);
+                if (response.isSuccessful()) {
+                    Toast.makeText(RegisterActivity.this, "Регистрация успешна", Toast.LENGTH_SHORT).show();
+                    finish();
+                } else {
+                    Toast.makeText(RegisterActivity.this, "Ошибка регистрации", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(RegisterActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+}
+
+
+================================================================================
+FILE: app\src\main\java\com\example\a123\RestaurantDetailActivity.java
+================================================================================
+package com.example.a123;
+
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.NumberPicker;
+import android.widget.ProgressBar;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class RestaurantDetailActivity extends AppCompatActivity {
+
+    private TextView restaurantNameTextView, restaurantAddressTextView, ratingTextView, cuisineTextView, openingHoursTextView;
+    private RecyclerView menuRecyclerView;
+    private ProgressBar progressBar;
+    private Button bookTableButton;
+    private int restaurantId, userId;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_restaurant_detail);
+
+        // Инициализация элементов интерфейса
+        restaurantNameTextView = findViewById(R.id.restaurantName);
+        restaurantAddressTextView = findViewById(R.id.restaurantAddressTextView);
+        ratingTextView = findViewById(R.id.ratingTextView);
+        cuisineTextView = findViewById(R.id.cuisineTextView);
+        openingHoursTextView = findViewById(R.id.openingHoursTextView);
+        progressBar = findViewById(R.id.progressBar);
+        menuRecyclerView = findViewById(R.id.menuRecyclerView);
+        bookTableButton = findViewById(R.id.bookTableButton);
+
+        // Настраиваем RecyclerView для меню
+        menuRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        // Получаем ID ресторана
+        restaurantId = getIntent().getIntExtra("restaurantId", 0);
+        userId = getSavedUserId();
+
+        if (userId == 0) {
+            Toast.makeText(this, "Пользователь не авторизован", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        if (restaurantId == 0) {
+            Toast.makeText(this, "Ошибка: ресторан не найден", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        loadRestaurantDetails();
+        loadMenu();
+        Spinner guestsSpinner = findViewById(R.id.guestsSpinner);
+
+        Integer[] guestsArray = new Integer[10];
+        for (int i = 0; i < 10; i++) {
+            guestsArray[i] = i + 1;
+        }
+
+        ArrayAdapter<Integer> adapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_spinner_item, // стандартный вид для выбора
+                guestsArray
+        );
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        guestsSpinner.setAdapter(adapter);
+
+        guestsSpinner.setSelection(1);
+        bookTableButton.setOnClickListener(v -> openBookingDialog());
+    }
+
+    private void loadRestaurantDetails() {
+        progressBar.setVisibility(View.VISIBLE);
+
+        ApiClient.getApiService().getRestaurantById(restaurantId).enqueue(new Callback<DataModels.Restaurant>() {
+            @Override
+            public void onResponse(Call<DataModels.Restaurant> call, Response<DataModels.Restaurant> response) {
+                progressBar.setVisibility(View.GONE);
+                if (response.isSuccessful() && response.body() != null) {
+                    DataModels.Restaurant r = response.body();
+                    restaurantNameTextView.setText(r.name);
+                    restaurantAddressTextView.setText(r.address);
+                    ratingTextView.setText(String.format(Locale.getDefault(), "★ %.1f", 4.5));
+                    cuisineTextView.setText(r.tematic);
+                    openingHoursTextView.setText("Часы работы: " + r.open_Time + " - " + r.close_Time);
+                } else {
+                    Toast.makeText(RestaurantDetailActivity.this, "Ошибка загрузки ресторана", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<DataModels.Restaurant> call, Throwable t) {
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(RestaurantDetailActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void loadMenu() {
+        ApiClient.getApiService().getRestaurantMenu(restaurantId).enqueue(new Callback<List<DataModels.Dish>>() {
+            @Override
+            public void onResponse(Call<List<DataModels.Dish>> call, Response<List<DataModels.Dish>> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<DataModels.Dish> menu = response.body();
+                    Adapters.MenuAdapter adapter = new Adapters.MenuAdapter(menu);
+                    menuRecyclerView.setAdapter(adapter);
+                } else {
+                    Toast.makeText(RestaurantDetailActivity.this, "Ошибка загрузки меню", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<DataModels.Dish>> call, Throwable t) {
+                Toast.makeText(RestaurantDetailActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void openBookingDialog() {
+        // Находим Spinner
+        Spinner guestsSpinner = findViewById(R.id.guestsSpinner);
+
+        // Создаем календарь для даты и времени
+        Calendar calendar = Calendar.getInstance();
+
+        // Диалог выбора даты
+        new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
+            calendar.set(Calendar.YEAR, year);
+            calendar.set(Calendar.MONTH, month);
+            calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+
+            // Диалог выбора времени
+            new TimePickerDialog(this, (timeView, hourOfDay, minute) -> {
+                calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                calendar.set(Calendar.MINUTE, minute);
+
+                String formattedDate = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+                        .format(calendar.getTime());
+
+                int numberOfGuests = (int) guestsSpinner.getSelectedItem();
+
+                if (userId == 0) {
+                    Toast.makeText(this, "Ошибка: пользователь не найден", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // Создаем объект бронирования
+                BookingRequest booking = new BookingRequest();
+                booking.id = 0;
+                booking.user_Id = userId;
+                booking.restaurant_Id = restaurantId;
+                booking.booking_Date = formattedDate;
+                booking.number_Of_Guests = numberOfGuests;
+                booking.status = "Ожидание";
+                booking.created_At = formattedDate;
+
+                // Отправляем запрос на сервер
+                ApiClient.getApiService().createBooking(booking)
+                        .enqueue(new Callback<Void>() {
+                            @Override
+                            public void onResponse(Call<Void> call, Response<Void> response) {
+                                if (response.isSuccessful()) {
+                                    Toast.makeText(RestaurantDetailActivity.this, "Бронирование успешно", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Toast.makeText(RestaurantDetailActivity.this, "Ошибка бронирования", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<Void> call, Throwable t) {
+                                Toast.makeText(RestaurantDetailActivity.this, "Ошибка сети", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+            }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show();
+
+        }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH)).show();
+    }
+
+    private int getSavedUserId() {
+        return getSharedPreferences("app_prefs", MODE_PRIVATE)
+                .getInt("user_id", 0);
+    }
+}
+
+
+================================================================================
+FILE: app\src\main\java\com\example\a123\RestaurantListActivity.java
+================================================================================
+package com.example.a123;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button; // Добавлено
+import android.widget.ImageButton;
+import android.widget.ProgressBar;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.a123.ApiClient;
+import com.example.a123.DataModels;
+import com.example.a123.R;
+import com.example.a123.RestaurantDetailActivity;
+
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+public class RestaurantListActivity extends AppCompatActivity {
+
+    private RecyclerView restaurantRecyclerView;
+    private ProgressBar progressBar;
+    private Button btnGoToNews; // Кнопка уже была в объявлении, теперь задействуем
+    private int userId;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_restaurant_list);
+
+        restaurantRecyclerView = findViewById(R.id.restaurantRecyclerView);
+        progressBar = findViewById(R.id.progressBar);
+        btnGoToNews = findViewById(R.id.btnGoToNews); // Инициализация кнопки из XML
+
+        restaurantRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        userId = getIntent().getIntExtra("userId", 0);
+
+        // Обработка перехода на новости
+        btnGoToNews.setOnClickListener(v -> {
+            Intent intent = new Intent(RestaurantListActivity.this, NewsActivity.class);
+            startActivity(intent);
+        });
+
+        ImageButton backButton = findViewById(R.id.backButton);
+        ImageButton profileButton = findViewById(R.id.profileButton);
+
+        backButton.setOnClickListener(v -> {
+            if (profileButton.getVisibility() == View.GONE) {
+                profileButton.setVisibility(View.VISIBLE);
+            } else {
+                profileButton.setVisibility(View.GONE);
+            }
+        });
+
+        profileButton.setOnClickListener(v -> {
+            int userIdPref = getSharedPreferences("app_prefs", MODE_PRIVATE).getInt("user_id", 0);
+            if (userIdPref == 0) {
+                Toast.makeText(this, "Пользователь не авторизован", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Intent intent = new Intent(this, ProfileActivity.class);
+            intent.putExtra("userId", userIdPref);
+            startActivity(intent);
+        });
+
+        loadRestaurants();
+    }
+
+    private void loadRestaurants() {
+        progressBar.setVisibility(View.VISIBLE);
+
+        ApiClient.getApiService().getRestaurants().enqueue(new Callback<List<DataModels.Restaurant>>() {
+            @Override
+            public void onResponse(Call<List<DataModels.Restaurant>> call, Response<List<DataModels.Restaurant>> response) {
+                progressBar.setVisibility(View.GONE);
+                if (response.isSuccessful() && response.body() != null) {
+                    List<DataModels.Restaurant> list = response.body();
+
+                    Adapters.RestaurantAdapter adapter = new Adapters.RestaurantAdapter(list, restaurant -> {
+                        Intent intent = new Intent(RestaurantListActivity.this, RestaurantDetailActivity.class);
+                        intent.putExtra("restaurantId", restaurant.id);
+                        intent.putExtra("userId", userId);
+                        startActivity(intent);
+                    });
+
+                    restaurantRecyclerView.setAdapter(adapter);
+
+                } else {
+                    Toast.makeText(RestaurantListActivity.this, "Ошибка загрузки ресторанов", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<DataModels.Restaurant>> call, Throwable t) {
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(RestaurantListActivity.this, "Ошибка сети: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+}
+
+
+================================================================================
+FILE: app\src\main\java\com\example\a123\UserIdResponse.java
+================================================================================
+package com.example.a123;
+
+public class UserIdResponse {
+    public int id;
+    public String first_Name;
+    public String last_Name;
+    public String phone;
+    public String login;
+    public String password;
+}
+
+
+
+================================================================================
+FILE: app\src\main\java\com\example\a123\UserRequest.java
+================================================================================
+package com.example.a123;
+
+public class UserRequest {
+    public int id;
+    public String first_Name;
+    public String last_Name;
+    public String login;
+    public String phone;
+    public String password;
+}
+
+
+
+================================================================================
+FILE: app\src\main\java\com\example\a123\Utils.java
+================================================================================
+package com.example.a123;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.widget.Toast;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+public class Utils {
+
+    public static class Network {
+        public static boolean isNetworkAvailable(Context context) {
+            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            if (cm != null) {
+                NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+                return activeNetwork != null && activeNetwork.isConnected();
+            }
+            return false;
+        }
+    }
+
+    public static class Prefs {
+        private static final String PREFS_NAME = "RestaurantAppPrefs";
+        private static final String KEY_USER_ID = "user_id";
+        private static final String KEY_USER_NAME = "user_name";
+        private static final String KEY_USER_EMAIL = "user_email";
+        private static final String KEY_IS_LOGGED_IN = "is_logged_in";
+        private static final String KEY_AUTH_TOKEN = "auth_token";
+
+        private SharedPreferences prefs;
+
+        public Prefs(Context context) {
+            prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        }
+
+        // keep string version
+        public void saveUserData(String userId, String name, String email, String token) {
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putString(KEY_USER_ID, userId);
+            editor.putString(KEY_USER_NAME, name);
+            editor.putString(KEY_USER_EMAIL, email);
+            editor.putString(KEY_AUTH_TOKEN, token);
+            editor.putBoolean(KEY_IS_LOGGED_IN, true);
+            editor.apply();
+        }
+
+        // convenient overload for int id
+        public void saveUserData(int userIdInt, String name, String email, String token) {
+            saveUserData(String.valueOf(userIdInt), name, email, token);
+        }
+
+        public void clearUserData() {
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.remove(KEY_USER_ID);
+            editor.remove(KEY_USER_NAME);
+            editor.remove(KEY_USER_EMAIL);
+            editor.remove(KEY_AUTH_TOKEN);
+            editor.putBoolean(KEY_IS_LOGGED_IN, false);
+            editor.apply();
+        }
+
+        public boolean isLoggedIn() {
+            return prefs.getBoolean(KEY_IS_LOGGED_IN, false);
+        }
+
+        // return string id; use Integer.parseInt where needed
+        public String getUserIdString() {
+            return prefs.getString(KEY_USER_ID, null);
+        }
+
+        public int getUserId() {
+            String v = prefs.getString(KEY_USER_ID, null);
+            if (v == null) return -1;
+            try { return Integer.parseInt(v); } catch (Exception ex) { return -1; }
+        }
+
+        public String getUserName() {
+            return prefs.getString(KEY_USER_NAME, null);
+        }
+
+        public String getUserEmail() {
+            return prefs.getString(KEY_USER_EMAIL, null);
+        }
+
+        public String getAuthToken() {
+            return prefs.getString(KEY_AUTH_TOKEN, null);
+        }
+    }
+
+    public static class UI {
+        public static void showToast(Context context, String message) {
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+        }
+        public static void showLongToast(Context context, String message) {
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+        }
+    }
+
+    public static class DateUtils {
+        public static String formatBookingDate(Date date) {
+            return new SimpleDateFormat("dd MMMM yyyy 'в' HH:mm", new Locale("ru")).format(date);
+        }
+    }
+
+    public static class BookingHelper {
+        public static String getStatusText(String status) {
+            if (status == null) return "";
+            switch (status.toLowerCase()) {
+                case "confirmed": return "Подтверждено";
+                case "pending": return "Ожидание подтверждения";
+                case "completed": return "Завершено";
+                case "cancelled": return "Отменено";
+                default: return status;
+            }
+        }
+    }
+}
+
+
+
+================================================================================
+FILE: app\src\main\res\drawable\back_item.xml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/BackgroundColor"/>
+    <corners android:radius="15dp"/>
+</shape>
+
+
+================================================================================
+FILE: app\src\main\res\drawable\btn_outline.xml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <stroke android:width="2dp" android:color="@color/PrimaryColor" />
+    <solid android:color="@android:color/transparent" />
+    <corners android:radius="12dp" />
+</shape>
+
+
+================================================================================
+FILE: app\src\main\res\drawable\btn_outline_small.xml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <stroke
+        android:width="1dp"
+        android:color="@color/PrimaryColor" />
+    <solid android:color="@android:color/transparent" />
+    <corners android:radius="8dp" />
+</shape>
+
+
+================================================================================
+FILE: app\src\main\res\drawable\btn_primary.xml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/PrimaryColor" />
+    <corners android:radius="12dp" />
+</shape>
+
+
+================================================================================
+FILE: app\src\main\res\drawable\button.xml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#5a0000"/>
+    <corners android:radius="30dp" />
+</shape>
+
+
+================================================================================
+FILE: app\src\main\res\drawable\category_bg.xml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/SecondaryColor" />
+    <stroke
+        android:width="1dp"
+        android:color="@color/TextHintColor" />
+    <corners android:radius="6dp" />
+</shape>
+
+
+================================================================================
+FILE: app\src\main\res\drawable\edit_text_bg.xml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/SecondaryColor" />
+    <stroke android:width="1dp" android:color="@color/TextHintColor" />
+    <corners android:radius="8dp" />
+</shape>
+
+
+================================================================================
+FILE: app\src\main\res\drawable\ic_launcher_background.xml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#3DDC84"
+        android:pathData="M0,0h108v108h-108z" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M9,0L9,108"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M19,0L19,108"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M29,0L29,108"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M39,0L39,108"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M49,0L49,108"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M59,0L59,108"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M69,0L69,108"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M79,0L79,108"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M89,0L89,108"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M99,0L99,108"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M0,9L108,9"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M0,19L108,19"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M0,29L108,29"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M0,39L108,39"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M0,49L108,49"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M0,59L108,59"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M0,69L108,69"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M0,79L108,79"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M0,89L108,89"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M0,99L108,99"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M19,29L89,29"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M19,39L89,39"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M19,49L89,49"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M19,59L89,59"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M19,69L89,69"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M19,79L89,79"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M29,19L29,89"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M39,19L39,89"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M49,19L49,89"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M59,19L59,89"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M69,19L69,89"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M79,19L79,89"
+        android:strokeWidth="0.8"
+        android:strokeColor="#33FFFFFF" />
+</vector>
+
+
+
+================================================================================
+FILE: app\src\main\res\drawable\ic_launcher_foreground.xml
+================================================================================
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path android:pathData="M31,63.928c0,0 6.4,-11 12.1,-13.1c7.2,-2.6 26,-1.4 26,-1.4l38.1,38.1L107,108.928l-32,-1L31,63.928z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:endX="85.84757"
+                android:endY="92.4963"
+                android:startX="42.9492"
+                android:startY="49.59793"
+                android:type="linear">
+                <item
+                    android:color="#44000000"
+                    android:offset="0.0" />
+                <item
+                    android:color="#00000000"
+                    android:offset="1.0" />
+            </gradient>
+        </aapt:attr>
+    </path>
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillType="nonZero"
+        android:pathData="M65.3,45.828l3.8,-6.6c0.2,-0.4 0.1,-0.9 -0.3,-1.1c-0.4,-0.2 -0.9,-0.1 -1.1,0.3l-3.9,6.7c-6.3,-2.8 -13.4,-2.8 -19.7,0l-3.9,-6.7c-0.2,-0.4 -0.7,-0.5 -1.1,-0.3C38.8,38.328 38.7,38.828 38.9,39.228l3.8,6.6C36.2,49.428 31.7,56.028 31,63.928h46C76.3,56.028 71.8,49.428 65.3,45.828zM43.4,57.328c-0.8,0 -1.5,-0.5 -1.8,-1.2c-0.3,-0.7 -0.1,-1.5 0.4,-2.1c0.5,-0.5 1.4,-0.7 2.1,-0.4c0.7,0.3 1.2,1 1.2,1.8C45.3,56.528 44.5,57.328 43.4,57.328L43.4,57.328zM64.6,57.328c-0.8,0 -1.5,-0.5 -1.8,-1.2s-0.1,-1.5 0.4,-2.1c0.5,-0.5 1.4,-0.7 2.1,-0.4c0.7,0.3 1.2,1 1.2,1.8C66.5,56.528 65.6,57.328 64.6,57.328L64.6,57.328z"
+        android:strokeWidth="1"
+        android:strokeColor="#00000000" />
+</vector>
+
+
+================================================================================
+FILE: app\src\main\res\drawable\image_rest.xml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/white"/>
+        <corners android:radius="20dp"/>
+</shape>
+
+
+================================================================================
+FILE: app\src\main\res\drawable\textbox.xml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#2a2a2a"/>
+    <corners android:radius="30dp"/>
+</shape>
+
+
+================================================================================
+FILE: app\src\main\res\drawable\vegetarian_bg.xml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#E8F5E8" />
+    <stroke
+        android:width="1dp"
+        android:color="#4CAF50" />
+    <corners android:radius="4dp" />
+</shape>
+
+
+================================================================================
+FILE: app\src\main\res\layout\activity_booking.xml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <LinearLayout
+        android:background="@color/BackgroundColor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="8dp"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="24dp">
+
+            <ImageButton
+                android:id="@+id/backButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/q3"
+                android:layout_marginEnd="16dp"
+                app:tint="@color/TextColor" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Бронирование стола"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/TextColor" />
+
+        </LinearLayout>
+
+        <!-- Booking Form Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            app:cardBackgroundColor="@color/CardColor"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Дата"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/TextColor"
+                    android:layout_marginBottom="8dp" />
+
+                <EditText
+                    android:id="@+id/dateEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:hint="дд/мм/гггг"
+                    android:textColorHint="@color/TextHintColor"
+                    android:inputType="date"
+                    android:background="@drawable/edit_text_bg"
+                    android:textColor="@color/TextColor"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:layout_marginBottom="20dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Время"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/TextColor"
+                    android:layout_marginBottom="8dp" />
+
+                <EditText
+                    android:id="@+id/timeEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:hint="чч:мм"
+                    android:textColorHint="@color/TextHintColor"
+                    android:inputType="time"
+                    android:background="@drawable/edit_text_bg"
+                    android:textColor="@color/TextColor"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:layout_marginBottom="20dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Количество человек"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/TextColor"
+                    android:layout_marginBottom="8dp" />
+
+                <EditText
+                    android:id="@+id/peopleEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:hint="1-20 человек"
+                    android:textColorHint="@color/TextHintColor"
+                    android:inputType="number"
+                    android:background="@drawable/edit_text_bg"
+                    android:textColor="@color/TextColor"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:layout_marginBottom="20dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Особые пожелания"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/TextColor"
+                    android:layout_marginBottom="8dp" />
+
+                <EditText
+                    android:id="@+id/notesEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="120dp"
+                    android:hint="Ваши пожелания..."
+                    android:textColorHint="@color/TextHintColor"
+                    android:inputType="textMultiLine"
+                    android:background="@drawable/edit_text_bg"
+                    android:textColor="@color/TextColor"
+                    android:paddingStart="16dp"
+                    android:paddingTop="16dp"
+                    android:paddingEnd="16dp"
+                    android:paddingBottom="16dp"
+                    android:gravity="top"
+                    android:layout_marginBottom="24dp" />
+
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="16dp"
+                    android:visibility="gone" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/confirmBookingButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:text="Подтвердить бронирование"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/button"
+                    android:textColor="@color/white" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+
+</ScrollView>
+
+
+================================================================================
+FILE: app\src\main\res\layout\activity_booking_confirmation.xml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/BackgroundColor"
+    android:padding="32dp"
+    android:gravity="center">
+
+    <ImageView
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:background="@drawable/q3"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="32dp"
+        app:tint="@color/AccentColor" />
+
+    <TextView
+        android:id="@+id/confirmationText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Бронирование подтверждено!"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:textColor="@color/TextColor"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="24dp"
+        android:gravity="center" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        app:cardBackgroundColor="@color/CardColor"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <TextView
+                android:id="@+id/bookingDetailsText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Детали бронирования"
+                android:textSize="16sp"
+                android:textColor="@color/TextSecondaryColor"
+                android:lineSpacingExtra="4dp" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/homeButton"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="На главную"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:background="@drawable/btn_primary"
+        android:textColor="@color/white"
+        android:layout_marginBottom="16dp" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/myBookingsButton"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="Мои бронирования"
+        android:textSize="18sp"
+        android:background="@drawable/btn_outline"
+        android:textColor="@color/TextColor" />
+
+</LinearLayout>
+
+
+================================================================================
+FILE: app\src\main\res\layout\activity_edit_profile.xml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/BackgroundColor"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="32dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Заголовок -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Редактирование профиля"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="@color/TextColor"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Имя -->
+        <EditText
+            android:id="@+id/editFirstName"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:hint="Имя"
+            android:inputType="textPersonName"
+            android:background="@drawable/edit_text_bg"
+            android:textColor="@color/TextColor"
+            android:textColorHint="@color/TextHintColor"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Фамилия -->
+        <EditText
+            android:id="@+id/editLastName"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:hint="Фамилия"
+            android:inputType="textPersonName"
+            android:background="@drawable/edit_text_bg"
+            android:textColor="@color/TextColor"
+            android:textColorHint="@color/TextHintColor"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Логин -->
+        <EditText
+            android:id="@+id/editLogin"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:hint="Логин"
+            android:inputType="textEmailAddress"
+            android:background="@drawable/edit_text_bg"
+            android:textColor="@color/TextColor"
+            android:textColorHint="@color/TextHintColor"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Телефон -->
+        <EditText
+            android:id="@+id/editPhone"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:hint="Телефон"
+            android:inputType="phone"
+            android:background="@drawable/edit_text_bg"
+            android:textColor="@color/TextColor"
+            android:textColorHint="@color/TextHintColor"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Пароль -->
+        <EditText
+            android:id="@+id/editPassword"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:hint="Пароль"
+            android:inputType="textPassword"
+            android:background="@drawable/edit_text_bg"
+            android:textColor="@color/TextColor"
+            android:textColorHint="@color/TextHintColor"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Прогресс загрузки -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Кнопка "Изменить данные" -->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/editProfileButton"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="Изменить данные"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:background="@drawable/btn_primary"
+            android:textColor="@color/white" />
+
+    </LinearLayout>
+</ScrollView>
+
+
+
+================================================================================
+FILE: app\src\main\res\layout\activity_login.xml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/BackgroundColor"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="32dp">
+
+        <ImageButton
+            android:id="@+id/backButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/q3"
+            android:layout_marginBottom="40dp"
+            app:tint="@color/TextColor" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Вход в аккаунт"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="@color/TextColor"
+            android:layout_marginBottom="40dp" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            app:cardBackgroundColor="@color/CardColor"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Логин"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/TextColor"
+                    android:layout_marginBottom="8dp" />
+
+                <EditText
+                    android:id="@+id/loginEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:hint="Введите логин"
+                    android:textColorHint="@color/TextHintColor"
+                    android:inputType="textEmailAddress"
+                    android:background="@drawable/edit_text_bg"
+                    android:textColor="@color/TextColor"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:layout_marginBottom="20dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Пароль"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/TextColor"
+                    android:layout_marginBottom="8dp" />
+
+                <EditText
+                    android:id="@+id/passwordEditText"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:hint="Введите пароль"
+                    android:textColorHint="@color/TextHintColor"
+                    android:inputType="textPassword"
+                    android:background="@drawable/edit_text_bg"
+                    android:textColor="@color/TextColor"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:layout_marginBottom="24dp" />
+
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginBottom="16dp"
+                    android:visibility="gone" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/loginButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:text="Войти"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/button"
+                    android:color="@color/PrimaryDarkColor"
+                    android:textColor="@color/white"/>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:id="@+id/forgotPasswordLink"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Забыли пароль?"
+            android:textColor="@color/AccentColor"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="24dp" />
+
+        <TextView
+            android:id="@+id/registerLink"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Нет аккаунта? Зарегистрироваться"
+            android:textColor="@color/AccentColor"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal" />
+
+    </LinearLayout>
+
+</ScrollView>
+
+
+================================================================================
+FILE: app\src\main\res\layout\activity_main.xml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    android:padding="16dp"
+    android:fitsSystemWindows="true">
+
+    <ImageView
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:background="@drawable/q3"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="60dp"
+        android:layout_marginBottom="40dp"
+        app:tint="@color/AccentColor" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Restaurant Finder"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:textColor="@color/TextColor"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="60dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Найдите идеальный ресторан для любого случая"
+        android:textSize="16sp"
+        android:textColor="@color/TextSecondaryColor"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="80dp"
+        android:gravity="center" />
+
+    <Button
+        android:id="@+id/loginButton"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="Войти"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:background="@drawable/btn_primary"
+        android:textColor="@color/white"
+        android:layout_marginBottom="16dp" />
+
+    <Button
+        android:id="@+id/registerButton"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="Зарегистрироваться"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:background="@drawable/btn_outline"
+        android:textColor="@color/TextColor"
+        android:layout_marginBottom="16dp" />
+
+    <Button
+        android:id="@+id/exploreButton"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:text="Продолжить как гость"
+        android:textSize="16sp"
+        android:background="@android:color/transparent"
+        android:textColor="@color/TextSecondaryColor" />
+
+</ScrollView>
+
+
+================================================================================
+FILE: app\src\main\res\layout\activity_news.xml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="НОВОСТИ"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:padding="20dp"
+        android:textColor="@color/black" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewNews"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="5dp" />
+</LinearLayout>
+
+
+================================================================================
+FILE: app\src\main\res\layout\activity_profile.xml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/BackgroundColor"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:gravity="center_vertical"
+            android:background="@color/PrimaryColor">
+
+            <ImageButton
+                android:id="@+id/backButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/q3"
+                android:layout_marginEnd="16dp"
+                app:tint="@color/white" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Мой профиль"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/white" />
+
+        </LinearLayout>
+
+        <!-- User Info Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            app:cardBackgroundColor="@color/CardColor"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <TextView
+                    android:id="@+id/userNameTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Иван Иванов"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/TextColor"
+                    android:layout_marginBottom="8dp" />
+
+                <TextView
+                    android:id="@+id/userEmailTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="ivan@example.com"
+                    android:textSize="16sp"
+                    android:textColor="@color/TextSecondaryColor"
+                    android:layout_marginBottom="24dp" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/editButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="Изменить данные"
+                    android:textSize="16sp"
+                    android:background="@drawable/button"
+                    android:textColor="@color/TextColor" />
+
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/logoutButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:text="Выйти"
+                    android:textSize="16sp"
+                    android:background="@drawable/btn_outline"
+                    android:textColor="@color/PrimaryColor" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- My Bookings Section -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            app:cardBackgroundColor="@color/CardColor"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Мои бронирования"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/TextColor"
+                    android:layout_marginBottom="16dp" />
+
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:visibility="gone" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/bookingsRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="400dp" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+
+</ScrollView>
+
+
+================================================================================
+FILE: app\src\main\res\layout\activity_register.xml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/BackgroundColor"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="32dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Регистрация"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="@color/TextColor"
+            android:layout_marginBottom="24dp" />
+
+        <EditText
+            android:id="@+id/nameEditText"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:hint="Имя"
+            android:inputType="textPersonName"
+            android:background="@drawable/edit_text_bg"
+            android:textColor="@color/TextColor"
+            android:textColorHint="@color/TextHintColor"
+            android:layout_marginBottom="16dp" />
+
+        <EditText
+            android:id="@+id/lastNameEditText"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:hint="Фамилия"
+            android:inputType="textPersonName"
+            android:background="@drawable/edit_text_bg"
+            android:textColor="@color/TextColor"
+            android:textColorHint="@color/TextHintColor"
+            android:layout_marginBottom="16dp" />
+
+        <EditText
+            android:id="@+id/emailEditText"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:hint="Логин"
+            android:inputType="textEmailAddress"
+            android:background="@drawable/edit_text_bg"
+            android:textColor="@color/TextColor"
+            android:textColorHint="@color/TextHintColor"
+            android:layout_marginBottom="16dp" />
+
+        <EditText
+            android:id="@+id/phoneEditText"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:hint="Телефон"
+            android:inputType="phone"
+            android:background="@drawable/edit_text_bg"
+            android:textColor="@color/TextColor"
+            android:textColorHint="@color/TextHintColor"
+            android:layout_marginBottom="16dp" />
+
+        <EditText
+            android:id="@+id/passwordEditText"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:hint="Пароль"
+            android:inputType="textPassword"
+            android:background="@drawable/edit_text_bg"
+            android:textColor="@color/TextColor"
+            android:textColorHint="@color/TextHintColor"
+            android:layout_marginBottom="24dp" />
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:layout_marginBottom="16dp" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/registerButton"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="Зарегистрироваться"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:background="@drawable/btn_primary"
+            android:textColor="@color/white" />
+
+    </LinearLayout>
+</ScrollView>
+
+
+
+================================================================================
+FILE: app\src\main\res\layout\activity_restaurant_detail.xml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/BackgroundColor"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Header Image -->
+        <ImageView
+            android:id="@+id/restaurantHeaderImage"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/rest"
+            android:background="@color/PrimaryColor" />
+
+        <!-- Header with Back Button -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:gravity="center_vertical"
+            android:background="@color/PrimaryColor">
+
+            <ImageButton
+                android:id="@+id/backButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@drawable/q3"
+                android:layout_marginEnd="16dp"
+                app:tint="@color/white" />
+
+            <TextView
+                android:id="@+id/restaurantName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Название ресторана"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="@color/white" />
+
+        </LinearLayout>
+
+        <!-- Restaurant Info Card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            app:cardBackgroundColor="@color/CardColor"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <TextView
+                    android:id="@+id/restaurantAddressTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Адрес ресторана"
+                    android:textSize="16sp"
+                    android:textColor="@color/TextSecondaryColor"
+                    android:layout_marginBottom="16dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:id="@+id/ratingTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="★ 4.5"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/AccentColor"
+                        android:layout_marginEnd="16dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="•"
+                        android:textSize="16sp"
+                        android:textColor="@color/TextSecondaryColor"
+                        android:layout_marginEnd="16dp" />
+
+                    <TextView
+                        android:id="@+id/cuisineTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Итальянская кухня"
+                        android:textSize="16sp"
+                        android:textColor="@color/TextSecondaryColor" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/openingHoursTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Часы работы: 10:00 - 23:00"
+                    android:textSize="14sp"
+                    android:textColor="@color/TextSecondaryColor"
+                    android:layout_marginBottom="24dp" />
+                <LinearLayout
+                    android:id="@+id/guestsLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="10dp"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Количество гостей:"
+                        android:textSize="16sp"
+                        android:textColor="@color/TextColor"
+                        android:layout_marginEnd="8dp"/>
+
+                    <Spinner
+                        android:id="@+id/guestsSpinner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:spinnerMode="dropdown"/>
+                </LinearLayout>
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/bookTableButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:text="Забронировать стол"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:background="@drawable/btn_primary"
+                    android:textColor="@color/white" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Menu Section -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            app:cardBackgroundColor="@color/CardColor"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Меню"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/TextColor"
+                    android:layout_marginBottom="16dp" />
+
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:visibility="gone" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/menuRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+
+</ScrollView>
+
+
+
+================================================================================
+FILE: app\src\main\res\layout\activity_restaurant_list.xml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/BackgroundColor">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical"
+        android:background="@color/PrimaryColor">
+
+
+
+        <ImageButton
+            android:id="@+id/backButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/q3"
+            android:layout_marginEnd="16dp"
+            app:tint="@color/white" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Рестораны"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/white" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnGoToNews"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="16dp"
+            android:text="Н"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:background="@drawable/button"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <ImageButton
+            android:id="@+id/profileButton"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/r5"
+            android:scaleType="centerInside"
+            android:padding="8dp"
+            android:background="?android:attr/selectableItemBackgroundBorderless"
+            app:tint="@color/white" />
+
+    </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:visibility="gone" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/restaurantRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="8dp" />
+
+</LinearLayout>
+
+
+================================================================================
+FILE: app\src\main\res\layout\item_booking.xml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardBackgroundColor="@color/CardColor"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/restaurantNameTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Название ресторана"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/TextColor"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/bookingDateTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Дата и время"
+            android:textSize="14sp"
+            android:textColor="@color/TextSecondaryColor"
+            android:layout_marginBottom="8dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:id="@+id/peopleCountTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2 чел."
+                android:textSize="14sp"
+                android:textColor="@color/TextSecondaryColor"
+                android:layout_marginEnd="16dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="•"
+                android:textSize="14sp"
+                android:textColor="@color/TextSecondaryColor"
+                android:layout_marginEnd="16dp" />
+
+            <TextView
+                android:id="@+id/statusTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Подтверждено"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/cancelButton"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp"
+            android:text="Отменить"
+            android:textSize="14sp"
+            android:background="@drawable/btn_outline_small"
+            android:textColor="@color/PrimaryColor"
+            android:layout_gravity="end" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>
+
+
+================================================================================
+FILE: app\src\main\res\layout\item_menu.xml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:cardBackgroundColor="@color/CardColor"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="8dp">
+
+            <TextView
+                android:id="@+id/dishNameTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Название блюда"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/TextColor" />
+
+            <TextView
+                android:id="@+id/dishPriceTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="$12.99"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/AccentColor" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/dishDescriptionTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Описание блюда"
+            android:textSize="14sp"
+            android:textColor="@color/TextSecondaryColor"
+            android:layout_marginBottom="8dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/dishCategoryTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Основное блюдо"
+                android:textSize="12sp"
+                android:textColor="@color/TextHintColor"
+                android:background="@drawable/category_bg"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/vegetarianBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="VEG"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:textColor="@color/PrimaryDarkColor"
+                android:background="@drawable/vegetarian_bg"
+                android:paddingStart="6dp"
+                android:paddingEnd="6dp"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>
+
+
+================================================================================
+FILE: app\src\main\res\layout\item_news.xml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="10dp"
+    app:cardCornerRadius="15dp"
+    app:cardElevation="6dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/newsImage"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_launcher_background" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="15dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/newsTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="#333333"
+                android:text="Заголовок новости" />
+
+            <TextView
+                android:id="@+id/newsDesc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textSize="14sp"
+                android:textColor="#666666"
+                android:ellipsize="end"
+                android:maxLines="3"
+                android:text="Краткое описание новости появится здесь..." />
+
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
+
+
+================================================================================
+FILE: app\src\main\res\layout\item_restaurant.xml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:id="@+id/cardView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:cardBackgroundColor="@color/CardColor"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <ImageView
+            android:id="@+id/restaurantImage"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:scaleType="centerCrop"
+            android:background="@color/PrimaryLightColor"
+            android:layout_marginBottom="12dp" />
+
+        <TextView
+            android:id="@+id/restaurantName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Название ресторана"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/TextColor"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/addressTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Адрес ресторана"
+            android:textSize="14sp"
+            android:textColor="@color/TextSecondaryColor"
+            android:layout_marginBottom="8dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/ratingTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="★ 4.5"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/AccentColor"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="•"
+                android:textSize="14sp"
+                android:textColor="@color/TextSecondaryColor"
+                android:layout_marginEnd="8dp" />
+
+            <TextView
+                android:id="@+id/cuisineTextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Итальянская кухня"
+                android:textSize="14sp"
+                android:textColor="@color/TextSecondaryColor"
+                android:ellipsize="end"
+                android:maxLines="1" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+
+</com.google.android.material.card.MaterialCardView>
+
+
+================================================================================
+FILE: app\src\main\res\mipmap-anydpi\ic_launcher.xml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@drawable/ic_launcher_background" />
+    <foreground android:drawable="@drawable/ic_launcher_foreground" />
+    <monochrome android:drawable="@drawable/ic_launcher_foreground" />
+</adaptive-icon>
+
+
+================================================================================
+FILE: app\src\main\res\mipmap-anydpi\ic_launcher_round.xml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+    <background android:drawable="@drawable/ic_launcher_background" />
+    <foreground android:drawable="@drawable/ic_launcher_foreground" />
+    <monochrome android:drawable="@drawable/ic_launcher_foreground" />
+</adaptive-icon>
+
+
+================================================================================
+FILE: app\src\main\res\values\colors.xml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="PrimaryColor">#8b0000</color>
+    <color name="PrimaryDarkColor">#5a0000</color>
+    <color name="PrimaryLightColor">#a52a2a</color>
+    <color name="SecondaryColor">#2c2c2c</color>
+    <color name="AccentColor">#d4af37</color>
+    <color name="BackgroundColor">#1a1a1a</color>
+    <color name="CardColor">#2a2a2a</color>
+    <color name="TextColor">#ffffff</color>
+    <color name="TextSecondaryColor">#b0b0b0</color>
+    <color name="TextHintColor">#4f4949</color>
+</resources>
+
+
+================================================================================
+FILE: app\src\main\res\values\strings.xml
+================================================================================
+<resources>
+    <string name="app_name">123</string>
+</resources>
+
+
+================================================================================
+FILE: app\src\main\res\values\themes.xml
+================================================================================
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme._123" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+    </style>
+
+    <style name="Theme._123" parent="Base.Theme._123" />
+</resources>
+
+
+================================================================================
+FILE: app\src\main\res\values-night\themes.xml
+================================================================================
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme._123" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your dark theme here. -->
+        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+    </style>
+</resources>
+
+
+================================================================================
+FILE: app\src\main\res\xml\backup_rules.xml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?><!--
+   Sample backup rules file; uncomment and customize as necessary.
+   See https://developer.android.com/guide/topics/data/autobackup
+   for details.
+   Note: This file is ignored for devices older that API 31
+   See https://developer.android.com/about/versions/12/backup-restore
+-->
+<full-backup-content>
+    <!--
+   <include domain="sharedpref" path="."/>
+   <exclude domain="sharedpref" path="device.xml"/>
+-->
+</full-backup-content>
+
+
+================================================================================
+FILE: app\src\main\res\xml\data_extraction_rules.xml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?><!--
+   Sample data extraction rules file; uncomment and customize as necessary.
+   See https://developer.android.com/about/versions/12/backup-restore#xml-changes
+   for details.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- TODO: Use <include> and <exclude> to control what is backed up.
+        <include .../>
+        <exclude .../>
+        -->
+    </cloud-backup>
+    <!--
+    <device-transfer>
+        <include .../>
+        <exclude .../>
+    </device-transfer>
+    -->
+</data-extraction-rules>
+
+
+================================================================================
+FILE: app\src\main\res\xml\network_security_config.xml
+================================================================================
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">10.0.2.2</domain>
+        <domain includeSubdomains="true">localhost</domain>
+    </domain-config>
+</network-security-config>
+
+
+================================================================================
+FILE: app\src\test\java\com\example\a123\ExampleUnitTest.java
+================================================================================
+package com.example.a123;
+
+import org.junit.Test;
+
+import static org.junit.Assert.*;
+
+/**
+ * Example local unit test, which will execute on the development machine (host).
+ *
+ * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
+ */
+public class ExampleUnitTest {
+    @Test
+    public void addition_isCorrect() {
+        assertEquals(4, 2 + 2);
+    }
+}
+
+
+
+================================================================================
+PROJECT INFORMATION:
+================================================================================

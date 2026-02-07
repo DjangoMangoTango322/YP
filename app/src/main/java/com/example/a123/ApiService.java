@@ -58,4 +58,7 @@ public interface ApiService {
     );
     @GET("api/News/GetAllNews")
     Call<List<News>> getAllNews();
+
+    @GET("api/Achievement/GetUserAchievements/{userId}")
+    Call<List<DataModels.AchievementDto>> getUserAchievements(@Path("userId") int userId);
 }

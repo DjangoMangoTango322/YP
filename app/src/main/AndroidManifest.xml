@@ -37,6 +37,7 @@
         <activity android:name=".NewsActivity" />
         <activity android:name=".ProfileActivity" />
         <activity android:name=".EditProfileActivity" />
+        <activity android:name=".AchievementsActivity"/>
     </application>
 
 </manifest>

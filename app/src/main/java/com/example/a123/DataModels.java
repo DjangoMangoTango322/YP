@@ -77,4 +77,9 @@ public class DataModels {
         public String restaurantAddress;
         public String restaurantCuisine;
     }
+    public static class AchievementDto {
+        public String name;
+        public String description;
+        public String unlockedAt; // Приходит как строка даты
+    }
 }
