@@ -14,7 +14,6 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Desktop;
 using Desktop.Pages;
-
 namespace Desktop
 {
     /// <summary>
@@ -75,6 +74,15 @@ namespace Desktop
             App.ClearAdminData();
             HideMenu();
             MainFrame.Navigate(new AdminLogin());
+        }
+        private void BtnLogs_Click(object sender, RoutedEventArgs e)
+        {
+            // Мы используем MainFrame, так как он объявлен в вашем MainWindow.xaml
+            MainFrame.Navigate(new LogsPage());
+
+            // Скрываем приветственную секцию, если она видна
+            WelcomeSection.Visibility = Visibility.Collapsed;
+            MainFrame.Visibility = Visibility.Visible;
         }
 
         public void SetActiveButton(Button button)
