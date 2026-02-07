@@ -83,6 +83,16 @@ namespace Desktop
         public async Task<List<Administrator>> GetAllAdminsAsync() => await GetAsync<List<Administrator>>("AdministratorController/GetAllAdmins");
         // ... другие методы для админов, если нужно
 
+        // News
+        // Получение всех новостей
+        public async Task<List<News>> GetAllNewsAsync() => await GetAsync<List<News>>("News/GetAllNews");
+
+        // Запуск парсинга новостей (обновление базы с сайта)
+        public async Task ParseNewsAsync() => await GetAsync<object>("News/ParseNewsFromSource");
+
+        // Удаление новости по ID
+        public async Task<bool> DeleteNewsAsync(int id) => await DeleteAsync($"News/DeleteNews/{id}");
+
         // Generic methods (как в YP-master)
         private async Task<T> GetAsync<T>(string endpoint)
         {
