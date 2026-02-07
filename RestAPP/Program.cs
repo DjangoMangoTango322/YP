@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using RestAPI.Context;
+using RestAPI.Interfaces;
+using RestAPI.Service;
 using RestAPP.Context;
 using RestAPP.Interfaces;
 using RestAPP.Service;
@@ -27,14 +29,17 @@ builder.Services.AddDbContext<UserContext>(options =>
 builder.Services.AddDbContext<AuditContext>(options =>
     options.UseSqlServer(DbConnection.config));
 
-builder.Services.AddScoped<IAuditService, AuditService>();
+builder.Services.AddDbContext<NewsContext>(options =>
+    options.UseSqlServer(DbConnection.config));
 
+builder.Services.AddScoped<IAuditService, AuditService>();
 builder.Services.AddScoped<RestAPI.Interfaces.IAdministrator, RestAPI.Service.AdministratorService>();
 builder.Services.AddScoped<RestAPI.Interfaces.IBooking, RestAPI.Service.BookingService>();
 builder.Services.AddScoped<RestAPI.Interfaces.IDish, RestAPI.Service.DishService>();
 builder.Services.AddScoped<RestAPI.Interfaces.IRestaurant, RestAPI.Service.RestaurantService>();
 builder.Services.AddScoped<RestAPI.Interfaces.IRestaurantDish, RestAPI.Service.RestaurantDishService>();
 builder.Services.AddScoped<RestAPI.Interfaces.IUser, RestAPI.Service.UserService>();
+builder.Services.AddScoped<INewsService, NewsService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
