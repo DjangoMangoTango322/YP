@@ -11,7 +11,7 @@ using Desktop.Models;
 
 namespace Desktop
 {
-    public class ApiContext 
+    public class ApiContext
     {
         private readonly HttpClient _httpClient;
         private readonly string _baseUrl = "https://localhost:7237/api/"; // Из YP-RestAPI, настрой по своему
@@ -103,6 +103,10 @@ namespace Desktop
         {
             var response = await _httpClient.DeleteAsync(_baseUrl + endpoint);
             return response.IsSuccessStatusCode;
+        }
+        public async Task<List<Log>> GetAllLogsAsync()
+        {
+            return await GetAsync<List<Log>>("UserController/GetAllLogs"); // Убедитесь, что в UserController есть такой метод
         }
     }
 }
