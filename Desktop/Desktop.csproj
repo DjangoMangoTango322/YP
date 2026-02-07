@@ -177,6 +177,7 @@
     <Compile Include="Models\Booking.cs" />
     <Compile Include="Models\Dish.cs" />
     <Compile Include="Models\Log.cs" />
+    <Compile Include="Models\News.cs" />
     <Compile Include="Models\Restaurant.cs" />
     <Compile Include="Models\RestaurantDish.cs" />
     <Compile Include="Models\User.cs" />
