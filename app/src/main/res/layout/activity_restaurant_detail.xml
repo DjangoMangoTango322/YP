@@ -117,6 +117,29 @@
                     android:textSize="14sp"
                     android:textColor="@color/TextSecondaryColor"
                     android:layout_marginBottom="24dp" />
+                <LinearLayout
+                    android:id="@+id/guestsLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="10dp"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Количество гостей:"
+                        android:textSize="16sp"
+                        android:textColor="@color/TextColor"
+                        android:layout_marginEnd="8dp"/>
+
+                    <Spinner
+                        android:id="@+id/guestsSpinner"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:spinnerMode="dropdown"/>
+                </LinearLayout>
 
                 <androidx.appcompat.widget.AppCompatButton
                     android:id="@+id/bookTableButton"
