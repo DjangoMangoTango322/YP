@@ -54,6 +54,7 @@
                     <Button x:Name="BtnNews" Content="📰 Новости"
                             Style="{StaticResource MenuButtonStyle}"
                             Click="BtnNews_Click"/>
+                    <Button x:Name="BtnAchievements" Content="🏆 Ачивки" Click="BtnAchievements_Click" Style="{StaticResource MenuButtonStyle}" />
                 </StackPanel>
                 <!-- User Info & Logout -->
                 <Border Grid.Row="2" Margin="15" Background="Transparent">

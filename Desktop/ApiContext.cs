@@ -93,6 +93,10 @@ namespace Desktop
         // Удаление новости по ID
         public async Task<bool> DeleteNewsAsync(int id) => await DeleteAsync($"News/DeleteNews/{id}");
 
+
+        public async Task<List<UserAchievementDTO>> GetAllUserAchievementsAsync()
+    => await GetAsync<List<UserAchievementDTO>>("Achievement/GetAllUserAchievements");
+
         // Generic methods (как в YP-master)
         private async Task<T> GetAsync<T>(string endpoint)
         {

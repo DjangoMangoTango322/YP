@@ -1,6 +1,6 @@
-﻿PROJECT EXPORT - 12/18/2025 20:49:03
-Project Path: C:\Users\semen\Desktop\123\YP
-Total Files: 33
+﻿PROJECT EXPORT - 02/07/2026 16:50:13
+Project Path: C:\Users\student-a502.PERMAVIAT\Desktop\asdasdaddsad\YP
+Total Files: 37
 
 ================================================================================
 FILE: Desktop.sln
@@ -46,7 +46,7 @@ using Desktop.Models;
 
 namespace Desktop
 {
-    public class ApiContext 
+    public class ApiContext
     {
         private readonly HttpClient _httpClient;
         private readonly string _baseUrl = "https://localhost:7237/api/"; // Из YP-RestAPI, настрой по своему
@@ -118,6 +118,16 @@ namespace Desktop
         public async Task<List<Administrator>> GetAllAdminsAsync() => await GetAsync<List<Administrator>>("AdministratorController/GetAllAdmins");
         // ... другие методы для админов, если нужно
 
+        // News
+        // Получение всех новостей
+        public async Task<List<News>> GetAllNewsAsync() => await GetAsync<List<News>>("News/GetAllNews");
+
+        // Запуск парсинга новостей (обновление базы с сайта)
+        public async Task ParseNewsAsync() => await GetAsync<object>("News/ParseNewsFromSource");
+
+        // Удаление новости по ID
+        public async Task<bool> DeleteNewsAsync(int id) => await DeleteAsync($"News/DeleteNews/{id}");
+
         // Generic methods (как в YP-master)
         private async Task<T> GetAsync<T>(string endpoint)
         {
@@ -138,6 +148,10 @@ namespace Desktop
         {
             var response = await _httpClient.DeleteAsync(_baseUrl + endpoint);
             return response.IsSuccessStatusCode;
+        }
+        public async Task<List<Log>> GetAllLogsAsync()
+        {
+            return await GetAsync<List<Log>>("UserController/GetAllLogs"); // Убедитесь, что в UserController есть такой метод
         }
     }
 }
@@ -262,6 +276,8 @@ FILE: Desktop\Desktop.csproj
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -283,12 +299,43 @@ FILE: Desktop\Desktop.csproj
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=10.0.0.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.10.0.2\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.6.1\lib\net462\System.Buffers.dll</HintPath>
+    </Reference>
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
+    <Reference Include="System.IO.Pipelines, Version=10.0.0.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.IO.Pipelines.10.0.2\lib\net462\System.IO.Pipelines.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Memory, Version=4.0.5.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Memory.4.6.3\lib\net462\System.Memory.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Net.Http.Json, Version=10.0.0.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Net.Http.Json.10.0.2\lib\net462\System.Net.Http.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.6.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.6.1\lib\net462\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.1.2\lib\net462\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Encodings.Web, Version=10.0.0.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Encodings.Web.10.0.2\lib\net462\System.Text.Encodings.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Text.Json, Version=10.0.0.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Text.Json.10.0.2\lib\net462\System.Text.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.4.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.6.3\lib\net462\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -369,6 +416,14 @@ FILE: Desktop\Desktop.csproj
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Pages\LogsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\NewsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\RestaurantsPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -387,6 +442,8 @@ FILE: Desktop\Desktop.csproj
     <Compile Include="Models\ApiResponse.cs" />
     <Compile Include="Models\Booking.cs" />
     <Compile Include="Models\Dish.cs" />
+    <Compile Include="Models\Log.cs" />
+    <Compile Include="Models\News.cs" />
     <Compile Include="Models\Restaurant.cs" />
     <Compile Include="Models\RestaurantDish.cs" />
     <Compile Include="Models\User.cs" />
@@ -426,6 +483,12 @@ FILE: Desktop\Desktop.csproj
     <Compile Include="Pages\Items\UserCard.xaml.cs">
       <DependentUpon>UserCard.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pages\LogsPage.xaml.cs">
+      <DependentUpon>LogsPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\NewsPage.xaml.cs">
+      <DependentUpon>NewsPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\RestaurantsPage.xaml.cs">
       <DependentUpon>RestaurantsPage.xaml</DependentUpon>
     </Compile>
@@ -460,6 +523,13 @@ FILE: Desktop\Desktop.csproj
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\System.ValueTuple.4.6.1\build\net471\System.ValueTuple.targets" Condition="Exists('..\packages\System.ValueTuple.4.6.1\build\net471\System.ValueTuple.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Данный проект ссылается на пакеты NuGet, отсутствующие на этом компьютере. Используйте восстановление пакетов NuGet, чтобы скачать их.  Дополнительную информацию см. по адресу: http://go.microsoft.com/fwlink/?LinkID=322105. Отсутствует следующий файл: {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\System.ValueTuple.4.6.1\build\net471\System.ValueTuple.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.ValueTuple.4.6.1\build\net471\System.ValueTuple.targets'))" />
+  </Target>
 </Project>
 
 
@@ -482,7 +552,6 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Desktop;
 using Desktop.Pages;
-
 namespace Desktop
 {
     /// <summary>
@@ -544,6 +613,21 @@ namespace Desktop
             HideMenu();
             MainFrame.Navigate(new AdminLogin());
         }
+        private void BtnLogs_Click(object sender, RoutedEventArgs e)
+        {
+            // Мы используем MainFrame, так как он объявлен в вашем MainWindow.xaml
+            MainFrame.Navigate(new LogsPage());
+
+            // Скрываем приветственную секцию, если она видна
+            WelcomeSection.Visibility = Visibility.Collapsed;
+            MainFrame.Visibility = Visibility.Visible;
+        }
+
+        private void BtnNews_Click(object sender, RoutedEventArgs e)
+        {
+            MainFrame.Navigate(new NewsPage());
+            SetActiveButton(BtnNews);
+        }
 
         public void SetActiveButton(Button button)
         {
@@ -596,7 +680,18 @@ FILE: Desktop\packages.config
 ================================================================================
 <?xml version="1.0" encoding="utf-8"?>
 <packages>
+  <package id="Microsoft.Bcl.AsyncInterfaces" version="10.0.2" targetFramework="net48" />
   <package id="Newtonsoft.Json" version="13.0.4" targetFramework="net48" />
+  <package id="System.Buffers" version="4.6.1" targetFramework="net48" />
+  <package id="System.IO.Pipelines" version="10.0.2" targetFramework="net48" />
+  <package id="System.Memory" version="4.6.3" targetFramework="net48" />
+  <package id="System.Net.Http.Json" version="10.0.2" targetFramework="net48" />
+  <package id="System.Numerics.Vectors" version="4.6.1" targetFramework="net48" />
+  <package id="System.Runtime.CompilerServices.Unsafe" version="6.1.2" targetFramework="net48" />
+  <package id="System.Text.Encodings.Web" version="10.0.2" targetFramework="net48" />
+  <package id="System.Text.Json" version="10.0.2" targetFramework="net48" />
+  <package id="System.Threading.Tasks.Extensions" version="4.6.3" targetFramework="net48" />
+  <package id="System.ValueTuple" version="4.6.1" targetFramework="net48" />
 </packages>
 
 
@@ -724,6 +819,49 @@ namespace Desktop.Models
         [Required]
         public string Category { get; set; }
         public bool IsSelected { get; set; } = false;
+    }
+}
+
+
+================================================================================
+FILE: Desktop\Models\Log.cs
+================================================================================
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Desktop.Models
+{
+    public class Log
+    {
+        public int Id { get; set; }
+        public int ActorId { get; set; }          
+        public string ActorType { get; set; }    
+        public string Action { get; set; }       
+        public string Entity { get; set; }       
+        public string Details { get; set; }   
+        public DateTime Timestamp { get; set; }
+    }
+}
+
+
+
+================================================================================
+FILE: Desktop\Models\News.cs
+================================================================================
+using System;
+
+namespace Desktop.Models
+{
+    public class News
+    {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
+        public string ImageUrl { get; set; }
+        public DateTime PublishDate { get; set; }
     }
 }
 
@@ -891,27 +1029,25 @@ namespace Desktop.Pages
                 if (_isEditMode)
                 {
                     await App.ApiContext.UpdateBookingAsync(_booking);
-                    MessageBox.Show("Бронирование обновлено!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show("Бронирование обновлено!", "Успех");
                 }
                 else
                 {
                     await App.ApiContext.CreateBookingAsync(_booking);
-                    MessageBox.Show("Бронирование создано!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show("Бронирование создано!", "Успех");
                 }
 
-                // Вместо GoBack — переходим на BookingsPage заново (это гарантированно обновит список)
-                NavigationService.Navigate(new BookingsPage());
+                NavigationService.Navigate(new BookingsPage());  // ← Новая страница с данными из API
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Ошибка при сохранении: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show($"Ошибка при сохранении: {ex.Message}", "Ошибка");
             }
             finally
             {
                 LoadingOverlay.Visibility = Visibility.Collapsed;
             }
         }
-
         private void Cancel_Click(object sender, RoutedEventArgs e)
         {
             NavigationService.GoBack();
@@ -1540,7 +1676,6 @@ namespace Desktop.Pages
                     b.IsSelected = false;
                 }
 
-                // Установка словарей в конвертеры (без ошибок)
                 if (Resources["UserConverter"] is IdToNameConverter userConv)
                 {
                     userConv.NameDictionary = _userLastNames;
@@ -1551,7 +1686,7 @@ namespace Desktop.Pages
                     restConv.NameDictionary = _restaurantNames;
                 }
 
-                ApplyFilter();
+                ApplyFilter();  // Обновляем FilteredBookings
             }
             catch (Exception ex)
             {
@@ -1889,6 +2024,214 @@ namespace Desktop.Pages
     }
 }
 
+
+
+================================================================================
+FILE: Desktop\Pages\LogsPage.xaml.cs
+================================================================================
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;          // ← для Mouse и Cursors
+using System.Windows.Threading;      // ← для DispatcherTimer
+using Desktop.Models;
+
+namespace Desktop.Pages
+{
+    /// <summary>
+    /// Логика взаимодействия для LogsPage.xaml
+    /// </summary>
+    public partial class LogsPage : Page
+    {
+        private readonly HttpClient _httpClient;
+        private readonly DispatcherTimer _timer;
+        private EventHandler _tickHandler;
+        public LogsPage()
+        {
+            InitializeComponent();
+            _httpClient = new HttpClient
+            {
+                BaseAddress = new Uri("https://localhost:7237/"),  // твой адрес бэкенда
+                Timeout = TimeSpan.FromSeconds(15)
+            };
+            _httpClient.DefaultRequestHeaders.Add("Accept", "application/json");
+
+            _timer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(12)  // каждые 12 секунд
+            };
+
+            _tickHandler = async (s, e) => await LoadLogsAsync();
+            _timer.Tick += _tickHandler;
+            _timer.Start();
+
+            _ = LoadLogsAsync();
+        }
+        private async Task LoadLogsAsync()
+        {
+            try
+            {
+                LogsGrid.IsEnabled = false;
+                Mouse.OverrideCursor = Cursors.Wait;
+
+                var logs = await _httpClient.GetFromJsonAsync<List<Log>>("api/Audit/all");
+
+                if (logs != null && logs.Count > 0)
+                {
+                    // Сортируем по времени по убыванию (самые свежие сверху)
+                    logs.Sort((a, b) => b.Timestamp.CompareTo(a.Timestamp));
+                    LogsGrid.ItemsSource = logs;
+
+                    LastUpdateText.Text = $"Последнее обновление: {DateTime.Now:HH:mm:ss}";
+                }
+                else
+                {
+                    LastUpdateText.Text = "Логи пусты";
+                }
+            }
+            catch (Exception ex)
+            {
+                LastUpdateText.Text = "Ошибка загрузки";
+                MessageBox.Show($"Не удалось загрузить логи:\n{ex.Message}");
+            }
+            finally
+            {
+                LogsGrid.IsEnabled = true;
+                Mouse.OverrideCursor = null;
+            }
+        }
+        private async void RefreshLogs_Click(object sender, RoutedEventArgs e)
+        {
+            await LoadLogsAsync();
+        }
+
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+            if (_timer != null)
+            {
+                _timer.Tick -= _tickHandler;
+                _timer.Stop();
+            }
+        }
+    }
+}
+ 
+
+
+================================================================================
+FILE: Desktop\Pages\NewsPage.xaml.cs
+================================================================================
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+using Desktop.Models;
+
+namespace Desktop.Pages
+{
+    /// <summary>
+    /// Логика взаимодействия для NewsPage.xaml
+    /// </summary>
+    public partial class NewsPage : Page
+    {
+        public ObservableCollection<News> NewsItems { get; set; } = new ObservableCollection<News>();
+        public NewsPage()
+        {
+            InitializeComponent(); 
+            NewsList.ItemsSource = NewsItems; 
+            LoadData();
+        }
+
+        private async void LoadData()
+        {
+            if (LoadingOverlay == null) return;
+            LoadingOverlay.Visibility = Visibility.Visible;
+            try
+            {
+                // Используем правильное название метода из ApiContext
+                var news = await App.ApiContext.GetAllNewsAsync();
+                NewsItems.Clear();
+                if (news != null)
+                {
+                    // Сортировка по ID, чтобы новости не прыгали
+                    var sorted = news.OrderBy(n => n.Id).ToList();
+                    foreach (var item in sorted) NewsItems.Add(item);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка загрузки: {ex.Message}");
+            }
+            finally { LoadingOverlay.Visibility = Visibility.Collapsed; }
+        }
+
+        // ОБНОВЛЕНИЕ (ПАРСИНГ)
+        private async void BtnParse_Click(object sender, RoutedEventArgs e)
+        {
+            LoadingOverlay.Visibility = Visibility.Visible;
+            try
+            {
+                // Вызываем RefreshNewsAsync, который стучится в api/News/RefreshNews
+                await App.ApiContext.ParseNewsAsync();
+
+                // Перезагружаем список, чтобы увидеть новые новости
+                LoadData();
+                MessageBox.Show("Парсер на сервере успешно отработал!", "Успех");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка вызова парсера: {ex.Message}");
+            }
+            finally { LoadingOverlay.Visibility = Visibility.Collapsed; }
+        }
+
+        // УДАЛЕНИЕ ОДНОЙ НОВОСТИ
+        private async void BtnDelete_Click(object sender, RoutedEventArgs e)
+        {
+            var selected = NewsList.SelectedItem as News;
+            if (selected == null)
+            {
+                MessageBox.Show("Выберите новость в списке!");
+                return;
+            }
+
+            if (MessageBox.Show($"Удалить новость #{selected.Id}?", "Подтверждение", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            {
+                LoadingOverlay.Visibility = Visibility.Visible;
+                try
+                {
+                    // Вызываем DeleteNewsAsync
+                    bool success = await App.ApiContext.DeleteNewsAsync(selected.Id);
+                    if (success)
+                    {
+                        NewsItems.Remove(selected);
+                        MessageBox.Show("Удалено.");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка удаления: {ex.Message}");
+                }
+                finally { LoadingOverlay.Visibility = Visibility.Collapsed; }
+            }
+        }
+    }
+}
 
 
 ================================================================================

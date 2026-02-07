@@ -85,6 +85,12 @@ namespace Desktop
             MainFrame.Visibility = Visibility.Visible;
         }
 
+        private void BtnAchievements_Click(object sender, RoutedEventArgs e)
+        {
+            MainFrame.Navigate(new AchievementsPage());
+            SetActiveButton(BtnAchievements);
+        }
+
         private void BtnNews_Click(object sender, RoutedEventArgs e)
         {
             MainFrame.Navigate(new NewsPage());
