@@ -1,0 +1,68 @@
+﻿<Page x:Class="Desktop.Pages.LogsPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:Desktop.Pages"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="LogsPage">
+
+    <Grid Background="White">
+        <StackPanel Margin="20">
+            <TextBlock Text="Журнал действий пользователей и администраторов" 
+                    FontSize="24" FontWeight="Bold" Margin="0,0,0,20"/>
+
+            <DataGrid x:Name="LogsGrid" 
+                   AutoGenerateColumns="False" 
+                   IsReadOnly="True" 
+                   Height="400"
+                   CanUserSortColumns="True"
+                   GridLinesVisibility="Horizontal">
+
+                <DataGrid.Columns>
+                    <!-- Время (с сортировкой по умолчанию по убыванию) -->
+                    <DataGridTextColumn Header="Время" 
+                                    Binding="{Binding Timestamp, StringFormat={}{0:dd.MM.yyyy HH:mm:ss}}" 
+                                    Width="160"
+                                    SortDirection="Descending"/>
+
+                    <!-- Тип актора (User / Admin) -->
+                    <DataGridTextColumn Header="Тип" 
+                                    Binding="{Binding ActorType}" 
+                                    Width="90"/>
+
+                    <!-- ID актора -->
+                    <DataGridTextColumn Header="ID" 
+                                    Binding="{Binding ActorId}" 
+                                    Width="80"/>
+
+                    <!-- Действие -->
+                    <DataGridTextColumn Header="Действие" 
+                                    Binding="{Binding Action}" 
+                                    Width="140"/>
+
+                    <!-- Сущность (над чем действие) -->
+                    <DataGridTextColumn Header="Объект" 
+                                    Binding="{Binding Entity}" 
+                                    Width="140"/>
+
+                    <!-- Детали (самая важная колонка — растягивается) -->
+                    <DataGridTextColumn Header="Детали" 
+                                    Binding="{Binding Details}" 
+                                    Width="*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                <Button Content="Обновить сейчас" 
+                     Width="140" 
+                     Margin="0,0,10,0" 
+                     Click="RefreshLogs_Click"/>
+                <TextBlock x:Name="LastUpdateText" 
+                        VerticalAlignment="Center" 
+                        Text="Последнее обновление: —"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Page>

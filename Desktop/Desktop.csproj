@@ -121,6 +121,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Pages\LogsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\RestaurantsPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -178,6 +182,9 @@
     </Compile>
     <Compile Include="Pages\Items\UserCard.xaml.cs">
       <DependentUpon>UserCard.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\LogsPage.xaml.cs">
+      <DependentUpon>LogsPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\RestaurantsPage.xaml.cs">
       <DependentUpon>RestaurantsPage.xaml</DependentUpon>
