@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using RestAPI.Context;
 using RestAPI.Interfaces;
-using RestAPI.Model;
+using RestAPI.Model; 
 
 namespace RestAPI.Controllers
 {
@@ -15,7 +15,7 @@ namespace RestAPI.Controllers
         public DishController(IDish dish)
         {
             _dish = dish;
-        }
+        } 
 
         [HttpPost("CreateDish")]
         public async Task<IActionResult> CreateDish([FromBody] Dish dish)
