@@ -85,6 +85,12 @@ namespace Desktop
             MainFrame.Visibility = Visibility.Visible;
         }
 
+        private void BtnNews_Click(object sender, RoutedEventArgs e)
+        {
+            MainFrame.Navigate(new NewsPage());
+            SetActiveButton(BtnNews);
+        }
+
         public void SetActiveButton(Button button)
         {
             // Сброс всех кнопок

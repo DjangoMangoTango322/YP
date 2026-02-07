@@ -48,7 +48,12 @@
                     <Button x:Name="BtnBookings" Content="📅 Бронирования"
                             Style="{StaticResource MenuButtonStyle}"
                             Click="BtnBookings_Click"/>
-                    <Button x:Name="BtnLogs" Content="📜 Логи" Style="{StaticResource MenuButtonStyle}" Click="BtnLogs_Click"/>
+                    <Button x:Name="BtnLogs" Content="📜 Логи" 
+                            Style="{StaticResource MenuButtonStyle}" 
+                            Click="BtnLogs_Click"/>
+                    <Button x:Name="BtnNews" Content="📰 Новости"
+                            Style="{StaticResource MenuButtonStyle}"
+                            Click="BtnNews_Click"/>
                 </StackPanel>
                 <!-- User Info & Logout -->
                 <Border Grid.Row="2" Margin="15" Background="Transparent">
