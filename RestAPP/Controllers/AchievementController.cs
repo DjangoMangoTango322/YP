@@ -16,7 +16,6 @@ namespace RestAPI.Controllers
             _context = context;
         }
 
-        // Инициализация базы данных начальными ачивками (вызвать один раз через Swagger)
         [HttpPost("InitAchievements")]
         public async Task<IActionResult> Init()
         {
