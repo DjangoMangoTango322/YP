@@ -11,7 +11,7 @@ namespace RestAPP.Context
         public AuditContext(DbContextOptions<AuditContext> options)
             : base(options)
         {
-            Database.EnsureCreated();
+            Database.EnsureCreated(); 
         }
     }
 }
