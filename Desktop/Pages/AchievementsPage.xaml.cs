@@ -20,7 +20,7 @@ namespace Desktop.Pages
     /// </summary>
     public partial class AchievementsPage : Page
     {
-        public AchievementsPage()
+        public AchievementsPage() 
         {
             InitializeComponent();
             LoadData();
