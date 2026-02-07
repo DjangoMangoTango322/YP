@@ -17,6 +17,6 @@ namespace RestAPI.Models
 
         public string ImageUrl { get; set; }
 
-        public DateTime PublishDate { get; set; } = DateTime.Now;
+        public DateTime PublishDate { get; set; } = DateTime.Now; 
     }
 }
