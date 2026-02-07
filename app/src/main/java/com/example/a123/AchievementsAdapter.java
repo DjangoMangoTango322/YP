@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-public class AchievementsAdapter extends RecyclerView.Adapter<AchievementsAdapter.ViewHolder> {
+public class AchievementsAdapter  extends RecyclerView.Adapter<AchievementsAdapter.ViewHolder> {
 
     private final List<DataModels.AchievementDto> achievementList;
 
