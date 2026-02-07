@@ -2,9 +2,10 @@
 using RestAPP.Model;
 
 
+
 namespace RestAPP.Context
 {
-    public class AuditContext
+    public class AuditContext : DbContext
     {
         public DbSet<ActivityLog> ActivityLogs { get; set; }
 

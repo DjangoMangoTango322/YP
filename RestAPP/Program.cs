@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using RestAPI.Context;
 using RestAPP.Context;
+using RestAPP.Interfaces;
+using RestAPP.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +23,11 @@ builder.Services.AddDbContext<RestaurantDishContext>(options =>
 
 builder.Services.AddDbContext<UserContext>(options =>
     options.UseSqlServer(DbConnection.config));
+
+builder.Services.AddDbContext<AuditContext>(options =>
+    options.UseSqlServer(DbConnection.config));
+
+builder.Services.AddScoped<IAuditService, AuditService>();
 
 builder.Services.AddScoped<RestAPI.Interfaces.IAdministrator, RestAPI.Service.AdministratorService>();
 builder.Services.AddScoped<RestAPI.Interfaces.IBooking, RestAPI.Service.BookingService>();
