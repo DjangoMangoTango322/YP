@@ -49,10 +49,10 @@ public class Adapters {
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             Restaurant r = restaurantList.get(position);
-            holder.nameTextView.setText(r.Name);
-            holder.addressTextView.setText(r.Address);
+            holder.nameTextView.setText(r.name);
+            holder.addressTextView.setText(r.address);
             holder.ratingTextView.setText(String.format(Locale.getDefault(), "★ %.1f", 4.5));
-            holder.cuisineTextView.setText(r.Tematic != null ? r.Tematic : "");
+            holder.cuisineTextView.setText(r.tematic != null ? r.tematic : "");
             holder.cardView.setOnClickListener(v -> {
                 if (listener != null) listener.onRestaurantClick(r);
             });
@@ -70,7 +70,7 @@ public class Adapters {
             public ViewHolder(@NonNull View itemView) {
                 super(itemView);
                 cardView = itemView.findViewById(R.id.cardView);
-                nameTextView = itemView.findViewById(R.id.restaurantNameTextView);
+                nameTextView = itemView.findViewById(R.id.restaurantName);
                 addressTextView = itemView.findViewById(R.id.addressTextView);
                 ratingTextView = itemView.findViewById(R.id.ratingTextView);
                 cuisineTextView = itemView.findViewById(R.id.cuisineTextView);
@@ -96,10 +96,10 @@ public class Adapters {
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             Dish d = menuList.get(position);
-            holder.dishNameTextView.setText(d.Name);
-            holder.dishDescriptionTextView.setText(d.Description);
-            holder.dishPriceTextView.setText(String.format(Locale.getDefault(), "%.0f ₽", d.Price));
-            holder.dishCategoryTextView.setText(d.Category != null ? d.Category : "");
+            holder.dishNameTextView.setText(d.name);
+            holder.dishDescriptionTextView.setText(d.description);
+            holder.dishPriceTextView.setText(String.format(Locale.getDefault(), "%.0f ₽", d.price));
+            holder.dishCategoryTextView.setText(d.category != null ? d.category : "");
             holder.vegetarianBadge.setVisibility(d.isVegetarian ? View.VISIBLE : View.GONE);
         }
 
@@ -141,11 +141,11 @@ public class Adapters {
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             Booking b = bookingList.get(position);
             holder.restaurantNameTextView.setText(b.restaurantName != null ? b.restaurantName : "Загрузка...");
-            holder.bookingDateTextView.setText(b.Booking_Date != null ? formatBookingDate(b.Booking_Date) : "");
-            holder.peopleCountTextView.setText(b.Number_Of_Guests + " чел.");
-            holder.statusTextView.setText(getStatusText(b.Status));
+            holder.bookingDateTextView.setText(b.booking_Date != null ? formatBookingDate(b.booking_Date) : "");
+            holder.peopleCountTextView.setText(b.number_Of_Guests + " чел.");
+            holder.statusTextView.setText(getStatusText(b.status));
             holder.cancelButton.setVisibility(
-                    ("completed".equalsIgnoreCase(b.Status) || "cancelled".equalsIgnoreCase(b.Status))
+                    ("completed".equalsIgnoreCase(b.status) || "cancelled".equalsIgnoreCase(b.status))
                             ? View.GONE : View.VISIBLE
             );
 
@@ -155,12 +155,12 @@ public class Adapters {
 
                 Booking booking = bookingList.get(currentPosition);
 
-                ApiClient.getApiService().cancelBooking(booking.User_Id, booking.Restaurant_Id)
+                ApiClient.getApiService().cancelBooking(booking.user_Id, booking.restaurant_Id)
                         .enqueue(new Callback<Void>() {
                             @Override
                             public void onResponse(Call<Void> call, Response<Void> response) {
                                 if (response.isSuccessful()) {
-                                    booking.Status = "cancelled";
+                                    booking.status = "cancelled";
                                     notifyItemChanged(currentPosition);
                                 } else {
                                     Toast.makeText(v.getContext(), "Ошибка отмены бронирования", Toast.LENGTH_SHORT).show();
@@ -180,7 +180,6 @@ public class Adapters {
             return bookingList != null ? bookingList.size() : 0;
         }
 
-        // Простая функция форматирования даты (вместо Utils.DateUtils)
         private String formatBookingDate(String isoDate) {
             if (isoDate == null) return "";
             // Пример: "2025-12-21T18:00:00" → "21.12.2025 18:00"
@@ -195,7 +194,6 @@ public class Adapters {
             }
         }
 
-        // Простая функция для статуса (вместо Utils.BookingHelper)
         private String getStatusText(String status) {
             if (status == null) return "Неизвестно";
             switch (status.toLowerCase()) {

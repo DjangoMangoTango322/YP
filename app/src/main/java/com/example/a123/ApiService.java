@@ -4,10 +4,15 @@ import com.example.a123.DataModels.Booking;
 import com.example.a123.DataModels.Dish;
 import com.example.a123.DataModels.Restaurant;
 import com.example.a123.DataModels.User;
+import com.example.a123.DataModels.News;
+import java.util.List;
+import retrofit2.Call;
+import retrofit2.http.GET;
 
 import java.util.List;
 
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
@@ -19,60 +24,30 @@ import retrofit2.http.Query;
 public interface ApiService {
 
     // Регистрация
-    @FormUrlEncoded
-    @POST("api/UserController/ReginU")
-    Call<Void> register(
-            @Field("First_Name") String firstName,
-            @Field("Last_Name") String lastName,
-            @Field("Login") String login,
-            @Field("Phone") String phone,
-            @Field("Password") String password
-    );
-
+    @POST("api/UserController/AddUser")
+    Call<Void> register(@Body UserRequest user);
     // Безопасный логин
-    @GET("api/UserController/Login")
-    Call<UserIdResponse> loginUser(
-            @Query("login") String login,
-            @Query("password") String password
-    );
+    @GET("api/UserController/GetAllUsers")
+    Call<List<UserIdResponse>> getAllUsers();
 
-    // Получение пользователя по ID — НОВЫЙ МЕТОД
-    @GET("api/UserController/GetUserById")
-    Call<User> getUserById(@Query("id") int id);
+    @GET("api/UserController/GetUserById/{id}")
+    Call<UserRequest> getUserById(@Path("id") int id);
 
     // Обновление пользователя — НОВЫЙ МЕТОД
-    @FormUrlEncoded
     @POST("api/UserController/UpdateUser")
-    Call<Void> updateUser(
-            @Field("Id") int id,
-            @Field("First_Name") String firstName,
-            @Field("Last_Name") String lastName,
-            @Field("Login") String login,
-            @Field("Phone") String phone,
-            @Field("Password") String password
-    );
+    Call<Void> updateUser(@Body UserRequest user);
 
     // Остальные методы (рестораны, меню, брони и т.д.)
     @GET("api/RestaurantController/GetAllRestaurants")
     Call<List<Restaurant>> getRestaurants();
 
-    @GET("api/RestaurantController/GetRestaurantById")
-    Call<Restaurant> getRestaurantById(@Query("id") int id);
+    @GET("api/RestaurantController/GetRestaurantById/{id}")
+    Call<DataModels.Restaurant> getRestaurantById(@Path("id") int id);
+    @GET("api/RestaurantDishController/GetDishesByRestaurantId/{restaurantId}")
+    Call<List<DataModels.Dish>> getRestaurantMenu(@Path("restaurantId") int id);
 
-    @GET("api/RestaurantDishController/GetDishesByRestaurantId")
-    Call<List<Dish>> getRestaurantMenu(@Query("restaurantId") int restaurantId);
-
-    @FormUrlEncoded
     @POST("api/BookingController/CreateBooking")
-    Call<Void> createBooking(
-            @Field("User_Id") int userId,
-            @Field("Restaurant_Id") int restaurantId,
-            @Field("Booking_Date") String date,
-            @Field("Number_Of_Guests") int guests,
-            @Field("Status") String status,
-            @Field("Created_At") String createdAt
-    );
-
+    Call<Void> createBooking(@Body BookingRequest booking);
     @GET("api/BookingController/GetAllBookings")
     Call<List<Booking>> getAllBookings();
 
@@ -81,4 +56,6 @@ public interface ApiService {
             @Path("userId") int userId,
             @Path("restaurantId") int restaurantId
     );
+    @GET("api/News/GetAllNews")
+    Call<List<News>> getAllNews();
 }
