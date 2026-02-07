@@ -1,6 +1,6 @@
-﻿PROJECT EXPORT - 12/17/2025 23:29:42
-Project Path: C:\Users\semen\Desktop\8939405\YP
-Total Files: 37
+﻿PROJECT EXPORT - 02/07/2026 16:49:30
+Project Path: C:\Users\student-a502.PERMAVIAT\Desktop\sadsdsa\YP
+Total Files: 47
 
 ================================================================================
 FILE: RestAPP.sln
@@ -65,7 +65,11 @@ FILE: RestAPP\Program.cs
 ================================================================================
 using Microsoft.EntityFrameworkCore;
 using RestAPI.Context;
+using RestAPI.Interfaces;
+using RestAPI.Service;
 using RestAPP.Context;
+using RestAPP.Interfaces;
+using RestAPP.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -87,12 +91,20 @@ builder.Services.AddDbContext<RestaurantDishContext>(options =>
 builder.Services.AddDbContext<UserContext>(options =>
     options.UseSqlServer(DbConnection.config));
 
+builder.Services.AddDbContext<AuditContext>(options =>
+    options.UseSqlServer(DbConnection.config));
+
+builder.Services.AddDbContext<NewsContext>(options =>
+    options.UseSqlServer(DbConnection.config));
+
+builder.Services.AddScoped<IAuditService, AuditService>();
 builder.Services.AddScoped<RestAPI.Interfaces.IAdministrator, RestAPI.Service.AdministratorService>();
 builder.Services.AddScoped<RestAPI.Interfaces.IBooking, RestAPI.Service.BookingService>();
 builder.Services.AddScoped<RestAPI.Interfaces.IDish, RestAPI.Service.DishService>();
 builder.Services.AddScoped<RestAPI.Interfaces.IRestaurant, RestAPI.Service.RestaurantService>();
 builder.Services.AddScoped<RestAPI.Interfaces.IRestaurantDish, RestAPI.Service.RestaurantDishService>();
 builder.Services.AddScoped<RestAPI.Interfaces.IUser, RestAPI.Service.UserService>();
+builder.Services.AddScoped<INewsService, NewsService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -106,7 +118,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
@@ -136,6 +148,7 @@ FILE: RestAPP\RestAPP.csproj
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="HtmlAgilityPack" Version="1.12.4" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.0" />
@@ -168,6 +181,30 @@ namespace RestAPP.Context
         }
     }
 }
+
+
+================================================================================
+FILE: RestAPP\Context\AuditContext.cs
+================================================================================
+using Microsoft.EntityFrameworkCore;
+using RestAPP.Model;
+
+
+
+namespace RestAPP.Context
+{
+    public class AuditContext : DbContext
+    {
+        public DbSet<ActivityLog> ActivityLogs { get; set; }
+
+        public AuditContext(DbContextOptions<AuditContext> options)
+            : base(options)
+        {
+            Database.EnsureCreated(); 
+        }
+    }
+}
+
 
 
 ================================================================================
@@ -210,7 +247,9 @@ namespace RestAPI.Context
     public class DbConnection : DbContext
     {
         //public static readonly string config = "Server=DESKTOP-U29GOO8\\SQLEXPRESS;Trusted_Connection=True;Database=tinder;TrustServerCertificate=True;";
-        public static readonly string config = "Server=10.0.201.112;TrustServerCertificate=True;Database=base1_ISP_22_4_16;User=ISP_22_4_16;PWD=6GdNkdTL69su_";
+        public static readonly string config = "Server=10.0.201.112;TrustServerCertificate=True;Database=base2_ISP_22_4_16;User=ISP_22_4_16;PWD=6GdNkdTL69su_";
+        // public static readonly string config =
+        // "Server=SEMEN1337\\SQLEXPRESS;Database=base1_ISP_22_4_16;Trusted_Connection=True;TrustServerCertificate=True;";
     }
 }
 
@@ -236,6 +275,33 @@ namespace RestAPP.Context
     }
 }
 
+
+
+================================================================================
+FILE: RestAPP\Context\NewsContext.cs
+================================================================================
+using Microsoft.EntityFrameworkCore;
+using RestAPI.Context;
+using RestAPI.Model;
+using RestAPI.Models;
+
+namespace RestAPP.Context
+{
+    public class NewsContext : DbContext
+    {
+        public DbSet<News> News { get; set; }
+
+        public NewsContext(DbContextOptions<NewsContext> options) : base(options) { }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // Эта строка гарантирует, что EF пойдет в таблицу "News" в схеме "dbo"
+            modelBuilder.Entity<News>().ToTable("News", "dbo");
+        }
+    }
+}
 
 
 ================================================================================
@@ -320,7 +386,7 @@ namespace RestAPI.Controllers
 {
     [Route("api/AdministratorController")]
     [ApiController]
-    public class AdministratorController : Controller
+    public class AdministratorController : ControllerBase
     {
         private readonly IAdministrator _administrator;
 
@@ -329,20 +395,16 @@ namespace RestAPI.Controllers
             _administrator = administrator;
         }
 
-        /// <summary>
-        /// Регистрация Администратора
-        /// </summary>
-        [Route("AddAdministrator")]
-        [HttpPost]
-        public Task AddAdministrator([FromForm] Administrator administrator)
+        [HttpPost("AddAdministrator")]
+        public async Task<IActionResult> AddAdministrator([FromBody] Administrator administrator)
         {
-            var res = _administrator.ReginA(administrator);
-            return res;
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            await _administrator.ReginA(administrator);
+            return Ok();
         }
 
-        /// <summary>
-        /// Авторизация Администратора
-        /// </summary>
         [HttpPost("LoginAdministrator")]
         public async Task<IActionResult> LoginAdministrator([FromForm] string login, [FromForm] string password)
         {
@@ -352,14 +414,12 @@ namespace RestAPI.Controllers
             var result = await _administrator.LoginAdmin(login, password);
 
             if (result <= 0)
-                return Unauthorized();
+                return Unauthorized("Неверный логин или пароль");
 
-            return Ok(new { AdministratorId = result });
+            var admin = await _administrator.GetAdminById(result);
+            return Ok(admin); // Возвращаем объект Administrator, как ожидает клиент
         }
 
-        /// <summary>
-        /// Получение всех администраторов
-        /// </summary>
         [HttpGet("GetAllAdmins")]
         public async Task<IActionResult> GetAllAdmins()
         {
@@ -367,9 +427,6 @@ namespace RestAPI.Controllers
             return Ok(admins);
         }
 
-        /// <summary>
-        /// Получение администратора по ID
-        /// </summary>
         [HttpGet("GetAdminById/{id}")]
         public async Task<IActionResult> GetAdminById(int id)
         {
@@ -379,24 +436,71 @@ namespace RestAPI.Controllers
             return Ok(admin);
         }
 
-        /// <summary>
-        /// Обновление администратора
-        /// </summary>
-        [HttpPut("UpdateAdmin")]
-        public async Task<IActionResult> UpdateAdmin([FromForm] Administrator admin)
+        [HttpPost("UpdateAdmin")]
+        public async Task<IActionResult> UpdateAdmin([FromBody] Administrator admin)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             await _administrator.UpdateAdmin(admin);
             return Ok();
         }
 
-        /// <summary>
-        /// Удаление администратора по ID
-        /// </summary>
         [HttpDelete("DeleteAdmin/{id}")]
         public async Task<IActionResult> DeleteAdmin(int id)
         {
             await _administrator.DeleteAdmin(id);
             return Ok();
+        }
+    }
+}
+
+
+================================================================================
+FILE: RestAPP\Controllers\AuditController.cs
+================================================================================
+using Microsoft.AspNetCore.Mvc;
+using RestAPP.Interfaces;
+
+namespace RestAPP.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class AuditController : ControllerBase
+    {
+        private readonly IAuditService _auditService;
+
+        public AuditController(IAuditService auditService)
+        {
+            _auditService = auditService;
+        }
+
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAll()
+        {
+            var logs = await _auditService.GetAllLogsAsync();
+            return Ok(logs);
+        }
+
+        [HttpGet("actor/{actorId}")]
+        public async Task<IActionResult> GetByActor(int actorId)
+        {
+            var logs = await _auditService.GetLogsByActorAsync(actorId);
+            return Ok(logs);
+        }
+
+        [HttpDelete("clear")]
+        public async Task<IActionResult> Clear()
+        {
+            await _auditService.ClearAllAsync();
+            return Ok(new { message = "Журнал аудита полностью очищен" });
+        }
+
+        [HttpDelete("trim/{count}")]
+        public async Task<IActionResult> Trim(int count = 1000)
+        {
+            await _auditService.TrimAsync(count);
+            return Ok(new { message = $"Оставлено последних {count} записей" });
         }
     }
 }
@@ -416,7 +520,7 @@ namespace RestAPI.Controllers
 {
     [Route("api/BookingController")]
     [ApiController]
-    public class BookingController : Controller
+    public class BookingController : ControllerBase
     {
         private readonly IBooking _booking;
 
@@ -425,19 +529,16 @@ namespace RestAPI.Controllers
             _booking = booking;
         }
 
-        /// <summary>
-        /// Создание бронирования
-        /// </summary>
         [HttpPost("CreateBooking")]
-        public async Task<IActionResult> CreateBooking([FromForm] Booking booking)
+        public async Task<IActionResult> CreateBooking([FromBody] Booking booking)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             await _booking.CreateBooking(booking);
             return Ok();
         }
 
-        /// <summary>
-        /// Получение всех бронирований
-        /// </summary>
         [HttpGet("GetAllBookings")]
         public async Task<IActionResult> GetAllBookings()
         {
@@ -445,46 +546,30 @@ namespace RestAPI.Controllers
             return Ok(bookings);
         }
 
-        /// <summary>
-        /// Получение бронирования по ID
-        /// </summary>
-        [HttpGet("GetBookingById/{id}")]
-        public async Task<IActionResult> GetBookingById(int id, int restaurantId)
+        [HttpGet("GetBookingById/{userId}/{restaurantId}")]
+        public async Task<IActionResult> GetBookingById(int userId, int restaurantId)
         {
-            var booking = await _booking.GetBookingById(id, restaurantId);
+            var booking = await _booking.GetBookingById(userId, restaurantId);
             if (booking == null)
                 return NotFound();
             return Ok(booking);
         }
 
-        /// <summary>
-        /// Обновление бронирования
-        /// </summary>
-        [HttpPut("UpdateBooking")]
-        public async Task<IActionResult> UpdateBooking([FromForm] Booking booking)
+        [HttpPost("UpdateBooking")]
+        public async Task<IActionResult> UpdateBooking([FromBody] Booking booking)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             await _booking.UpdateBooking(booking);
             return Ok();
         }
 
-        /// <summary>
-        /// Удаление бронирования
-        /// </summary>
-        [HttpDelete("DeleteBooking/{id}")]
+        [HttpDelete("DeleteBooking/{userId}/{restaurantId}")]
         public async Task<IActionResult> DeleteBooking(int userId, int restaurantId)
         {
             await _booking.DeleteBooking(userId, restaurantId);
             return Ok();
-        }
-
-        /// <summary>
-        /// Получение бронирований пользователя
-        /// </summary>
-        [HttpGet("GetBookingsByUserId/{userId}")]
-        public async Task<IActionResult> GetBookingsByUserId(int userId)
-        {
-            var bookings = await _booking.GetBookingsByUserId(userId);
-            return Ok(bookings);
         }
     }
 }
@@ -504,7 +589,7 @@ namespace RestAPI.Controllers
 {
     [Route("api/DishController")]
     [ApiController]
-    public class DishController : Controller
+    public class DishController : ControllerBase
     {
         private readonly IDish _dish;
 
@@ -513,19 +598,16 @@ namespace RestAPI.Controllers
             _dish = dish;
         }
 
-        /// <summary>
-        /// Создание блюда
-        /// </summary>
         [HttpPost("CreateDish")]
-        public async Task<IActionResult> CreateDish([FromForm] Dish dish)
+        public async Task<IActionResult> CreateDish([FromBody] Dish dish)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             await _dish.CreateDish(dish);
             return Ok();
         }
 
-        /// <summary>
-        /// Получение всех блюд
-        /// </summary>
         [HttpGet("GetAllDishes")]
         public async Task<IActionResult> GetAllDishes()
         {
@@ -533,9 +615,6 @@ namespace RestAPI.Controllers
             return Ok(dishes);
         }
 
-        /// <summary>
-        /// Получение блюда по ID
-        /// </summary>
         [HttpGet("GetDishById/{id}")]
         public async Task<IActionResult> GetDishById(int id)
         {
@@ -545,34 +624,66 @@ namespace RestAPI.Controllers
             return Ok(dish);
         }
 
-        /// <summary>
-        /// Обновление блюда
-        /// </summary>
-        [HttpPut("UpdateDish")]
-        public async Task<IActionResult> UpdateDish([FromForm] Dish dish)
+        [HttpPost("UpdateDish")]
+        public async Task<IActionResult> UpdateDish([FromBody] Dish dish)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             await _dish.UpdateDish(dish);
             return Ok();
         }
 
-        /// <summary>
-        /// Удаление блюда
-        /// </summary>
         [HttpDelete("DeleteDish/{id}")]
         public async Task<IActionResult> DeleteDish(int id)
         {
             await _dish.DeleteDish(id);
             return Ok();
         }
+    }
+}
 
-        /// <summary>
-        /// Получение блюд по категории
-        /// </summary>
-        [HttpGet("GetDishesByCategory/{category}")]
-        public async Task<IActionResult> GetDishesByCategory(string category)
+
+================================================================================
+FILE: RestAPP\Controllers\NewsController.cs
+================================================================================
+using Microsoft.AspNetCore.Mvc;
+using RestAPI.Interfaces;
+using RestAPI.Models;
+
+namespace RestAPI.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class NewsController : ControllerBase
+    {
+        private readonly INewsService _newsService;
+
+        public NewsController(INewsService newsService)
         {
-            var dishes = await _dish.GetDishesByCategory(category);
-            return Ok(dishes);
+            _newsService = newsService;
+        }
+
+        [HttpGet("GetAllNews")]
+        public async Task<IActionResult> GetAllNews()
+        {
+            var news = await _newsService.GetAllNews();
+            return Ok(news);
+        }
+
+        [HttpPost("RefreshNews")]
+        public async Task<IActionResult> RefreshNews()
+        {
+            await _newsService.ParseNewsFromSource();
+            return Ok("База обновлена");
+        }
+
+        [HttpDelete("DeleteNews/{id}")]
+        public async Task<IActionResult> DeleteNews(int id)
+        {
+            // Правильный вызов:
+            await _newsService.DeleteNews(id);
+            return Ok("Запись удалена");
         }
     }
 }
@@ -591,7 +702,7 @@ namespace RestAPI.Controllers
 {
     [Route("api/RestaurantController")]
     [ApiController]
-    public class RestaurantController : Controller
+    public class RestaurantController : ControllerBase
     {
         private readonly IRestaurant _restaurant;
 
@@ -600,19 +711,16 @@ namespace RestAPI.Controllers
             _restaurant = restaurant;
         }
 
-        /// <summary>
-        /// Создание ресторана
-        /// </summary>
         [HttpPost("CreateRestaurant")]
-        public async Task<IActionResult> CreateRestaurant([FromForm] Restaurant restaurant)
+        public async Task<IActionResult> CreateRestaurant([FromBody] Restaurant restaurant)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             await _restaurant.CreateRestaurant(restaurant);
             return Ok();
         }
 
-        /// <summary>
-        /// Получение всех ресторанов
-        /// </summary>
         [HttpGet("GetAllRestaurants")]
         public async Task<IActionResult> GetAllRestaurants()
         {
@@ -620,9 +728,6 @@ namespace RestAPI.Controllers
             return Ok(restaurants);
         }
 
-        /// <summary>
-        /// Получение ресторана по ID
-        /// </summary>
         [HttpGet("GetRestaurantById/{id}")]
         public async Task<IActionResult> GetRestaurantById(int id)
         {
@@ -632,38 +737,24 @@ namespace RestAPI.Controllers
             return Ok(restaurant);
         }
 
-        /// <summary>
-        /// Обновление ресторана
-        /// </summary>
-        [HttpPut("UpdateRestaurant")]
-        public async Task<IActionResult> UpdateRestaurant([FromForm] Restaurant restaurant)
+        [HttpPost("UpdateRestaurant")]
+        public async Task<IActionResult> UpdateRestaurant([FromBody] Restaurant restaurant)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             await _restaurant.UpdateRestaurant(restaurant);
             return Ok();
         }
 
-        /// <summary>
-        /// Удаление ресторана
-        /// </summary>
         [HttpDelete("DeleteRestaurant/{id}")]
         public async Task<IActionResult> DeleteRestaurant(int id)
         {
             await _restaurant.DeleteRestaurant(id);
             return Ok();
         }
-
-        /// <summary>
-        /// Получение ресторанов по тематике
-        /// </summary>
-        [HttpGet("GetRestaurantsByTematic/{tematic}")]
-        public async Task<IActionResult> GetRestaurantsByTematic(string tematic)
-        {
-            var restaurants = await _restaurant.GetRestaurantsByTematic(tematic);
-            return Ok(restaurants);
-        }
     }
 }
-
 
 
 ================================================================================
@@ -741,7 +832,7 @@ namespace RestAPI.Controllers
 {
     [Route("api/UserController")]
     [ApiController]
-    public class UserController : Controller
+    public class UserController : ControllerBase
     {
         private readonly IUser _user;
 
@@ -750,37 +841,16 @@ namespace RestAPI.Controllers
             _user = user;
         }
 
-        /// <summary>
-        /// Регистрация пользователя
-        /// </summary>
-        [Route("AddUser")]
-        [HttpPost]
-        public Task AddUser([FromForm] User user)
+        [HttpPost("AddUser")]
+        public async Task<IActionResult> AddUser([FromBody] User user)
         {
-            var res = _user.ReginU(user);
-            return res;
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            await _user.ReginU(user);
+            return Ok();
         }
 
-        /// <summary>
-        /// Авторизация пользователя
-        /// </summary>
-        [HttpPost("LoginUser")]
-        public async Task<IActionResult> LoginUser([FromForm] string login, [FromForm] string password)
-        {
-            if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password))
-                return BadRequest("Email и пароль обязательны");
-
-            var result = await _user.LoginUser(login, password);
-
-            if (result <= 0)
-                return Unauthorized();
-
-            return Ok(new { UserId = result });
-        }
-
-        /// <summary>
-        /// Получение всех пользователей
-        /// </summary>
         [HttpGet("GetAllUsers")]
         public async Task<IActionResult> GetAllUsers()
         {
@@ -788,9 +858,6 @@ namespace RestAPI.Controllers
             return Ok(users);
         }
 
-        /// <summary>
-        /// Получение пользователя по ID
-        /// </summary>
         [HttpGet("GetUserById/{id}")]
         public async Task<IActionResult> GetUserById(int id)
         {
@@ -800,35 +867,21 @@ namespace RestAPI.Controllers
             return Ok(user);
         }
 
-        
-        /// <summary>
-        /// Обновление пользователя
-        /// </summary>
-        [HttpPut("UpdateUser")]
-        public async Task<IActionResult> UpdateUser([FromForm] User user)
+        [HttpPost("UpdateUser")]
+        public async Task<IActionResult> UpdateUser([FromBody] User user)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             await _user.UpdateUser(user);
             return Ok();
         }
 
-        /// <summary>
-        /// Удаление пользователя
-        /// </summary>
         [HttpDelete("DeleteUser/{id}")]
-        public async Task<IActionResult> DeleteUser(int id) 
+        public async Task<IActionResult> DeleteUser(int id)
         {
             await _user.DeleteUser(id);
             return Ok();
-        }
-
-        /// <summary>
-        /// Проверка учетных данных
-        /// </summary>
-        [HttpPost("ValidateUserCredentials")]
-        public async Task<IActionResult> ValidateUserCredentials([FromForm] string login, [FromForm] string password)
-        {
-            var isValid = await _user.ValidateUserCredentials(login, password);
-            return Ok(new { IsValid = isValid });
         }
     }
 }
@@ -852,6 +905,28 @@ namespace RestAPI.Interfaces
     }
 }
 
+
+
+================================================================================
+FILE: RestAPP\Interfaces\IAuditService.cs
+================================================================================
+using RestAPP.Model;
+
+namespace RestAPP.Interfaces
+{
+    public interface IAuditService
+    {
+        Task LogAsync(int actorId, string actorType, string action, string entity, string? details = null);
+
+        Task<List<ActivityLog>> GetAllLogsAsync();
+
+        Task<List<ActivityLog>> GetLogsByActorAsync(int actorId);
+
+        Task ClearAllAsync();
+
+        Task TrimAsync(int keepLastCount = 1000);
+    }
+}
 
 
 ================================================================================
@@ -889,6 +964,25 @@ namespace RestAPI.Interfaces
         Task UpdateDish(Dish dish);
         Task DeleteDish(int id);
         Task<List<Dish>> GetDishesByCategory(string category);
+    }
+}
+
+
+================================================================================
+FILE: RestAPP\Interfaces\INewsService.cs
+================================================================================
+using RestAPI.Models;
+
+namespace RestAPI.Interfaces
+{
+    public interface INewsService
+    {
+        Task<List<News>> GetAllNews();
+        Task ParseNewsFromSource();
+
+        Task DeleteNews(int id);
+
+        Task DeleteOldNews();
     }
 }
 
@@ -949,6 +1043,37 @@ namespace RestAPI.Interfaces
         Task<int> LoginUser(string login, string password);
     }
 }
+
+
+================================================================================
+FILE: RestAPP\Model\ActivityLog.cs
+================================================================================
+using System.ComponentModel.DataAnnotations;
+
+namespace RestAPP.Model
+{
+    public class ActivityLog
+    {
+        [Key]
+        public int Id { get; set; }
+
+        public int ActorId { get; set; }                // ID пользователя или администратора
+        [Required, StringLength(50)]
+        public string ActorType { get; set; }           // "User" или "Admin"
+
+        [Required, StringLength(50)]
+        public string Action { get; set; }              // LOGIN, REGISTER, CREATE, UPDATE, DELETE, BOOKING и т.д.
+
+        [Required, StringLength(50)]
+        public string Entity { get; set; }              // User, Booking, Restaurant, Dish, RestaurantDish, Auth и т.д.
+
+        [StringLength(1000)]
+        public string? Details { get; set; }            // дополнительная информация
+
+        public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+    }
+}
+
 
 
 ================================================================================
@@ -1033,6 +1158,33 @@ namespace RestAPI.Model
     }
 }
 
+
+
+================================================================================
+FILE: RestAPP\Model\News.cs
+================================================================================
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace RestAPI.Models
+{
+    [Table("News")]
+    public class News
+    {
+        [Key]
+        public int Id { get; set; }
+
+        [Required]
+        public string Title { get; set; }
+
+        public string Description { get; set; }
+
+        public string ImageUrl { get; set; }
+
+        public DateTime PublishDate { get; set; } = DateTime.Now; 
+    }
+}
 
 
 ================================================================================
@@ -1208,6 +1360,79 @@ namespace RestAPI.Service
 
 
 ================================================================================
+FILE: RestAPP\Service\AuditService.cs
+================================================================================
+using RestAPP.Context;
+using RestAPP.Interfaces;
+using RestAPP.Model;
+using Microsoft.EntityFrameworkCore;
+
+namespace RestAPP.Service
+{
+    public class AuditService : IAuditService
+    {
+        private readonly AuditContext _context;
+
+        public AuditService(AuditContext context)
+        {
+            _context = context;
+        }
+
+        public async Task LogAsync(int actorId, string actorType, string action, string entity, string? details = null)
+        {
+            var log = new ActivityLog
+            {
+                ActorId = actorId,
+                ActorType = actorType,
+                Action = action,
+                Entity = entity,
+                Details = details,
+                Timestamp = DateTime.UtcNow
+            };
+
+            _context.ActivityLogs.Add(log);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<ActivityLog>> GetAllLogsAsync()
+        {
+            return await _context.ActivityLogs
+                .OrderByDescending(l => l.Timestamp)
+                .ToListAsync();
+        }
+
+        public async Task<List<ActivityLog>> GetLogsByActorAsync(int actorId)
+        {
+            return await _context.ActivityLogs
+                .Where(l => l.ActorId == actorId)
+                .OrderByDescending(l => l.Timestamp)
+                .ToListAsync();
+        }
+
+        public async Task ClearAllAsync()
+        {
+            _context.ActivityLogs.RemoveRange(_context.ActivityLogs);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task TrimAsync(int keepLastCount = 1000)
+        {
+            var toDelete = await _context.ActivityLogs
+                .OrderByDescending(l => l.Timestamp)
+                .Skip(keepLastCount)
+                .ToListAsync();
+
+            if (toDelete.Any())
+            {
+                _context.ActivityLogs.RemoveRange(toDelete);
+                await _context.SaveChangesAsync();
+            }
+        }
+    }
+}
+
+
+================================================================================
 FILE: RestAPP\Service\BookingService.cs
 ================================================================================
 using Microsoft.EntityFrameworkCore;
@@ -1328,6 +1553,123 @@ namespace RestAPI.Service
             return await _Dishcontext.Dishes
                 .Where(d => d.Category == category)
                 .ToListAsync();
+        }
+    }
+}
+
+
+================================================================================
+FILE: RestAPP\Service\NewsService.cs
+================================================================================
+using HtmlAgilityPack;
+using Microsoft.EntityFrameworkCore;
+using RestAPI.Interfaces;
+using RestAPI.Models;
+using RestAPP.Context;
+using System.Net;
+
+namespace RestAPI.Service
+{
+    // 1. Весь код ДОЛЖЕН быть внутри класса
+    public class NewsService : INewsService
+    {
+        private readonly NewsContext _context;
+
+        // Конструктор класса
+        public NewsService(NewsContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<List<News>> GetAllNews()
+        {
+            await DeleteOldNews();
+            return await _context.News.OrderBy(n => n.PublishDate).ToListAsync();
+        }
+
+        public async Task ParseNewsFromSource()
+        {
+            // Новый URL
+            string url = "https://59.ru/text/tags/restoran/";
+
+            // Актуальные классы из вашего файла
+            string cardClass = "wrap_RL97A";
+            string titleClass = "header_RL97A";
+            string descClass = "subtitle_RL97A";
+
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36");
+
+            try
+            {
+                var html = await client.GetStringAsync(url);
+                var doc = new HtmlDocument();
+                doc.LoadHtml(html);
+
+                // 1. Ищем карточки новостей
+                var nodes = doc.DocumentNode.SelectNodes($"//div[contains(@class, '{cardClass}')]");
+
+                if (nodes == null) return;
+
+                foreach (var node in nodes)
+                {
+                    try
+                    {
+                        var titleNode = node.SelectSingleNode($".//a[contains(@class, '{titleClass}')]")
+                                     ?? node.SelectSingleNode(".//h2")
+                                     ?? node.SelectSingleNode(".//h3");
+
+                        var descNode = node.SelectSingleNode($".//*[contains(@class, '{descClass}')]")
+                                    ?? node.SelectSingleNode(".//p");
+
+                        var imgNode = node.SelectSingleNode(".//img");
+
+                        string title = WebUtility.HtmlDecode(titleNode?.InnerText?.Trim());
+                        string desc = WebUtility.HtmlDecode(descNode?.InnerText?.Trim());
+                        string img = imgNode?.GetAttributeValue("src", "");
+
+                        if (!string.IsNullOrEmpty(title))
+                        {
+                            if (!await _context.News.AnyAsync(n => n.Title == title))
+                            {
+                                _context.News.Add(new News
+                                {
+                                    Title = title,
+                                    Description = desc ?? "Новость из рубрики Рестораны",
+                                    ImageUrl = img,
+                                    PublishDate = DateTime.Now
+                                });
+                            }
+                        }
+                    }
+                    catch { continue; }
+                }
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при парсинге 59.ru: {ex.Message}");
+            }
+        }
+        public async Task DeleteNews(int id)
+        {
+            var item = await _context.News.FindAsync(id);
+            if (item != null)
+            {
+                _context.News.Remove(item);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task DeleteOldNews()
+        {
+            var limit = DateTime.Now.AddDays(-7);
+            var oldItems = _context.News.Where(n => n.PublishDate < limit);
+            if (await oldItems.AnyAsync())
+            {
+                _context.News.RemoveRange(oldItems);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

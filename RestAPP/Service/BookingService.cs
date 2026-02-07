@@ -10,17 +10,22 @@ namespace RestAPI.Service
     {
         private readonly BookingContext _Bookingcontext;
         private readonly UserContext _Usercontext;
+        private readonly AchievementContext _achievementContext; // Добавить поле
 
-        public BookingService(BookingContext Bookingcontext, UserContext Usercontext)
+        public BookingService(BookingContext Bookingcontext, UserContext Usercontext, AchievementContext achievementContext)
         {
             _Bookingcontext = Bookingcontext;
             _Usercontext = Usercontext;
+            _achievementContext = achievementContext;
         }
 
         public async Task CreateBooking(Booking booking)
         {
             _Bookingcontext.Bookings.Add(booking);
             await _Bookingcontext.SaveChangesAsync();
+
+            // --- ЛОГИКА АЧИВОК ---
+            await CheckAndAwardAchievements(booking.User_Id);
         }
 
         public async Task<Booking> GetBookingById(int userId, int restaurantId)
@@ -53,6 +58,36 @@ namespace RestAPI.Service
             return await _Bookingcontext.Bookings
                 .Where(b => b.User_Id == userId)
                 .ToListAsync();
+        }
+        private async Task CheckAndAwardAchievements(int userId)
+        {
+            // 1. Считаем количество бронирований пользователя
+            int count = await _Bookingcontext.Bookings.CountAsync(b => b.User_Id == userId);
+
+            // 2. Получаем все возможные ачивки
+            var allAchievements = await _achievementContext.Achievements.ToListAsync();
+
+            // 3. Проверяем каждую
+            foreach (var ach in allAchievements)
+            {
+                if (count >= ach.Threshold)
+                {
+                    // Проверяем, есть ли уже эта ачивка у юзера
+                    bool hasIt = await _achievementContext.UserAchievements
+                        .AnyAsync(ua => ua.UserId == userId && ua.AchievementId == ach.Id);
+
+                    if (!hasIt)
+                    {
+                        _achievementContext.UserAchievements.Add(new UserAchievement
+                        {
+                            UserId = userId,
+                            AchievementId = ach.Id,
+                            UnlockedAt = DateTime.UtcNow
+                        });
+                    }
+                }
+            }
+            await _achievementContext.SaveChangesAsync();
         }
     }
 }

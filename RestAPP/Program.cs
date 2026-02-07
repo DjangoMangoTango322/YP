@@ -32,6 +32,9 @@ builder.Services.AddDbContext<AuditContext>(options =>
 builder.Services.AddDbContext<NewsContext>(options =>
     options.UseSqlServer(DbConnection.config));
 
+builder.Services.AddDbContext<AchievementContext>(options =>
+    options.UseSqlServer(DbConnection.config));
+
 builder.Services.AddScoped<IAuditService, AuditService>();
 builder.Services.AddScoped<RestAPI.Interfaces.IAdministrator, RestAPI.Service.AdministratorService>();
 builder.Services.AddScoped<RestAPI.Interfaces.IBooking, RestAPI.Service.BookingService>();
