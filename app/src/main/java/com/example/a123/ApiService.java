@@ -5,6 +5,8 @@ import com.example.a123.DataModels.Dish;
 import com.example.a123.DataModels.Restaurant;
 import com.example.a123.DataModels.User;
 import com.example.a123.DataModels.News;
+import com.google.gson.JsonObject;
+
 import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -22,6 +24,13 @@ import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface ApiService {
+
+    // В файле ApiService.java добавьте:
+    @GET("api/AiKitchen/dishes")
+    Call<List<Dish>> getAllDishes();
+
+    @GET("api/AiKitchen/describe/{name}")
+    Call<JsonObject> getAiDescription(@Path("name") String dishName);
 
     // Регистрация
     @POST("api/UserController/AddUser")
