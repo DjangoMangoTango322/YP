@@ -70,7 +70,13 @@ public class RestaurantListActivity extends AppCompatActivity {
             intent.putExtra("userId", userIdPref);
             startActivity(intent);
         });
+        Button btnAi = findViewById(R.id.btnOpenAiKitchen);
 
+// Обработка нажатия
+        btnAi.setOnClickListener(v -> {
+            Intent intent = new Intent(RestaurantListActivity.this, AiDishListActivity.class);
+            startActivity(intent);
+        });
         loadRestaurants();
     }
 

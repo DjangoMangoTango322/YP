@@ -14,8 +14,6 @@
         android:gravity="center_vertical"
         android:background="@color/PrimaryColor">
 
-
-
         <ImageButton
             android:id="@+id/backButton"
             android:layout_width="48dp"
@@ -55,7 +53,6 @@
             android:padding="8dp"
             android:background="?android:attr/selectableItemBackgroundBorderless"
             app:tint="@color/white" />
-
     </LinearLayout>
 
     <ProgressBar
@@ -69,7 +66,20 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/restaurantRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:padding="8dp" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnOpenAiKitchen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Повар-ИИ: История блюд"
+        android:layout_margin="16dp"
+        android:textColor="@color/white"
+        app:cornerRadius="8dp"
+        android:background="@color/PrimaryColor"
+
+        app:icon="@android:drawable/ic_menu_info_details" />
 
 </LinearLayout>
