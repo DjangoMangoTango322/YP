@@ -38,6 +38,9 @@
         <activity android:name=".ProfileActivity" />
         <activity android:name=".EditProfileActivity" />
         <activity android:name=".AchievementsActivity"/>
+        <activity
+            android:name=".AiDishListActivity"
+            android:label="AI Кухня" />
     </application>
 
 </manifest>
