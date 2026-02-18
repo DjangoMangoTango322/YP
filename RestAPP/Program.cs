@@ -43,6 +43,7 @@ builder.Services.AddScoped<RestAPI.Interfaces.IRestaurant, RestAPI.Service.Resta
 builder.Services.AddScoped<RestAPI.Interfaces.IRestaurantDish, RestAPI.Service.RestaurantDishService>();
 builder.Services.AddScoped<RestAPI.Interfaces.IUser, RestAPI.Service.UserService>();
 builder.Services.AddScoped<INewsService, NewsService>();
+builder.Services.AddScoped<RestAPP.Services.GigaChatService>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
