@@ -10,25 +10,21 @@ namespace RestAPP.Controllers
     public class AiKitchenController : ControllerBase
     {
         private readonly GigaChatService _gigaChatService;
-        private readonly DishContext _context; // ЗАМЕНИЛИ RestaurantContext на DishContext
-
-        // В конструкторе также меняем тип контекста
+        private readonly DishContext _context; 
         public AiKitchenController(GigaChatService gigaChatService, DishContext context)
         {
             _gigaChatService = gigaChatService;
             _context = context;
         }
 
-        // Получить список всех блюд
+        
         [HttpGet("dishes")]
         public async Task<IActionResult> GetAllDishes()
         {
-            // Теперь _context.Dishes будет доступен, так как мы используем DishContext
             var dishes = await _context.Dishes.ToListAsync();
             return Ok(dishes);
         }
 
-        // Получить AI описание для конкретного блюда
         [HttpGet("describe/{dishName}")]
         public async Task<IActionResult> GetDescription(string dishName)
         {

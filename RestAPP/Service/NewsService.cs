@@ -7,12 +7,10 @@ using System.Net;
 
 namespace RestAPI.Service
 {
-    // 1. Весь код ДОЛЖЕН быть внутри класса
     public class NewsService : INewsService
     {
         private readonly NewsContext _context;
 
-        // Конструктор класса
         public NewsService(NewsContext context)
         {
             _context = context;
@@ -26,10 +24,8 @@ namespace RestAPI.Service
 
         public async Task ParseNewsFromSource()
         {
-            // Новый URL
             string url = "https://59.ru/text/tags/restoran/";
 
-            // Актуальные классы из вашего файла
             string cardClass = "wrap_RL97A";
             string titleClass = "header_RL97A";
             string descClass = "subtitle_RL97A";
@@ -43,7 +39,6 @@ namespace RestAPI.Service
                 var doc = new HtmlDocument();
                 doc.LoadHtml(html);
 
-                // 1. Ищем карточки новостей
                 var nodes = doc.DocumentNode.SelectNodes($"//div[contains(@class, '{cardClass}')]");
 
                 if (nodes == null) return;

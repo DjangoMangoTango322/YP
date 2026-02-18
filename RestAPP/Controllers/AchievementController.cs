@@ -33,7 +33,6 @@ namespace RestAPI.Controllers
             return Ok("Ачивки уже есть");
         }
 
-        // Для Android: получить ачивки конкретного пользователя
         [HttpGet("GetUserAchievements/{userId}")]
         public async Task<IActionResult> GetUserAchievements(int userId)
         {
@@ -50,7 +49,6 @@ namespace RestAPI.Controllers
             return Ok(list);
         }
 
-        // Для Desktop: получить все выданные ачивки (кто и что получил)
         [HttpGet("GetAllUserAchievements")]
         public async Task<IActionResult> GetAllUserAchievements()
         {

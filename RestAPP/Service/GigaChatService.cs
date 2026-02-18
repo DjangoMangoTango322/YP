@@ -13,13 +13,11 @@ namespace RestAPP.Services
 
         public async Task<string> GetDishDescriptionAsync(string dishName)
         {
-            // Игнорируем проверку SSL (для сертификатов МинЦифры в dev-режиме)
             var handler = new HttpClientHandler();
             handler.ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true;
 
             using (var client = new HttpClient(handler))
             {
-                // 1. Получаем Токен (Access Token)
                 var requestId = Guid.NewGuid().ToString();
                 client.DefaultRequestHeaders.Add("RqUID", requestId);
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", GIGACHAT_AUTH_KEY);
@@ -34,7 +32,6 @@ namespace RestAPP.Services
                 dynamic authData = JsonConvert.DeserializeObject(authString);
                 string accessToken = authData.access_token;
 
-                // 2. Делаем запрос к модели
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
                 var prompt = $"Расскажи кратко историю происхождения блюда '{dishName}' и перечисли его классический состав. Уложись в 3-4 предложения.";

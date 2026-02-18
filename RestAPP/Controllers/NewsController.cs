@@ -32,7 +32,6 @@ namespace RestAPI.Controllers
         [HttpDelete("DeleteNews/{id}")]
         public async Task<IActionResult> DeleteNews(int id)
         {
-            // Правильный вызов:
             await _newsService.DeleteNews(id);
             return Ok("Запись удалена");
         }

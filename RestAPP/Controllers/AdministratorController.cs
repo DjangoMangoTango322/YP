@@ -37,7 +37,7 @@ namespace RestAPI.Controllers
                 return Unauthorized("Неверный логин или пароль");
 
             var admin = await _administrator.GetAdminById(result);
-            return Ok(admin); // Возвращаем объект Administrator, как ожидает клиент
+            return Ok(admin); 
         }
 
         [HttpGet("GetAllAdmins")]

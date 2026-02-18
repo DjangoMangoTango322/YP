@@ -15,7 +15,6 @@ namespace RestAPP.Context
         {
             base.OnModelCreating(modelBuilder);
 
-            // Эта строка гарантирует, что EF пойдет в таблицу "News" в схеме "dbo"
             modelBuilder.Entity<News>().ToTable("News", "dbo");
         }
     }

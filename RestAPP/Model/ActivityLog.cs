@@ -7,18 +7,18 @@ namespace RestAPP.Model
         [Key]
         public int Id { get; set; }
 
-        public int ActorId { get; set; }                // ID пользователя или администратора
+        public int ActorId { get; set; }                
         [Required, StringLength(50)]
-        public string ActorType { get; set; }           // "User" или "Admin"
+        public string ActorType { get; set; }           
 
         [Required, StringLength(50)]
-        public string Action { get; set; }              // LOGIN, REGISTER, CREATE, UPDATE, DELETE, BOOKING и т.д.
+        public string Action { get; set; }              
 
         [Required, StringLength(50)]
-        public string Entity { get; set; }              // User, Booking, Restaurant, Dish, RestaurantDish, Auth и т.д.
+        public string Entity { get; set; }              
 
         [StringLength(1000)]
-        public string? Details { get; set; }            // дополнительная информация
+        public string? Details { get; set; }          
 
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
     }

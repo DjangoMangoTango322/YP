@@ -10,7 +10,7 @@ namespace RestAPI.Service
     {
         private readonly BookingContext _Bookingcontext;
         private readonly UserContext _Usercontext;
-        private readonly AchievementContext _achievementContext; // Добавить поле
+        private readonly AchievementContext _achievementContext;
 
         public BookingService(BookingContext Bookingcontext, UserContext Usercontext, AchievementContext achievementContext)
         {
@@ -24,7 +24,6 @@ namespace RestAPI.Service
             _Bookingcontext.Bookings.Add(booking);
             await _Bookingcontext.SaveChangesAsync();
 
-            // --- ЛОГИКА АЧИВОК ---
             await CheckAndAwardAchievements(booking.User_Id);
         }
 
@@ -61,18 +60,14 @@ namespace RestAPI.Service
         }
         private async Task CheckAndAwardAchievements(int userId)
         {
-            // 1. Считаем количество бронирований пользователя
             int count = await _Bookingcontext.Bookings.CountAsync(b => b.User_Id == userId);
 
-            // 2. Получаем все возможные ачивки
             var allAchievements = await _achievementContext.Achievements.ToListAsync();
 
-            // 3. Проверяем каждую
             foreach (var ach in allAchievements)
             {
                 if (count >= ach.Threshold)
                 {
-                    // Проверяем, есть ли уже эта ачивка у юзера
                     bool hasIt = await _achievementContext.UserAchievements
                         .AnyAsync(ua => ua.UserId == userId && ua.AchievementId == ach.Id);
 
